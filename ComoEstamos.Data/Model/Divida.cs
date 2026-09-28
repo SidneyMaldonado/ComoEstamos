@@ -41,8 +41,9 @@ namespace ComoEstamos.Data.Model
         [Precision(10, 2)]
         public decimal Valor { get; set; }
 
+        /// <summary>true = dívida (valor a pagar); false = crédito (valor a receber).</summary>
         [Column("dm_divida")]
-        public bool? EhDivida { get; set; } = true;
+        public bool EhDivida { get; set; } = true;
 
         [ForeignKey(nameof(IdUsuario))]
         public Usuario? Usuario { get; set; }
