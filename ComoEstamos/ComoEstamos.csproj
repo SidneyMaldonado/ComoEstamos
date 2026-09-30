@@ -84,6 +84,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ComoEstamos.Data\ComoEstamos.Data.csproj" />
+	  <ProjectReference Include="..\ComoEstamos.Core\ComoEstamos.Core.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -8,9 +8,12 @@ namespace ComoEstamos.Data.Repository
         Task<List<Historico>> ListarPorInvestimentoAsync(int idInvestimento, bool incluirInativos = false);
     }
 
-    public class HistoricoRepository(IDbContextFactory<AppDbContext> contextFactory)
-        : RepositoryBase<Historico>(contextFactory), IHistoricoRepository
+    public class HistoricoRepository : RepositoryBase<Historico>, IHistoricoRepository
     {
+        public HistoricoRepository(IDbContextFactory<AppDbContext> contextFactory) : base(contextFactory) { }
+
+        internal HistoricoRepository(AppDbContext contexto) : base(contexto) { }
+
         public Task<List<Historico>> ListarPorInvestimentoAsync(int idInvestimento, bool incluirInativos = false) =>
             ListarAsync(h => h.IdInvestimento == idInvestimento, incluirInativos, q => q.OrderByDescending(h => h.DataHistorico));
     }

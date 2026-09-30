@@ -9,9 +9,12 @@ namespace ComoEstamos.Data.Repository
         Task<List<Divida>> ListarPorUsuarioAsync(int idUsuario, bool incluirInativos = false);
     }
 
-    public class DividaRepository(IDbContextFactory<AppDbContext> contextFactory)
-        : RepositoryBase<Divida>(contextFactory), IDividaRepository
+    public class DividaRepository : RepositoryBase<Divida>, IDividaRepository
     {
+        public DividaRepository(IDbContextFactory<AppDbContext> contextFactory) : base(contextFactory) { }
+
+        internal DividaRepository(AppDbContext contexto) : base(contexto) { }
+
         public Task<List<Divida>> ListarPorUsuarioAsync(int idUsuario, bool incluirInativos = false) =>
             ListarAsync(d => d.IdUsuario == idUsuario, incluirInativos, q => q
                 .Include(d => d.Credor)

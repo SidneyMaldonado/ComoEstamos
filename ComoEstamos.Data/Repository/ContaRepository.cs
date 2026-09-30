@@ -10,9 +10,12 @@ namespace ComoEstamos.Data.Repository
         Task AtualizarSaldoAsync(int idConta, decimal novoSaldo);
     }
 
-    public class ContaRepository(IDbContextFactory<AppDbContext> contextFactory)
-        : RepositoryBase<Conta>(contextFactory), IContaRepository
+    public class ContaRepository : RepositoryBase<Conta>, IContaRepository
     {
+        public ContaRepository(IDbContextFactory<AppDbContext> contextFactory) : base(contextFactory) { }
+
+        internal ContaRepository(AppDbContext contexto) : base(contexto) { }
+
         public Task<List<Conta>> ListarPorUsuarioAsync(int idUsuario, bool incluirInativos = false) =>
             ListarAsync(c => c.IdUsuario == idUsuario, incluirInativos, q => q.OrderBy(c => c.Nome));
 
@@ -25,11 +28,11 @@ namespace ComoEstamos.Data.Repository
 
         public async Task AtualizarSaldoAsync(int idConta, decimal novoSaldo)
         {
-            await using var db = await ContextFactory.CreateDbContextAsync();
-            var conta = await db.Contas.FindAsync(idConta)
+            await using var ctx = await AbrirContextoAsync();
+            var conta = await ctx.Db.Contas.FindAsync(idConta)
                 ?? throw new KeyNotFoundException($"Conta {idConta} não encontrada.");
             conta.Saldo = novoSaldo;
-            await db.SaveChangesAsync();
+            await ctx.SalvarAsync();
         }
     }
 }
