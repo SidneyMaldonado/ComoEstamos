@@ -1,4 +1,5 @@
-﻿using ComoEstamos.Data;
+using ComoEstamos.Core;
+using ComoEstamos.Data;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 
@@ -18,14 +19,19 @@ namespace ComoEstamos
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            builder.Services.AddSingleton<SaldoDatabase>();
+            var caminhoBanco = Path.Combine(FileSystem.AppDataDirectory, "comoestamos.db3");
+            builder.Services.AddComoEstamosData(caminhoBanco);
+            builder.Services.AddComoEstamosCore();
+
             builder.Services.AddTransient<MainPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+            var app = builder.Build();
+            app.Services.AplicarMigrations();
+            return app;
         }
     }
 }
