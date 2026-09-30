@@ -1,3 +1,4 @@
+using ComoEstamos.Core;
 using ComoEstamos.Data;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
@@ -20,6 +21,7 @@ namespace ComoEstamos
 
             var caminhoBanco = Path.Combine(FileSystem.AppDataDirectory, "comoestamos.db3");
             builder.Services.AddComoEstamosData(caminhoBanco);
+            builder.Services.AddComoEstamosCore();
 
             builder.Services.AddTransient<MainPage>();
 

@@ -13,9 +13,12 @@ namespace ComoEstamos.Data.Repository
         Task RegistrarPagamentoAsync(int idParcela, DateTime dataPagamento);
     }
 
-    public class ParcelaRepository(IDbContextFactory<AppDbContext> contextFactory)
-        : RepositoryBase<Parcela>(contextFactory), IParcelaRepository
+    public class ParcelaRepository : RepositoryBase<Parcela>, IParcelaRepository
     {
+        public ParcelaRepository(IDbContextFactory<AppDbContext> contextFactory) : base(contextFactory) { }
+
+        internal ParcelaRepository(AppDbContext contexto) : base(contexto) { }
+
         public Task<List<Parcela>> ListarPorDividaAsync(int idDivida, bool incluirInativos = false) =>
             ListarAsync(p => p.IdDivida == idDivida, incluirInativos, q => q.OrderBy(p => p.DataVencimento));
 
@@ -33,11 +36,11 @@ namespace ComoEstamos.Data.Repository
 
         public async Task RegistrarPagamentoAsync(int idParcela, DateTime dataPagamento)
         {
-            await using var db = await ContextFactory.CreateDbContextAsync();
-            var parcela = await db.Parcelas.FindAsync(idParcela)
+            await using var ctx = await AbrirContextoAsync();
+            var parcela = await ctx.Db.Parcelas.FindAsync(idParcela)
                 ?? throw new KeyNotFoundException($"Parcela {idParcela} não encontrada.");
             parcela.DataPagamento = dataPagamento;
-            await db.SaveChangesAsync();
+            await ctx.SalvarAsync();
         }
     }
 }

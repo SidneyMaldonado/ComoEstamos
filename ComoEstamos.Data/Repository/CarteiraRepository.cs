@@ -8,9 +8,12 @@ namespace ComoEstamos.Data.Repository
         Task<List<Carteira>> ListarPorUsuarioAsync(int idUsuario, bool incluirInativos = false);
     }
 
-    public class CarteiraRepository(IDbContextFactory<AppDbContext> contextFactory)
-        : RepositoryBase<Carteira>(contextFactory), ICarteiraRepository
+    public class CarteiraRepository : RepositoryBase<Carteira>, ICarteiraRepository
     {
+        public CarteiraRepository(IDbContextFactory<AppDbContext> contextFactory) : base(contextFactory) { }
+
+        internal CarteiraRepository(AppDbContext contexto) : base(contexto) { }
+
         public Task<List<Carteira>> ListarPorUsuarioAsync(int idUsuario, bool incluirInativos = false) =>
             ListarAsync(c => c.IdUsuario == idUsuario, incluirInativos, q => q.OrderBy(c => c.Nome));
     }

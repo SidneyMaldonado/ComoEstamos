@@ -12,9 +12,12 @@ namespace ComoEstamos.Data.Repository
         Task AlterarSenhaAsync(int idUsuario, string novaSenha);
     }
 
-    public class UsuarioRepository(IDbContextFactory<AppDbContext> contextFactory)
-        : RepositoryBase<Usuario>(contextFactory), IUsuarioRepository
+    public class UsuarioRepository : RepositoryBase<Usuario>, IUsuarioRepository
     {
+        public UsuarioRepository(IDbContextFactory<AppDbContext> contextFactory) : base(contextFactory) { }
+
+        internal UsuarioRepository(AppDbContext contexto) : base(contexto) { }
+
         private const int Iteracoes = 100_000;
         private const int TamanhoSalt = 16;
         private const int TamanhoHash = 32;
@@ -22,8 +25,8 @@ namespace ComoEstamos.Data.Repository
         public async Task<Usuario?> ObterPorEmailAsync(string email)
         {
             var emailNormalizado = NormalizarEmail(email);
-            await using var db = await ContextFactory.CreateDbContextAsync();
-            return await db.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Email == emailNormalizado);
+            await using var ctx = await AbrirContextoAsync();
+            return await ctx.Db.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Email == emailNormalizado);
         }
 
         public Task<Usuario> CriarAsync(Usuario usuario, string senha)
@@ -43,11 +46,11 @@ namespace ComoEstamos.Data.Repository
 
         public async Task AlterarSenhaAsync(int idUsuario, string novaSenha)
         {
-            await using var db = await ContextFactory.CreateDbContextAsync();
-            var usuario = await db.Usuarios.FindAsync(idUsuario)
+            await using var ctx = await AbrirContextoAsync();
+            var usuario = await ctx.Db.Usuarios.FindAsync(idUsuario)
                 ?? throw new KeyNotFoundException($"Usuario {idUsuario} não encontrado.");
             usuario.SenhaHash = GerarHash(novaSenha);
-            await db.SaveChangesAsync();
+            await ctx.SalvarAsync();
         }
 
         private static string NormalizarEmail(string email) => email.Trim().ToLowerInvariant();

@@ -6,10 +6,12 @@ namespace ComoEstamos.Data
 {
     public static class ServiceCollectionExtensions
     {
-        /// <summary>Registra o AppDbContext (SQLite no caminho informado) e todos os repositórios.</summary>
+        /// <summary>Registra o AppDbContext (SQLite no caminho informado), a unidade de trabalho e todos os repositórios.</summary>
         public static IServiceCollection AddComoEstamosData(this IServiceCollection services, string caminhoBanco)
         {
             services.AddDbContextFactory<AppDbContext>(options => options.UseSqlite($"Data Source={caminhoBanco}"));
+
+            services.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>();
 
             services.AddSingleton<IUsuarioRepository, UsuarioRepository>();
             services.AddSingleton<ICarteiraRepository, CarteiraRepository>();

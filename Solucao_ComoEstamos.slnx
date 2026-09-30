@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="ComoEstamos.Core/ComoEstamos.Core.csproj" />
   <Project Path="ComoEstamos.Data/ComoEstamos.Data.csproj" />
+  <Project Path="ComoEstamos.Test/ComoEstamos.Test.csproj" Id="186668fe-4cf6-4306-ad87-626239d4dde5" />
   <Project Path="ComoEstamos/ComoEstamos.csproj" />
 </Solution>
