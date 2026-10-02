@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
              x:Class="ComoEstamos.Pages.ContasPage"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="#1A2E6E">
+             BackgroundColor="{StaticResource AzulFundo}">
 
     <Grid>
         <!-- Fundo azul com a imagem -->
@@ -13,16 +14,57 @@
                VerticalOptions="Fill" />
 
         <!-- Conteúdo da página -->
-        <VerticalStackLayout
-            VerticalOptions="Start"
-            Padding="20,50,20,20"
-            Spacing="16">
+        <Grid RowDefinitions="Auto,Auto,*"
+              Padding="20,50,20,20"
+              RowSpacing="16">
 
-           <BoxView HeightRequest="2"
-                     BackgroundColor="#FFD700"
-                     Margin="0,4,0,4" />
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <ImageButton Source="menu_icon.png"
+                             WidthRequest="40"
+                             HeightRequest="40"
+                             Padding="8"
+                             BackgroundColor="Transparent"
+                             VerticalOptions="Center"
+                             Clicked="Menu_Clicked"
+                             SemanticProperties.Description="Abrir menu" />
+                <Label Grid.Column="1"
+                       Text="Contas"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="32"
+                       TextColor="{StaticResource Dourado}"
+                       VerticalTextAlignment="Center" />
 
-        </VerticalStackLayout>
+                <!-- Botão de incluir: sinal de mais dourado sobre um círculo -->
+                <Border Grid.Column="2"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        VerticalOptions="Center"
+                        BackgroundColor="{StaticResource AzulEscuro}"
+                        Stroke="{StaticResource Dourado}"
+                        StrokeThickness="2"
+                        StrokeShape="Ellipse"
+                        SemanticProperties.Description="Incluir conta">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Incluir_Tapped" />
+                    </Border.GestureRecognizers>
+                    <Label Text="+"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="28"
+                           TextColor="{StaticResource Dourado}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Margin="0,-3,0,0" />
+                </Border>
+            </Grid>
+
+            <BoxView Grid.Row="1"
+                     HeightRequest="2"
+                     BackgroundColor="{StaticResource Dourado}" />
+
+            <controls:TabelaContas x:Name="Tabela"
+                                   Grid.Row="2"
+                                   ContaTocada="Tabela_ContaTocada" />
+        </Grid>
     </Grid>
 
 </ContentPage>

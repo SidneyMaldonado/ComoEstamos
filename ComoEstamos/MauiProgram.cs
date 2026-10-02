@@ -1,5 +1,7 @@
 using ComoEstamos.Core;
 using ComoEstamos.Data;
+using ComoEstamos.Pages;
+using ComoEstamos.Services;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 
@@ -23,7 +25,11 @@ namespace ComoEstamos
             builder.Services.AddComoEstamosData(caminhoBanco);
             builder.Services.AddComoEstamosCore();
 
+            builder.Services.AddSingleton<IUsuarioAtual, UsuarioAtual>();
+
             builder.Services.AddTransient<MainPage>();
+            builder.Services.AddTransient<ContasPage>();
+            builder.Services.AddTransient<ContaPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();
