@@ -1,15 +1,45 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
              x:Class="ComoEstamos.MainPage"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="#1A2E6E">
+             BackgroundColor="{StaticResource AzulFundo}">
 
     <Grid>
         <Image Source="fundo.png"
                Aspect="AspectFill"
                HorizontalOptions="Fill"
                VerticalOptions="Fill" />
+
+        <Grid RowDefinitions="Auto,Auto,*"
+              Padding="20,50,20,20"
+              RowSpacing="16">
+
+            <!-- Título -->
+            <HorizontalStackLayout Spacing="12">
+                <ImageButton Source="menu_icon.png"
+                             WidthRequest="40"
+                             HeightRequest="40"
+                             Padding="8"
+                             BackgroundColor="Transparent"
+                             VerticalOptions="Center"
+                             Clicked="Menu_Clicked"
+                             SemanticProperties.Description="Abrir menu" />
+                <Label Text="Como Estamos"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="32"
+                       TextColor="{StaticResource Dourado}"
+                       VerticalTextAlignment="Center" />
+            </HorizontalStackLayout>
+
+            <BoxView Grid.Row="1"
+                     HeightRequest="2"
+                     BackgroundColor="{StaticResource Dourado}" />
+
+            <!-- Tabela de contas -->
+            <controls:TabelaContas x:Name="Tabela" Grid.Row="2" />
+        </Grid>
     </Grid>
 
 </ContentPage>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
+             x:Class="ComoEstamos.Controls.TabelaContas"
+             x:Name="Raiz">
+
+    <Border x:DataType="controls:TabelaContas"
+            BindingContext="{x:Reference Raiz}"
+            VerticalOptions="Start"
+            BackgroundColor="{StaticResource FundoTabela}"
+            Stroke="{StaticResource DouradoSuave}"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 12"
+            Padding="0">
+
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+
+            <!-- Cabeçalho -->
+            <Grid ColumnDefinitions="*,Auto"
+                  Padding="16,12"
+                  BackgroundColor="{StaticResource AzulEscuro}">
+                <Label Text="Conta"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       TextColor="{StaticResource Dourado}" />
+                <Label Grid.Column="1"
+                       Text="Saldo"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       TextColor="{StaticResource Dourado}"
+                       HorizontalTextAlignment="End" />
+            </Grid>
+
+            <BoxView Grid.Row="1"
+                     HeightRequest="1"
+                     BackgroundColor="{StaticResource Dourado}" />
+
+            <!-- Linhas -->
+            <CollectionView Grid.Row="2"
+                            ItemsSource="{Binding Contas}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="controls:ContaLinha">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12"
+                              Padding="16,12"
+                              BackgroundColor="{Binding Fundo}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Linha_Tocada" />
+                            </Grid.GestureRecognizers>
+                            <Label Text="{Binding Nome}"
+                                   FontSize="15"
+                                   TextColor="{StaticResource TextoClaro}"
+                                   LineBreakMode="TailTruncation"
+                                   VerticalTextAlignment="Center" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding Saldo}"
+                                   FontSize="15"
+                                   TextColor="{Binding CorSaldo}"
+                                   HorizontalTextAlignment="End"
+                                   VerticalTextAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Sem contas -->
+            <Label Grid.Row="3"
+                   Text="Nenhuma conta cadastrada."
+                   IsVisible="{Binding SemContas}"
+                   FontSize="15"
+                   TextColor="{StaticResource TextoClaro}"
+                   Opacity="0.7"
+                   HorizontalTextAlignment="Center"
+                   Padding="16,20" />
+        </Grid>
+    </Border>
+
+</ContentView>

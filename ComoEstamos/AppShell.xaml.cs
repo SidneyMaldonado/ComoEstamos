@@ -1,4 +1,4 @@
-﻿using ComoEstamos.Pages;
+using ComoEstamos.Pages;
 
 namespace ComoEstamos
 {
@@ -7,7 +7,7 @@ namespace ComoEstamos
         public AppShell()
         {
             InitializeComponent();
-            Routing.RegisterRoute(nameof(ContasPage), typeof(ContasPage));
+            Routing.RegisterRoute(ContaPage.Rota, typeof(ContaPage));
         }
     }
 }

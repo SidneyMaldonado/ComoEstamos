@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ComoEstamos.Pages.ContaPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <ContentPage.Resources>
+        <Style x:Key="TituloCampo" TargetType="Label">
+            <Setter Property="FontFamily" Value="OpenSansSemibold" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="TextColor" Value="{StaticResource Dourado}" />
+        </Style>
+        <Style x:Key="Campo" TargetType="Entry">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="TextColor" Value="{StaticResource TextoClaro}" />
+            <Setter Property="PlaceholderColor" Value="#99F2F4FA" />
+            <Setter Property="BackgroundColor" Value="{StaticResource AzulEscuro}" />
+        </Style>
+        <Style x:Key="MensagemErro" TargetType="Label">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="TextColor" Value="{StaticResource TextoErro}" />
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <ScrollView>
+            <VerticalStackLayout Padding="20,50,20,20" Spacing="16">
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <Label x:Name="Titulo"
+                           Text="Incluir Conta"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="32"
+                           TextColor="{StaticResource Dourado}"
+                           VerticalTextAlignment="Center" />
+                    <!-- Botão de excluir: lixeira dourada sobre um círculo, como o "+" da lista -->
+                    <Border x:Name="BotaoExcluir"
+                            Grid.Column="1"
+                            WidthRequest="44"
+                            HeightRequest="44"
+                            VerticalOptions="Center"
+                            IsVisible="False"
+                            BackgroundColor="{StaticResource AzulEscuro}"
+                            Stroke="{StaticResource Dourado}"
+                            StrokeThickness="2"
+                            StrokeShape="Ellipse"
+                            SemanticProperties.Description="Excluir conta">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Excluir_Tapped" />
+                        </Border.GestureRecognizers>
+                        <Image Source="lixeira_icon.png"
+                               WidthRequest="22"
+                               HeightRequest="22" />
+                    </Border>
+                </Grid>
+
+                <BoxView HeightRequest="2" BackgroundColor="{StaticResource Dourado}" />
+
+                <!-- Formulário -->
+                <Border BackgroundColor="{StaticResource FundoTabela}"
+                        Stroke="{StaticResource DouradoSuave}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="16,20">
+                    <VerticalStackLayout Spacing="8">
+
+                        <Label Text="Nome da Conta" Style="{StaticResource TituloCampo}" />
+                        <Entry x:Name="CampoNome"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: Nubank"
+                               MaxLength="100"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroNome" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Saldo (R$)"
+                               Style="{StaticResource TituloCampo}"
+                               Margin="0,8,0,0" />
+                        <Entry x:Name="CampoSaldo"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 1.250,00"
+                               Keyboard="Numeric"
+                               ReturnType="Done" />
+                        <Label x:Name="ErroSaldo" Style="{StaticResource MensagemErro}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Botões -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Text="Cancelar"
+                            BackgroundColor="Transparent"
+                            BorderColor="{StaticResource Dourado}"
+                            BorderWidth="2"
+                            TextColor="{StaticResource Dourado}"
+                            FontFamily="OpenSansSemibold"
+                            CornerRadius="10"
+                            HeightRequest="48"
+                            Clicked="Cancelar_Clicked" />
+                    <Button x:Name="BotaoSalvar"
+                            Grid.Column="1"
+                            Text="Salvar"
+                            BackgroundColor="{StaticResource Dourado}"
+                            TextColor="{StaticResource AzulEscuro}"
+                            FontFamily="OpenSansSemibold"
+                            CornerRadius="10"
+                            HeightRequest="48"
+                            Clicked="Salvar_Clicked" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

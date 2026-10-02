@@ -4,11 +4,41 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:ComoEstamos"
+    xmlns:pages="clr-namespace:ComoEstamos.Pages"
     Shell.BackgroundColor="#1A2E6E"
+    Shell.FlyoutBehavior="Flyout"
+    FlyoutBackgroundColor="{StaticResource AzulEscuro}"
     Title="ComoEstamos">
 
-    <ShellContent
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <Shell.FlyoutHeader>
+        <VerticalStackLayout Padding="20,40,20,16" Spacing="12">
+            <Label Text="Como Estamos"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="24"
+                   TextColor="{StaticResource Dourado}" />
+            <BoxView HeightRequest="2" BackgroundColor="{StaticResource Dourado}" />
+        </VerticalStackLayout>
+    </Shell.FlyoutHeader>
+
+    <Shell.ItemTemplate>
+        <DataTemplate x:DataType="BaseShellItem">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" Padding="20,14">
+                <Image Source="{Binding FlyoutIcon}" WidthRequest="24" HeightRequest="24" />
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       FontSize="17"
+                       TextColor="{StaticResource TextoClaro}"
+                       VerticalTextAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <FlyoutItem Title="Início" Icon="inicio_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate local:MainPage}" Route="MainPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Contas" Icon="contas_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate pages:ContasPage}" Route="contas" />
+    </FlyoutItem>
 
 </Shell>

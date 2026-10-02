@@ -13,7 +13,7 @@ ComoEstamos.Test  ──►  Core e Data
 |---|---|---|
 | `ComoEstamos.Data` | EF Core + SQLite, entidades (`Model/`), migrations, repositórios, `UnitOfWork` | Conter regra de negócio que envolva mais de uma entidade; referenciar Core ou MAUI |
 | `ComoEstamos.Core` | Casos de uso (`UseCases/`), regras de negócio, `RegraDeNegocioException` | Usar `AppDbContext` ou `DbSet` diretamente; referenciar MAUI |
-| `ComoEstamos` (MAUI) | Telas, navegação, injeção de dependência (`MauiProgram`) | Orquestrar vários repositórios; nesse caso, chamar um caso de uso |
+| `ComoEstamos` (MAUI) | Telas, navegação, injeção de dependência (`MauiProgram`), usuário atual. Ver [05-Telas.md](05-Telas.md) | Orquestrar vários repositórios; nesse caso, chamar um caso de uso |
 | `ComoEstamos.Test` | Testes de repositórios, da UnitOfWork e dos casos de uso | — |
 
 ## Quem a tela chama
