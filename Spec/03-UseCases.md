@@ -4,12 +4,9 @@ Ficam em `ComoEstamos.Core/UseCases/`, um arquivo por caso de uso.
 
 ## Quando criar
 
-Crie um caso de uso quando a operação:
-
-- altera **mais de um repositório** (precisa de atomicidade), ou
-- tem **regra de negócio** que não é só persistência (cálculo, validação entre entidades).
-
-CRUD simples de uma entidade continua indo direto ao repositório.
+Toda operação chamada por uma tela tem um caso de uso, inclusive o CRUD simples
+(decisão de 07/10/2026). O CRUD de cada entidade tem 5 casos de uso padrão, descritos em
+[07-Crud.md](07-Crud.md), em `UseCases/<Entidades>/`. Os casos de uso abaixo são os que vão além do CRUD.
 
 ## Convenções
 
@@ -18,8 +15,10 @@ CRUD simples de uma entidade continua indo direto ao repositório.
 - Recebe `IUnitOfWorkFactory` no construtor e usa **uma** unidade de trabalho por execução
   (ver [02-UnitOfWork.md](02-UnitOfWork.md)).
 - Ordem: **validar tudo → alterar → `ConfirmarAsync()`**. Nenhuma alteração antes da última validação.
+- Consultas (buscar) também abrem a unidade de trabalho, mas não chamam `ConfirmarAsync`.
 - Erros:
   - `RegraDeNegocioException`: operação recusada por regra. A mensagem é mostrada ao usuário.
+  - `ValidacaoException` (herda da anterior): campos fora do domínio, com a lista de erros por campo.
   - `KeyNotFoundException`: o Id principal recebido não existe (mesmo padrão dos repositórios).
 - Registro em `ComoEstamos.Core/ServiceCollectionExtensions.cs` (`AddComoEstamosCore`), como singleton.
 - Testes em `ComoEstamos.Test/UseCaseTests/<Nome>Tests.cs` (ver [04-Testes.md](04-Testes.md)).

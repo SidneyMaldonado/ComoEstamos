@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using ComoEstamos.Data.Model;
 using ComoEstamos.Data.Repository;
 
-namespace ComoEstamos.Services
+namespace ComoEstamos.Core.Services
 {
     /// <summary>
     /// Usuário dono dos dados exibidos nas telas. Enquanto não há login, é um usuário

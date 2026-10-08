@@ -12,6 +12,7 @@ implementação exigir uma decisão diferente, atualize o documento no mesmo com
 | [04-Testes.md](04-Testes.md) | Como testar repositórios e casos de uso |
 | [05-Telas.md](05-Telas.md) | Telas MAUI: navegação, usuário atual, padrão de CRUD e cores |
 | [06-Pendencias.md](06-Pendencias.md) | O que falta fazer ou decidir na próxima etapa |
+| [07-Crud.md](07-Crud.md) | Estrutura de todo CRUD: página → service → 5 casos de uso → repositório, validação de domínio, 4 páginas e testes |
 
 ## Glossário
 

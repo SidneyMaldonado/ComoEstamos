@@ -182,5 +182,35 @@ namespace ComoEstamos.Test.RepositoryTests
 
             Assert.IsEmpty(await _repository.ListarPorUsuarioAsync(usuario.Id));
         }
+
+        [TestMethod]
+        public async Task ExisteAtivaPorContaCategoriaECredor_ConsideramSoDividasAtivas()
+        {
+            var usuario = await CriarUsuarioAsync();
+            var conta = new Conta { IdUsuario = usuario.Id, Nome = "Corrente" };
+            var outraConta = new Conta { IdUsuario = usuario.Id, Nome = "Poupança" };
+            var categoria = new Categoria { IdUsuario = usuario.Id, Nome = "Moradia" };
+            var credor = new Credor { IdUsuario = usuario.Id, Nome = "Banco" };
+            await SemearAsync(conta, outraConta, categoria, credor);
+            var ativa = NovaDivida(usuario.Id);
+            ativa.IdConta = conta.Id;
+            ativa.IdCategoria = categoria.Id;
+            ativa.IdCredor = credor.Id;
+            var inativa = NovaDivida(usuario.Id);
+            inativa.IdConta = outraConta.Id;
+            inativa.Ativo = false;
+            await SemearAsync(ativa, inativa);
+
+            Assert.IsTrue(await _repository.ExisteAtivaPorContaAsync(conta.Id));
+            Assert.IsTrue(await _repository.ExisteAtivaPorCategoriaAsync(categoria.Id));
+            Assert.IsTrue(await _repository.ExisteAtivaPorCredorAsync(credor.Id));
+            Assert.IsFalse(await _repository.ExisteAtivaPorContaAsync(outraConta.Id));
+        }
+
+        [TestMethod]
+        public async Task ExisteAtivaPorCredorAsync_RetornaFalsoSemDividas()
+        {
+            Assert.IsFalse(await _repository.ExisteAtivaPorCredorAsync(1));
+        }
     }
 }

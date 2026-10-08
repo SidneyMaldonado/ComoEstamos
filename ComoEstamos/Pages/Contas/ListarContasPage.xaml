@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
+             x:Class="ComoEstamos.Pages.Contas.ListarContasPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <Grid RowDefinitions="Auto,Auto,*" Style="{StaticResource Conteudo}">
+
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <ImageButton Style="{StaticResource BotaoMenu}" Clicked="Menu_Clicked" />
+                <Label Grid.Column="1"
+                       Text="Contas"
+                       Style="{StaticResource TituloPagina}" />
+                <Border Grid.Column="2"
+                        Style="{StaticResource BotaoCirculo}"
+                        SemanticProperties.Description="Incluir conta">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Incluir_Tapped" />
+                    </Border.GestureRecognizers>
+                    <Label Style="{StaticResource SinalMais}" />
+                </Border>
+            </Grid>
+
+            <BoxView Grid.Row="1" Style="{StaticResource LinhaTitulo}" />
+
+            <controls:TabelaRegistros x:Name="Tabela"
+                                   Grid.Row="2"
+                                   TituloTexto="Conta"
+                                   TituloValor="Saldo"
+                                   MensagemVazia="Nenhuma conta cadastrada."
+                                   LinhaTocada="Tabela_LinhaTocada" />
+        </Grid>
+    </Grid>
+
+</ContentPage>

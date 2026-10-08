@@ -11,6 +11,9 @@ namespace ComoEstamos.Data.Repository
         Task<List<Parcela>> ListarPendentesAsync(int idUsuario, DateTime vencimentoAte);
 
         Task RegistrarPagamentoAsync(int idParcela, DateTime dataPagamento);
+
+        Task<bool> ExisteAtivaPorContaAsync(int idConta);
+        Task<bool> ExisteAtivaPorCategoriaAsync(int idCategoria);
     }
 
     public class ParcelaRepository : RepositoryBase<Parcela>, IParcelaRepository
@@ -42,5 +45,9 @@ namespace ComoEstamos.Data.Repository
             parcela.DataPagamento = dataPagamento;
             await ctx.SalvarAsync();
         }
+
+        public Task<bool> ExisteAtivaPorContaAsync(int idConta) => ExisteAtivoAsync(p => p.IdConta == idConta);
+
+        public Task<bool> ExisteAtivaPorCategoriaAsync(int idCategoria) => ExisteAtivoAsync(p => p.IdCategoria == idCategoria);
     }
 }

@@ -2,10 +2,10 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:ComoEstamos.Controls"
-             x:Class="ComoEstamos.Controls.TabelaContas"
+             x:Class="ComoEstamos.Controls.TabelaRegistros"
              x:Name="Raiz">
 
-    <Border x:DataType="controls:TabelaContas"
+    <Border x:DataType="controls:TabelaRegistros"
             BindingContext="{x:Reference Raiz}"
             VerticalOptions="Start"
             BackgroundColor="{StaticResource FundoTabela}"
@@ -20,12 +20,13 @@
             <Grid ColumnDefinitions="*,Auto"
                   Padding="16,12"
                   BackgroundColor="{StaticResource AzulEscuro}">
-                <Label Text="Conta"
+                <Label Text="{Binding TituloTexto}"
                        FontFamily="OpenSansSemibold"
                        FontSize="15"
                        TextColor="{StaticResource Dourado}" />
                 <Label Grid.Column="1"
-                       Text="Saldo"
+                       Text="{Binding TituloValor}"
+                       IsVisible="{Binding TemColunaValor}"
                        FontFamily="OpenSansSemibold"
                        FontSize="15"
                        TextColor="{StaticResource Dourado}"
@@ -38,10 +39,10 @@
 
             <!-- Linhas -->
             <CollectionView Grid.Row="2"
-                            ItemsSource="{Binding Contas}"
+                            ItemsSource="{Binding Linhas}"
                             SelectionMode="None">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="controls:ContaLinha">
+                    <DataTemplate x:DataType="controls:LinhaTabela">
                         <Grid ColumnDefinitions="*,Auto"
                               ColumnSpacing="12"
                               Padding="16,12"
@@ -49,15 +50,23 @@
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="Linha_Tocada" />
                             </Grid.GestureRecognizers>
-                            <Label Text="{Binding Nome}"
-                                   FontSize="15"
-                                   TextColor="{StaticResource TextoClaro}"
-                                   LineBreakMode="TailTruncation"
-                                   VerticalTextAlignment="Center" />
+                            <VerticalStackLayout VerticalOptions="Center">
+                                <Label Text="{Binding Texto}"
+                                       FontSize="15"
+                                       TextColor="{StaticResource TextoClaro}"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding Detalhe}"
+                                       IsVisible="{Binding TemDetalhe}"
+                                       FontSize="12"
+                                       TextColor="{StaticResource TextoClaro}"
+                                       Opacity="0.7"
+                                       LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
                             <Label Grid.Column="1"
-                                   Text="{Binding Saldo}"
+                                   Text="{Binding Valor}"
+                                   IsVisible="{Binding TemValor}"
                                    FontSize="15"
-                                   TextColor="{Binding CorSaldo}"
+                                   TextColor="{Binding CorValor}"
                                    HorizontalTextAlignment="End"
                                    VerticalTextAlignment="Center" />
                         </Grid>
@@ -65,10 +74,10 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <!-- Sem contas -->
+            <!-- Lista vazia -->
             <Label Grid.Row="3"
-                   Text="Nenhuma conta cadastrada."
-                   IsVisible="{Binding SemContas}"
+                   Text="{Binding MensagemVazia}"
+                   IsVisible="{Binding Vazia}"
                    FontSize="15"
                    TextColor="{StaticResource TextoClaro}"
                    Opacity="0.7"

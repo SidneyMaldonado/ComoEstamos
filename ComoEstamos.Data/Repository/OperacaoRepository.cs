@@ -6,6 +6,8 @@ namespace ComoEstamos.Data.Repository
     public interface IOperacaoRepository : IRepository<Operacao>
     {
         Task<List<Operacao>> ListarPorInvestimentoAsync(int idInvestimento, bool incluirInativos = false);
+
+        Task<bool> ExisteAtivaPorInvestimentoAsync(int idInvestimento);
     }
 
     public class OperacaoRepository : RepositoryBase<Operacao>, IOperacaoRepository
@@ -16,5 +18,8 @@ namespace ComoEstamos.Data.Repository
 
         public Task<List<Operacao>> ListarPorInvestimentoAsync(int idInvestimento, bool incluirInativos = false) =>
             ListarAsync(o => o.IdInvestimento == idInvestimento, incluirInativos, q => q.OrderByDescending(o => o.DataOperacao));
+
+        public Task<bool> ExisteAtivaPorInvestimentoAsync(int idInvestimento) =>
+            ExisteAtivoAsync(o => o.IdInvestimento == idInvestimento);
     }
 }

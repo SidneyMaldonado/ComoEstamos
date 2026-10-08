@@ -38,7 +38,11 @@
                      BackgroundColor="{StaticResource Dourado}" />
 
             <!-- Tabela de contas -->
-            <controls:TabelaContas x:Name="Tabela" Grid.Row="2" />
+            <controls:TabelaRegistros x:Name="Tabela"
+                                   Grid.Row="2"
+                                   TituloTexto="Conta"
+                                   TituloValor="Saldo"
+                                   MensagemVazia="Nenhuma conta cadastrada." />
         </Grid>
     </Grid>
 

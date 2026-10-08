@@ -118,5 +118,41 @@ namespace ComoEstamos.Test.RepositoryTests
 
             Assert.IsEmpty(await _repository.ListarPorCarteiraAsync(_carteira.Id));
         }
+
+        [TestMethod]
+        public async Task ListarPorUsuarioAsync_RetornaInvestimentosDasCarteirasDoUsuarioComCarteira()
+        {
+            var renda = new Carteira { IdUsuario = _usuario.Id, Nome = "Renda Fixa" };
+            var outroUsuario = await CriarUsuarioAsync("outro@teste.com");
+            var alheia = new Carteira { IdUsuario = outroUsuario.Id, Nome = "Alheia" };
+            await SemearAsync(renda, alheia);
+            var inativo = NovoInvestimento("OIBR3");
+            inativo.Ativo = false;
+            await SemearAsync(
+                NovoInvestimento("VALE3"),
+                NovoInvestimento("CDB", renda.Id),
+                NovoInvestimento("PETR4"),
+                NovoInvestimento("BBAS3", alheia.Id),
+                inativo);
+
+            var lista = await _repository.ListarPorUsuarioAsync(_usuario.Id);
+
+            // Por carteira (Ações, Renda Fixa) e, dentro dela, por nome.
+            CollectionAssert.AreEqual(new[] { "PETR4", "VALE3", "CDB" }, lista.Select(i => i.Nome).ToArray());
+            Assert.AreEqual("Renda Fixa", lista[2].Carteira?.Nome);
+        }
+
+        [TestMethod]
+        public async Task ExisteAtivoPorCarteiraAsync_ConsideraSoInvestimentosAtivos()
+        {
+            var vazia = new Carteira { IdUsuario = _usuario.Id, Nome = "Vazia" };
+            await SemearAsync(vazia);
+            var inativo = NovoInvestimento("OIBR3", vazia.Id);
+            inativo.Ativo = false;
+            await SemearAsync(NovoInvestimento("PETR4"), inativo);
+
+            Assert.IsTrue(await _repository.ExisteAtivoPorCarteiraAsync(_carteira.Id));
+            Assert.IsFalse(await _repository.ExisteAtivoPorCarteiraAsync(vazia.Id));
+        }
     }
 }

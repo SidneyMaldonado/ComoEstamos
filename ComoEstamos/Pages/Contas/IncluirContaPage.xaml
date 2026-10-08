@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ComoEstamos.Pages.Contas.IncluirContaPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource ConteudoFormulario}">
+
+                <Label Text="Incluir Conta" Style="{StaticResource TituloPagina}" />
+
+                <BoxView Style="{StaticResource LinhaTitulo}" />
+
+                <Border Style="{StaticResource Cartao}">
+                    <VerticalStackLayout Spacing="8">
+
+                        <Label Text="Nome da Conta" Style="{StaticResource TituloCampo}" />
+                        <Entry x:Name="CampoNome"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: Nubank"
+                               MaxLength="100"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroNome" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Saldo (R$)" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoSaldo"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 1.250,00"
+                               Keyboard="Numeric"
+                               ReturnType="Done" />
+                        <Label x:Name="ErroSaldo" Style="{StaticResource MensagemErro}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Text="Cancelar"
+                            Style="{StaticResource BotaoSecundario}"
+                            Clicked="Cancelar_Clicked" />
+                    <Button x:Name="BotaoSalvar"
+                            Grid.Column="1"
+                            Text="Salvar"
+                            Style="{StaticResource BotaoPrincipal}"
+                            Clicked="Salvar_Clicked" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>
