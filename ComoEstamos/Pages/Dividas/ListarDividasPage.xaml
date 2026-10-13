@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
+             x:Class="ComoEstamos.Pages.Dividas.ListarDividasPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <Grid RowDefinitions="Auto,Auto,Auto,*" Style="{StaticResource Conteudo}">
+
+            <!-- Atalho: arrastar o dedo para baixo volta para a tela inicial (o contrário do atalho da MainPage).
+                 As linhas da tabela continuam rolando. -->
+            <Grid.GestureRecognizers>
+                <SwipeGestureRecognizer Direction="Down" Swiped="ArrastarParaBaixo_Swiped" />
+            </Grid.GestureRecognizers>
+
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <ImageButton Style="{StaticResource BotaoMenu}" Clicked="Menu_Clicked" />
+                <Label Grid.Column="1"
+                       Text="Dívidas"
+                       Style="{StaticResource TituloPagina}" />
+                <Border Grid.Column="2"
+                        Style="{StaticResource BotaoCirculo}"
+                        SemanticProperties.Description="Incluir dívida">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Incluir_Tapped" />
+                    </Border.GestureRecognizers>
+                    <Label Style="{StaticResource SinalMais}" />
+                </Border>
+            </Grid>
+
+            <BoxView Grid.Row="1" Style="{StaticResource LinhaTitulo}" />
+
+            <!-- Filtros: nome, mês de vencimento e ocultar pagas -->
+            <Border Grid.Row="2" Style="{StaticResource Cartao}" Padding="12">
+                <VerticalStackLayout Spacing="8">
+
+                    <Entry x:Name="CampoNome"
+                           Style="{StaticResource Campo}"
+                           Placeholder="Buscar pelo nome"
+                           ClearButtonVisibility="WhileEditing"
+                           ReturnType="Search"
+                           TextChanged="Filtro_Alterado" />
+
+                    <!-- Mês de vencimento: ‹ outubro/2026 › e ✕ para voltar a "Todos os meses" -->
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+                        <Button Text="‹"
+                                Style="{StaticResource BotaoSecundario}"
+                                WidthRequest="48"
+                                Padding="0"
+                                FontSize="22"
+                                SemanticProperties.Description="Mês anterior"
+                                Clicked="MesAnterior_Clicked" />
+                        <Label x:Name="TextoMes"
+                               Grid.Column="1"
+                               FontSize="16"
+                               TextColor="{StaticResource TextoClaro}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Mes_Tapped" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Button Grid.Column="2"
+                                Text="›"
+                                Style="{StaticResource BotaoSecundario}"
+                                WidthRequest="48"
+                                Padding="0"
+                                FontSize="22"
+                                SemanticProperties.Description="Próximo mês"
+                                Clicked="ProximoMes_Clicked" />
+                        <Button x:Name="BotaoTodosMeses"
+                                Grid.Column="3"
+                                Text="✕"
+                                Style="{StaticResource BotaoSecundario}"
+                                WidthRequest="48"
+                                Padding="0"
+                                SemanticProperties.Description="Mostrar todos os meses"
+                                Clicked="TodosMeses_Clicked" />
+                    </Grid>
+
+                    <HorizontalStackLayout Spacing="4">
+                        <CheckBox x:Name="CaixaOcultarPagas"
+                                  Style="{StaticResource CaixaMarcar}"
+                                  IsChecked="True"
+                                  CheckedChanged="OcultarPagas_Alterado" />
+                        <Label Text="Ocultar dívidas pagas"
+                               FontSize="15"
+                               TextColor="{StaticResource TextoClaro}"
+                               VerticalTextAlignment="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OcultarPagas_Tapped" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <controls:TabelaRegistros x:Name="Tabela"
+                                   Grid.Row="3"
+                                   TituloTexto="Dívida"
+                                   TituloValor="Valor Total"
+                                   LinhaTocada="Tabela_LinhaTocada" />
+        </Grid>
+    </Grid>
+
+</ContentPage>

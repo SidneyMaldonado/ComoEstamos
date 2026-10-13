@@ -4,6 +4,7 @@ using ComoEstamos.Pages.Carteiras;
 using ComoEstamos.Pages.Categorias;
 using ComoEstamos.Pages.Contas;
 using ComoEstamos.Pages.Credores;
+using ComoEstamos.Pages.Dividas;
 using ComoEstamos.Pages.Investimentos;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
@@ -56,6 +57,12 @@ namespace ComoEstamos
             builder.Services.AddTransient<VisualizarInvestimentoPage>();
             builder.Services.AddTransient<IncluirInvestimentoPage>();
             builder.Services.AddTransient<AlterarInvestimentoPage>();
+
+            // Dívidas: listar (consulta com filtros), visualizar, incluir e alterar; excluir é pela visualizar.
+            builder.Services.AddTransient<ListarDividasPage>();
+            builder.Services.AddTransient<VisualizarDividaPage>();
+            builder.Services.AddTransient<IncluirDividaPage>();
+            builder.Services.AddTransient<AlterarDividaPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

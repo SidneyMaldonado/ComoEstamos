@@ -63,5 +63,12 @@ namespace ComoEstamos
         }
 
         private void Menu_Clicked(object? sender, EventArgs e) => Shell.Current.FlyoutIsPresented = true;
+
+        private async void ArrastarParaCima_Swiped(object? sender, SwipedEventArgs e) => await AbrirDividasAsync();
+
+        private async void Dividas_Tapped(object? sender, TappedEventArgs e) => await AbrirDividasAsync();
+
+        /// <summary>Abre a lista de dívidas como o item "Dívidas" do menu (rota absoluta do Shell).</summary>
+        private static Task AbrirDividasAsync() => Shell.Current.GoToAsync("//dividas");
     }
 }

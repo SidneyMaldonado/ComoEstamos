@@ -1,0 +1,91 @@
+using ComoEstamos.Controls;
+using ComoEstamos.Core.Formatacao;
+using ComoEstamos.Core.Services;
+using ComoEstamos.Data.Model;
+
+namespace ComoEstamos.Pages.Dividas
+{
+    /// <summary>
+    /// Visualização da dívida, só de leitura: os dados em cima e a lista das parcelas embaixo.
+    /// O lápis abre a alteração; a lixeira pede confirmação e exclui a dívida e as parcelas.
+    /// </summary>
+    public partial class VisualizarDividaPage : ContentPage, IQueryAttributable
+    {
+        public const string Rota = "visualizar-divida";
+
+        private readonly IDividaService dividaService;
+
+        private int idDivida;
+        private Divida? divida;
+
+        public VisualizarDividaPage(IDividaService dividaService)
+        {
+            this.dividaService = dividaService;
+            InitializeComponent();
+        }
+
+        public void ApplyQueryAttributes(IDictionary<string, object> query) => idDivida = Formulario.LerId(query);
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            divida = await dividaService.BuscarPorIdAsync(idDivida);
+            if (divida is null)
+            {
+                await Formulario.AvisarNaoEncontradoAsync(this, "Dívida não encontrada", "A dívida não existe mais ou foi excluída.");
+                return;
+            }
+
+            var parcelas = divida.Parcelas;
+            var pagas = parcelas.Count(p => p.DataPagamento is not null);
+
+            ValorNome.Text = divida.Nome;
+            ValorCredor.Text = divida.Credor?.Nome ?? "—";
+            ValorConta.Text = divida.Conta?.Nome ?? "—";
+            ValorCategoria.Text = divida.Categoria?.Nome ?? "—";
+            ValorTotal.Text = FormatoBr.Moeda(divida.Valor);
+            // Valor da próxima parcela em aberto: depois de uma alteração, pode ser diferente do das pagas.
+            var referencia = parcelas.FirstOrDefault(p => p.DataPagamento is null) ?? parcelas.FirstOrDefault();
+            ValorParcelas.Text = $"{divida.NumeroParcelas}x de {FormatoBr.Moeda(referencia?.Valor ?? divida.Valor)}";
+            ValorSituacao.Text = parcelas.Count > 0 && pagas == parcelas.Count ? "Paga" : $"{pagas} de {parcelas.Count} pagas";
+            ValorDiaVencimento.Text = divida.DiaVencimento.ToString(FormatoBr.Cultura);
+            ValorPrimeiroVencimento.Text = FormatoBr.Data(divida.DataPrimeiroVencimento);
+            ValorDataCriacao.Text = FormatoBr.DataHora(divida.DataCriacao);
+            ValorDataAlteracao.Text = FormatoBr.DataHora(divida.DataAlteracao);
+
+            var numeradas = parcelas.Select((p, i) => (parcela: p, numero: i + 1)).ToList();
+            TabelaParcelas.Linhas = LinhaTabela.Montar(
+                numeradas,
+                n => n.parcela.Id,
+                n => $"{n.numero}/{parcelas.Count} · {FormatoBr.Data(n.parcela.DataVencimento)}",
+                n => Situacao(n.parcela),
+                n => n.parcela.Valor);
+        }
+
+        /// <summary>"Paga em 05/10/2026", "Vencida" ou "Em aberto".</summary>
+        private static string Situacao(Parcela parcela) =>
+            parcela.DataPagamento is DateTime pagamento ? $"Paga em {FormatoBr.Data(pagamento)}"
+            : parcela.DataVencimento.Date < DateTime.Today ? "Vencida"
+            : "Em aberto";
+
+        private async void Alterar_Tapped(object? sender, TappedEventArgs e)
+        {
+            if (divida is not null)
+                await Shell.Current.GoToAsync($"{AlterarDividaPage.Rota}?id={divida.Id}");
+        }
+
+        private async void Excluir_Tapped(object? sender, TappedEventArgs e)
+        {
+            if (divida is null)
+                return;
+
+            var id = divida.Id;
+            var pergunta = $"Confirma a exclusão da dívida \"{divida.Nome}\" e de todas as parcelas?";
+            if (divida.Parcelas.Any(p => p.DataPagamento is not null))
+                pergunta += " Os pagamentos já feitos continuam descontados do saldo da conta.";
+            await Formulario.ConfirmarEExcluirAsync(this, "Excluir dívida", pergunta, () => dividaService.ExcluirAsync(id));
+        }
+
+        private async void Voltar_Clicked(object? sender, EventArgs e) => await Formulario.VoltarAsync();
+    }
+}

@@ -1,3 +1,4 @@
+using System.Globalization;
 using ComoEstamos.Core.Formatacao;
 using ComoEstamos.Core.Validacao;
 
@@ -42,6 +43,27 @@ namespace ComoEstamos.Pages
             if (!FormatoBr.TentarLerDecimal(campo.Text, out valor))
             {
                 MostrarErro(erro, $"Valor inválido. Use o formato {exemplo}.");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Lê o número inteiro digitado no campo. Se estiver vazio ou não for um inteiro, mostra a
+        /// mensagem abaixo dele e devolve <c>false</c>. A faixa é validada no caso de uso.
+        /// </summary>
+        /// <param name="rotulo">Nome do campo com artigo, em minúsculas ("o número de parcelas").</param>
+        public static bool TentarLerInteiro(Entry campo, Label erro, string rotulo, out int valor)
+        {
+            if (string.IsNullOrWhiteSpace(campo.Text))
+            {
+                MostrarErro(erro, $"Informe {rotulo}.");
+                valor = 0;
+                return false;
+            }
+            if (!int.TryParse(campo.Text.Trim(), NumberStyles.None, FormatoBr.Cultura, out valor))
+            {
+                MostrarErro(erro, "Valor inválido. Use só números, sem vírgula.");
                 return false;
             }
             return true;

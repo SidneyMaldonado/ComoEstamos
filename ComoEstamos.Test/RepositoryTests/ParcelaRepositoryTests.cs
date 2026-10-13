@@ -76,6 +76,25 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
+        public async Task ListarPorUsuarioAsync_RetornaParcelasAtivasDasDividasDoUsuarioPorVencimento()
+        {
+            var outroUsuario = await CriarUsuarioAsync("outro@teste.com");
+            var dividaDeOutro = await CriarDividaAsync(outroUsuario.Id);
+            var outraDivida = await CriarDividaAsync(_usuario.Id);
+            var inativa = NovaParcela(new DateTime(2026, 9, 1), descricao: "Inativa");
+            inativa.Ativo = false;
+            await SemearAsync(
+                NovaParcela(new DateTime(2026, 11, 10), descricao: "B"),
+                NovaParcela(new DateTime(2026, 10, 5), outraDivida.Id, "A"),
+                NovaParcela(new DateTime(2026, 10, 1), dividaDeOutro.Id, "De outro"),
+                inativa);
+
+            var lista = await _repository.ListarPorUsuarioAsync(_usuario.Id);
+
+            CollectionAssert.AreEqual(new[] { "A", "B" }, lista.Select(p => p.Descricao).ToArray());
+        }
+
+        [TestMethod]
         public async Task ListarPorDividaAsync_IgnoraInativasPorPadrao()
         {
             var inativa = NovaParcela(new DateTime(2026, 11, 10), descricao: "Inativa");

@@ -1,5 +1,6 @@
 using ComoEstamos.Core;
-using ComoEstamos.Core.UseCases;
+using ComoEstamos.Core.UseCases.Dividas;
+using ComoEstamos.Core.Validacao;
 using ComoEstamos.Data;
 using ComoEstamos.Data.Model;
 using ComoEstamos.Test.RepositoryTests;
@@ -37,6 +38,16 @@ namespace ComoEstamos.Test.UseCaseTests
             DataPrimeiroVencimento = new DateTime(2026, 10, 10)
         };
 
+        private Task<Divida> ExecutarAsync(Divida divida) => _useCase.ExecutarAsync(divida, _usuario.Id);
+
+        /// <summary>Confere que a dívida é recusada com erro no campo informado e que nada foi gravado.</summary>
+        private async Task AssertRecusaCampoAsync(Divida divida, string campo)
+        {
+            var ex = await Assert.ThrowsExactlyAsync<ValidacaoException>(() => ExecutarAsync(divida));
+            Assert.IsTrue(ex.Erros.Any(e => e.Campo == campo), $"Esperava erro no campo {campo}.");
+            await AssertNadaGravadoAsync();
+        }
+
         private async Task<List<Parcela>> ParcelasGravadasAsync()
         {
             await using var db = CriarContexto();
@@ -53,7 +64,7 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_GravaDividaEGeraUmaParcelaPorMes()
         {
-            var divida = await _useCase.ExecutarAsync(NovaDivida(1200m, 12));
+            var divida = await ExecutarAsync(NovaDivida(1200m, 12));
 
             Assert.IsGreaterThan(0, divida.Id);
             var parcelas = await ParcelasGravadasAsync();
@@ -68,7 +79,7 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_RetornaDividaComAsParcelas()
         {
-            var divida = await _useCase.ExecutarAsync(NovaDivida(300m, 3));
+            var divida = await ExecutarAsync(NovaDivida(300m, 3));
 
             Assert.HasCount(3, divida.Parcelas);
         }
@@ -76,7 +87,7 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_ColocaCentavosDoArredondamentoNaUltimaParcela()
         {
-            await _useCase.ExecutarAsync(NovaDivida(100m, 3));
+            await ExecutarAsync(NovaDivida(100m, 3));
 
             var parcelas = await ParcelasGravadasAsync();
             CollectionAssert.AreEqual(new[] { 33.33m, 33.33m, 33.34m }, parcelas.Select(p => p.Valor).ToArray());
@@ -86,7 +97,7 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_ParcelaUnicaRecebeValorTotal()
         {
-            await _useCase.ExecutarAsync(NovaDivida(99.99m, 1));
+            await ExecutarAsync(NovaDivida(99.99m, 1));
 
             var parcelas = await ParcelasGravadasAsync();
             Assert.HasCount(1, parcelas);
@@ -100,7 +111,7 @@ namespace ComoEstamos.Test.UseCaseTests
             divida.DiaVencimento = 31;
             divida.DataPrimeiroVencimento = new DateTime(2027, 1, 31);
 
-            await _useCase.ExecutarAsync(divida);
+            await ExecutarAsync(divida);
 
             var parcelas = await ParcelasGravadasAsync();
             CollectionAssert.AreEqual(
@@ -115,7 +126,7 @@ namespace ComoEstamos.Test.UseCaseTests
             divida.DiaVencimento = 10;
             divida.DataPrimeiroVencimento = new DateTime(2026, 10, 25, 14, 30, 0);
 
-            await _useCase.ExecutarAsync(divida);
+            await ExecutarAsync(divida);
 
             var parcelas = await ParcelasGravadasAsync();
             CollectionAssert.AreEqual(
@@ -126,7 +137,7 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_DescreveParcelasComNomeENumero()
         {
-            await _useCase.ExecutarAsync(NovaDivida(300m, 3));
+            await ExecutarAsync(NovaDivida(300m, 3));
 
             var parcelas = await ParcelasGravadasAsync();
             CollectionAssert.AreEqual(new[] { "Notebook 1/3", "Notebook 2/3", "Notebook 3/3" }, parcelas.Select(p => p.Descricao).ToArray());
@@ -138,7 +149,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida(1200m, 12);
             divida.Nome = new string('A', 100);
 
-            await _useCase.ExecutarAsync(divida);
+            await ExecutarAsync(divida);
 
             var parcelas = await ParcelasGravadasAsync();
             Assert.IsTrue(parcelas.All(p => p.Descricao.Length <= 100));
@@ -151,7 +162,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var credito = NovaDivida(500m, 2);
             credito.EhDivida = false;
 
-            var gravado = await _useCase.ExecutarAsync(credito);
+            var gravado = await ExecutarAsync(credito);
 
             await using var db = CriarContexto();
             Assert.IsFalse((await db.Dividas.SingleAsync()).EhDivida);
@@ -164,7 +175,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida(200m, 2);
             divida.Parcelas.Add(new Parcela { Descricao = "Intrusa", Valor = 1m });
 
-            await _useCase.ExecutarAsync(divida);
+            await ExecutarAsync(divida);
 
             var parcelas = await ParcelasGravadasAsync();
             Assert.HasCount(2, parcelas);
@@ -179,9 +190,24 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida();
             divida.IdCredor = credor.Id;
 
-            var gravada = await _useCase.ExecutarAsync(divida);
+            var gravada = await ExecutarAsync(divida);
 
             Assert.AreEqual(credor.Id, gravada.IdCredor);
+        }
+
+        [TestMethod]
+        public async Task ExecutarAsync_GravaParaOUsuarioRecebidoERemoveEspacosDoNome()
+        {
+            var outro = await CriarUsuarioAsync("outro@teste.com");
+            var divida = NovaDivida();
+            divida.IdUsuario = outro.Id;
+            divida.Nome = "  Notebook  ";
+
+            var gravada = await ExecutarAsync(divida);
+
+            Assert.AreEqual(_usuario.Id, gravada.IdUsuario);
+            Assert.AreEqual("Notebook", gravada.Nome);
+            Assert.IsTrue(gravada.Ativo);
         }
 
         [TestMethod]
@@ -192,24 +218,25 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida();
             divida.DiaVencimento = dia;
 
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(divida));
-            await AssertNadaGravadoAsync();
+            await AssertRecusaCampoAsync(divida, nameof(Divida.DiaVencimento));
         }
 
         [TestMethod]
-        public async Task ExecutarAsync_RecusaNumeroDeParcelasMenorQueUm()
+        [DataRow(0, DisplayName = "Zero parcelas")]
+        [DataRow(361, DisplayName = "361 parcelas")]
+        public async Task ExecutarAsync_RecusaNumeroDeParcelasForaDaFaixa(int parcelas)
         {
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(NovaDivida(parcelas: 0)));
-            await AssertNadaGravadoAsync();
+            await AssertRecusaCampoAsync(NovaDivida(parcelas: parcelas), nameof(Divida.NumeroParcelas));
         }
 
         [TestMethod]
         [DataRow(0.0, DisplayName = "Valor zero")]
         [DataRow(-10.0, DisplayName = "Valor negativo")]
-        public async Task ExecutarAsync_RecusaValorNaoPositivo(double valor)
+        [DataRow(10.555, DisplayName = "Três casas decimais")]
+        [DataRow(100000000.0, DisplayName = "Maior que decimal(10,2)")]
+        public async Task ExecutarAsync_RecusaValorForaDoDominio(double valor)
         {
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(NovaDivida((decimal)valor)));
-            await AssertNadaGravadoAsync();
+            await AssertRecusaCampoAsync(NovaDivida((decimal)valor), nameof(Divida.Valor));
         }
 
         [TestMethod]
@@ -218,8 +245,16 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida();
             divida.Nome = "   ";
 
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(divida));
-            await AssertNadaGravadoAsync();
+            await AssertRecusaCampoAsync(divida, nameof(Divida.Nome));
+        }
+
+        [TestMethod]
+        public async Task ExecutarAsync_RecusaNomeMaiorQue100Caracteres()
+        {
+            var divida = NovaDivida();
+            divida.Nome = new string('A', 101);
+
+            await AssertRecusaCampoAsync(divida, nameof(Divida.Nome));
         }
 
         [TestMethod]
@@ -228,8 +263,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida();
             divida.IdConta = null;
 
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(divida));
-            await AssertNadaGravadoAsync();
+            await AssertRecusaCampoAsync(divida, nameof(Divida.IdConta));
         }
 
         [TestMethod]
@@ -238,8 +272,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida();
             divida.IdCategoria = null;
 
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(divida));
-            await AssertNadaGravadoAsync();
+            await AssertRecusaCampoAsync(divida, nameof(Divida.IdCategoria));
         }
 
         [TestMethod]
@@ -251,8 +284,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida();
             divida.IdConta = contaDeOutro.Id;
 
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(divida));
-            await AssertNadaGravadoAsync();
+            await AssertRecusaCampoAsync(divida, nameof(Divida.IdConta));
         }
 
         [TestMethod]
@@ -264,8 +296,7 @@ namespace ComoEstamos.Test.UseCaseTests
                 await db.SaveChangesAsync();
             }
 
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(NovaDivida()));
-            await AssertNadaGravadoAsync();
+            await AssertRecusaCampoAsync(NovaDivida(), nameof(Divida.IdCategoria));
         }
 
         [TestMethod]
@@ -276,17 +307,28 @@ namespace ComoEstamos.Test.UseCaseTests
             var divida = NovaDivida();
             divida.IdCredor = credor.Id;
 
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(divida));
+            await AssertRecusaCampoAsync(divida, nameof(Divida.IdCredor));
+        }
+
+        [TestMethod]
+        public async Task ExecutarAsync_MostraTodosOsErrosDeUmaVez()
+        {
+            var divida = NovaDivida(0m, 0);
+            divida.Nome = "";
+            divida.IdConta = null;
+
+            var ex = await Assert.ThrowsExactlyAsync<ValidacaoException>(() => ExecutarAsync(divida));
+
+            CollectionAssert.AreEquivalent(
+                new[] { nameof(Divida.Nome), nameof(Divida.Valor), nameof(Divida.NumeroParcelas), nameof(Divida.IdConta) },
+                ex.Erros.Select(e => e.Campo).ToArray());
             await AssertNadaGravadoAsync();
         }
 
         [TestMethod]
         public async Task ExecutarAsync_RecusaUsuarioInexistente()
         {
-            var divida = NovaDivida();
-            divida.IdUsuario = 999;
-
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(divida));
+            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(NovaDivida(), 999));
             await AssertNadaGravadoAsync();
         }
     }

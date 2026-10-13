@@ -29,21 +29,26 @@ Toda operação chamada por uma tela tem um caso de uso, inclusive o CRUD simple
 
 ### CriarDividaUseCase
 
-Cadastra uma dívida ou crédito e gera as parcelas.
+Cadastra uma dívida ou crédito e gera as parcelas. Fica em `UseCases/Dividas/` e é chamado por
+`IDividaService.IncluirAsync` (tela Incluir Dívida). Assinatura: `ExecutarAsync(Divida divida, int idUsuario)`.
+A validação dos campos fica em `DividaValidador` e o cálculo das parcelas (valor, vencimento, descrição) em
+`Parcelamento`, ambos em `UseCases/Dividas/` e usados também pelo `AlterarDividaUseCase`.
 
 **Repositórios:** Usuarios, Contas, Categorias, Credores (leitura) · Dividas, Parcelas (escrita)
 
-**Validações** (qualquer falha → `RegraDeNegocioException`, nada gravado):
+**Dono:** como no CRUD ([07-Crud.md](07-Crud.md#dono-do-registro)), sobrescreve `IdUsuario` com o usuário
+recebido, zera o `Id` e grava ativa. Usuário inexistente ou desativado → `RegraDeNegocioException`.
 
-| Regra | |
+**Validações** (todas juntas numa `ValidacaoException`, um erro por campo; nada gravado):
+
+| Campo | Regra |
 |---|---|
-| Nome | obrigatório |
-| `DiaVencimento` | entre 1 e 31 |
-| `NumeroParcelas` | ≥ 1 |
-| `Valor` | > 0 |
-| Conta e Categoria | obrigatórias (a parcela exige as duas), ativas e do mesmo usuário |
-| Credor | opcional; se informado, deve estar ativo e ser do mesmo usuário |
-| Usuário | existente e ativo |
+| `Nome` | Obrigatório, sem espaços nas pontas, até 100 caracteres. Pode repetir (não é único) |
+| `Valor` | Valor total: de 0,01 a 99.999.999,99, até 2 casas |
+| `NumeroParcelas` | De 1 a 360 (`DividaValidador.MaximoParcelas`) |
+| `DiaVencimento` | De 1 a 31 |
+| `IdConta`, `IdCategoria` | Obrigatórias (a parcela exige as duas), ativas e do mesmo usuário |
+| `IdCredor` | Opcional; se informado, ativo e do mesmo usuário |
 
 **Geração das parcelas:**
 
@@ -57,6 +62,72 @@ Cadastra uma dívida ou crédito e gera as parcelas.
 - Conta e categoria das parcelas = as da dívida. As parcelas nascem ativas e sem pagamento.
 - Parcelas que vierem preenchidas em `divida.Parcelas` são descartadas; quem gera é o caso de uso.
 - Crédito (`EhDivida = false`) gera parcelas da mesma forma.
+
+### AlterarDividaUseCase
+
+Decisão de 13/10/2026 (opção "refazer só as em aberto"). Chamado por `IDividaService.AlterarAsync`.
+Assinatura: `ExecutarAsync(Divida divida, int idUsuario)`.
+
+**Repositórios:** Contas, Categorias, Credores (leitura) · Dividas, Parcelas (escrita)
+
+- Inexistente ou de outro usuário → `KeyNotFoundException`; excluída → `RegraDeNegocioException`.
+- Valida os campos como a inclusão (`DividaValidador`). `EhDivida` não muda.
+- **As parcelas pagas nunca mudam** de valor, vencimento, conta ou categoria (só a descrição, abaixo).
+
+**Campos simples** (nome, credor, conta, categoria), sem mudar nenhum campo financeiro: as parcelas continuam
+as mesmas. A descrição de todas é refeita com o novo nome (`<Nome> <n>/<total>`, na ordem de vencimento); a
+nova conta e categoria valem **só para as em aberto**.
+
+**Campos financeiros** (valor total, número de parcelas, dia ou primeiro vencimento) mudaram:
+
+| Regra (só quando há parcelas pagas) | Campo do erro |
+|---|---|
+| O primeiro vencimento não pode mudar | `DataPrimeiroVencimento` |
+| Número de parcelas ≥ quantidade de pagas | `NumeroParcelas` |
+| Sobrando parcelas em aberto, o total deve cobrir o já pago mais R$ 0,01 por parcela em aberto | `Valor` |
+| Todas pagas (número de parcelas = pagas): o total deve ser igual ao já pago | `Valor` |
+
+- As parcelas **em aberto são desativadas** (não apagadas) e são geradas novas, de `k+1` até o total (`k` =
+  pagas), dividindo **o que falta pagar** (total − pago) igualmente, com os centavos na última.
+- Os vencimentos das novas seguem a regra da inclusão pela posição (a parcela `n` vence no mês `n−1` a partir do
+  primeiro vencimento, no `DiaVencimento`). As pagas ficam com os números `1..k`, por ordem de vencimento.
+- Ex.: 12x de R$ 100 com 2 pagas, alterada para R$ 1.000 em 10x → as 2 pagas ficam; 8 novas de R$ 100 (3/10 a 10/10).
+
+### ExcluirDividaUseCase
+
+Decisão de 13/10/2026 (opção "excluir tudo sem mexer no saldo"). Chamado por `IDividaService.ExcluirAsync`.
+
+- Inexistente ou de outro usuário → `KeyNotFoundException`; já excluída → `RegraDeNegocioException`.
+- Desativa a dívida e **todas** as parcelas ativas dela, pagas ou não. Nada é apagado do banco.
+- **O saldo das contas não muda**: o que já foi pago continua descontado.
+- Depois disso, a dívida e as parcelas não impedem mais a exclusão da conta, da categoria ou do credor.
+
+### BuscarDividasUseCase
+
+Consulta da tela de dívidas. Fica em `UseCases/Dividas/` e é chamado por `IDividaService.BuscarAsync`.
+Assinatura: `ExecutarAsync(FiltroDividas filtro, int idUsuario)` → `List<ResumoDivida>`.
+
+**Repositórios:** Dividas, Parcelas (leitura; uma consulta de cada, agrupadas em memória)
+
+- Só **dívidas** (`EhDivida = true`) ativas do usuário; créditos ficam para uma tela própria.
+- Considera só as parcelas **ativas**. A dívida está **paga** quando tem parcelas e todas têm `DataPagamento`
+  (não há coluna de situação na dívida).
+- `ResumoDivida`: nome, dia de vencimento, número de parcelas, valor total, valor da parcela
+  (o da próxima parcela em aberto; sem parcelas, total ÷ parcelas truncado), parcelas pagas, próximo vencimento
+  (1ª parcela em aberto) e se está paga.
+
+| Filtro (`FiltroDividas`) | Regra |
+|---|---|
+| `Nome` | Parte do nome, sem diferenciar maiúsculas nem acentos ("cartao" acha "Cartão"); espaços nas pontas ignorados; vazio não filtra |
+| `MesVencimento` | Dívidas com **alguma parcela** vencendo no mês/ano (o dia é ignorado); nulo não filtra |
+| `OcultarPagas` | Remove as pagas |
+
+**Ordem:** as em aberto pelo **próximo vencimento**; depois as pagas, pelo último vencimento. Empate: por nome.
+
+### BuscarDividaPorIdUseCase
+
+Dívida da tela Visualizar, com `Credor`, `Conta`, `Categoria` e as **parcelas ativas** por vencimento.
+`null` se não existe, é de outro usuário ou está inativa (mesma regra do BuscarPorId do CRUD).
 
 ### PagarParcelaUseCase
 
@@ -131,8 +202,6 @@ Operações já identificadas que envolvem mais de um repositório. Especifique 
 | Caso de uso | Envolve | Decisões em aberto |
 |---|---|---|
 | `EstornarPagamentoParcelaUseCase` | Parcelas, Dividas, Contas | Precisa de um método no repositório para limpar `DataPagamento`; reverte o saldo com o sinal inverso de `PagarParcela` |
-| `DesativarDividaUseCase` | Dividas, Parcelas | Desativar também as parcelas em aberto? E as já pagas? |
-| `AlterarDividaUseCase` | Dividas, Parcelas | O que fazer com as parcelas já geradas quando mudam valor, número de parcelas ou vencimento (regerar só as não pagas?) |
 | `TransferirEntreContasUseCase` | Contas | Uma só tabela, mas duas contas precisam mudar juntas |
 | `RegistrarHistoricoUseCase` | Investimentos, Historicos | Retrato da carteira inteira ou de um investimento; periodicidade (manual ou mensal) |
 | `DesativarOperacaoUseCase` | Operacoes, Investimentos | Reverter a quantidade do investimento; impedir se a quantidade ficar negativa |

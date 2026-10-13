@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ComoEstamos.Pages.Dividas.AlterarDividaPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource ConteudoFormulario}">
+
+                <Label Text="Alterar Dívida" Style="{StaticResource TituloPagina}" />
+
+                <BoxView Style="{StaticResource LinhaTitulo}" />
+
+                <!-- Só aparece quando já há parcelas pagas -->
+                <Label x:Name="AvisoPagas"
+                       IsVisible="False"
+                       FontSize="14"
+                       TextColor="{StaticResource TextoClaro}" />
+
+                <Border Style="{StaticResource Cartao}">
+                    <VerticalStackLayout Spacing="8">
+
+                        <Label Text="Nome da Dívida" Style="{StaticResource TituloCampo}" />
+                        <Entry x:Name="CampoNome"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: Notebook"
+                               MaxLength="100"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroNome" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Valor Total (R$)" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoValor"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 3.600,00"
+                               Keyboard="Numeric"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroValor" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Número de Parcelas" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoNumeroParcelas"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 12"
+                               Keyboard="Numeric"
+                               MaxLength="3"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroNumeroParcelas" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Primeiro Vencimento" Style="{StaticResource TituloCampoSeguinte}" />
+                        <DatePicker x:Name="CampoPrimeiroVencimento"
+                                    Style="{StaticResource CampoData}"
+                                    DateSelected="PrimeiroVencimento_Selecionado" />
+                        <Label x:Name="ErroPrimeiroVencimento" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Dia de Vencimento" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoDiaVencimento"
+                               Style="{StaticResource Campo}"
+                               Placeholder="De 1 a 31"
+                               Keyboard="Numeric"
+                               MaxLength="2"
+                               ReturnType="Next" />
+                        <Label Text="Dia das parcelas seguintes. Se o mês não tiver esse dia, vence no último dia do mês."
+                               FontSize="12"
+                               TextColor="{StaticResource TextoClaro}"
+                               Opacity="0.7" />
+                        <Label x:Name="ErroDiaVencimento" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Conta" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Picker x:Name="CampoConta"
+                                Style="{StaticResource CampoEscolha}"
+                                Title="Escolha a conta" />
+                        <Label x:Name="ErroConta" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Categoria" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Picker x:Name="CampoCategoria"
+                                Style="{StaticResource CampoEscolha}"
+                                Title="Escolha a categoria" />
+                        <Label x:Name="ErroCategoria" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Credor" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Picker x:Name="CampoCredor"
+                                Style="{StaticResource CampoEscolha}"
+                                Title="Opcional" />
+                        <Label x:Name="ErroCredor" Style="{StaticResource MensagemErro}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Text="Cancelar"
+                            Style="{StaticResource BotaoSecundario}"
+                            Clicked="Cancelar_Clicked" />
+                    <Button x:Name="BotaoSalvar"
+                            Grid.Column="1"
+                            Text="Salvar"
+                            Style="{StaticResource BotaoPrincipal}"
+                            Clicked="Salvar_Clicked" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

@@ -7,6 +7,9 @@ namespace ComoEstamos.Data.Repository
     {
         Task<List<Parcela>> ListarPorDividaAsync(int idDivida, bool incluirInativos = false);
 
+        /// <summary>Parcelas ativas das dívidas (e créditos) do usuário, por vencimento.</summary>
+        Task<List<Parcela>> ListarPorUsuarioAsync(int idUsuario);
+
         /// <summary>Parcelas ainda não pagas do usuário que vencem até a data informada.</summary>
         Task<List<Parcela>> ListarPendentesAsync(int idUsuario, DateTime vencimentoAte);
 
@@ -24,6 +27,9 @@ namespace ComoEstamos.Data.Repository
 
         public Task<List<Parcela>> ListarPorDividaAsync(int idDivida, bool incluirInativos = false) =>
             ListarAsync(p => p.IdDivida == idDivida, incluirInativos, q => q.OrderBy(p => p.DataVencimento));
+
+        public Task<List<Parcela>> ListarPorUsuarioAsync(int idUsuario) =>
+            ListarAsync(p => p.Divida!.IdUsuario == idUsuario, montarConsulta: q => q.OrderBy(p => p.DataVencimento));
 
         public Task<List<Parcela>> ListarPendentesAsync(int idUsuario, DateTime vencimentoAte) =>
             ListarAsync(
