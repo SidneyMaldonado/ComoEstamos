@@ -55,6 +55,12 @@ namespace ComoEstamos.Core.Formatacao
         /// <summary>Número com exatamente <paramref name="casas"/> casas decimais (<c>1.250,50</c>).</summary>
         public static string NumeroFixo(decimal valor, int casas) => valor.ToString("N" + casas, Cultura);
 
+        /// <summary>Data (<c>07/10/2026</c>).</summary>
+        public static string Data(DateTime data) => data.ToString("dd/MM/yyyy", Cultura);
+
+        /// <summary>Mês por extenso e ano (<c>outubro/2026</c>).</summary>
+        public static string MesAno(DateTime data) => data.ToString("MMMM/yyyy", Cultura);
+
         /// <summary>Data e hora (<c>07/10/2026 14:30</c>), ou "—" se nula.</summary>
         public static string DataHora(DateTime? data) => data?.ToString("dd/MM/yyyy HH:mm", Cultura) ?? "—";
     }

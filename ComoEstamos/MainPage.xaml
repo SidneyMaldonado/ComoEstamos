@@ -12,9 +12,14 @@
                HorizontalOptions="Fill"
                VerticalOptions="Fill" />
 
-        <Grid RowDefinitions="Auto,Auto,*,Auto"
+        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto"
               Padding="20,50,20,20"
               RowSpacing="16">
+
+            <!-- Atalho: arrastar o dedo para cima abre as dívidas. As linhas da tabela continuam rolando. -->
+            <Grid.GestureRecognizers>
+                <SwipeGestureRecognizer Direction="Up" Swiped="ArrastarParaCima_Swiped" />
+            </Grid.GestureRecognizers>
 
             <!-- Título -->
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
@@ -49,6 +54,19 @@
                     Text="Atualizar Saldos"
                     Style="{StaticResource BotaoPrincipal}"
                     Clicked="AtualizarSaldos_Clicked" />
+
+            <!-- Dica do atalho; tocar também abre as dívidas (no Windows, o arrasto com o mouse não dispara o gesto). -->
+            <Label Grid.Row="4"
+                   Text="︿  Arraste para cima para ver as dívidas"
+                   FontSize="12"
+                   TextColor="{StaticResource Dourado}"
+                   Opacity="0.8"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,-8,0,0">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="Dividas_Tapped" />
+                </Label.GestureRecognizers>
+            </Label>
         </Grid>
     </Grid>
 

@@ -527,6 +527,25 @@
         <Setter Property="TitleColor" Value="#99F2F4FA" />
         <Setter Property="BackgroundColor" Value="{StaticResource AzulEscuro}" />
     </Style>
+
+    <Style x:Key="CampoData" TargetType="DatePicker">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoClaro}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource AzulEscuro}" />
+        <Setter Property="Format" Value="dd/MM/yyyy" />
+    </Style>
+
+    <!-- Caixa de marcar dourada (filtros) -->
+    <Style x:Key="CaixaMarcar" TargetType="CheckBox">
+        <Setter Property="Color" Value="{StaticResource Dourado}" />
+    </Style>
+
+    <!-- Título de uma seção dentro da página (ex.: "Parcelas" na Visualizar Dívida) -->
+    <Style x:Key="TituloSecao" TargetType="Label">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="TextColor" Value="{StaticResource Dourado}" />
+    </Style>
     <Style x:Key="MensagemErro" TargetType="Label">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="TextColor" Value="{StaticResource TextoErro}" />

@@ -19,8 +19,8 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
   não há tela de Operação. Quando houver, decidir se a quantidade passa a mudar só pelas operações
   (`RegistrarOperacaoUseCase`) e fica só de leitura no formulário.
 - [ ] **Casos de uso candidatos** em [03-UseCases.md](03-UseCases.md#catálogo--candidatos-futuros): estornar
-  pagamento, desativar/alterar dívida, transferir entre contas, registrar histórico, desativar operação.
-  Cada um tem decisões em aberto. Os CRUDs de Dívida e Operação dependem deles.
+  pagamento, transferir entre contas, registrar histórico, desativar operação.
+  Cada um tem decisões em aberto. O CRUD de Operação depende deles.
 
 ## Regras a implementar
 
@@ -36,9 +36,9 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 
   | Entidade | Observação |
   |---|---|
-  | Dívida | Inclusão pelo `CriarDividaUseCase`; alterar e excluir dependem de casos de uso em aberto |
+  | Dívida | Listar, Visualizar, Incluir, Alterar e Excluir feitos em 13/10/2026 ([05-Telas.md](05-Telas.md#dívidas)). Falta a tela de **créditos** (`EhDivida = false`) |
   | Operação | Inclusão pelo `RegistrarOperacaoUseCase`; excluir depende de `DesativarOperacaoUseCase` |
-  | Parcela | Sem inclusão própria; tela de pagamento (`PagarParcelaUseCase`) |
+  | Parcela | Sem inclusão própria; tela de pagamento (`PagarParcelaUseCase`). Candidata: tocar na parcela da Visualizar Dívida para pagar |
   | Histórico | Só consulta; depende de `RegistrarHistoricoUseCase` |
 
 ## Testes no app
@@ -56,6 +56,13 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 - [ ] **Windows e Android — 13/10/2026:** testar no app o total da tela inicial, a tela "Atualizar Saldos"
   (Salvar, Cancelar, erro de formato e de faixa abaixo da conta, nada gravado quando há erro) e o
   compartilhamento da imagem dos saldos (no Android, conferir a fonte, que não é Calibri, e o app de destino).
+- [ ] **Windows e Android — Dívidas (13/10/2026):** testar no app a lista (cada filtro, ✕ do mês, ocultar
+  pagas, ordem, filtros mantidos ao voltar), a Visualizar (rolagem da tabela de parcelas em tela pequena) e a
+  Incluir (Pickers, `DatePicker` preenchendo o dia, erros de formato e de domínio, parcelas geradas), a Alterar
+  (sem e com parcelas pagas: aviso, primeiro vencimento bloqueado, erros de valor e de número de parcelas) e a
+  exclusão (Sim e Não, mensagem extra quando há parcela paga). Na tela inicial, o atalho para as dívidas: arrastar
+  para cima (Android: em cima da tabela, fora dela e com muitas contas) e tocar na dica; e a volta, arrastando para
+  baixo na lista de dívidas.
 - [ ] **Android:** aviso `CS8602` em `Platforms/Android/MainActivity.cs` (linha 27), anterior a 13/10/2026.
 
 ## Limpeza

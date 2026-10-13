@@ -4,6 +4,7 @@ using ComoEstamos.Core.UseCases.Carteiras;
 using ComoEstamos.Core.UseCases.Categorias;
 using ComoEstamos.Core.UseCases.Contas;
 using ComoEstamos.Core.UseCases.Credores;
+using ComoEstamos.Core.UseCases.Dividas;
 using ComoEstamos.Core.UseCases.Investimentos;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +16,6 @@ namespace ComoEstamos.Core
         public static IServiceCollection AddComoEstamosCore(this IServiceCollection services)
         {
             services.AddSingleton<IPagarParcelaUseCase, PagarParcelaUseCase>();
-            services.AddSingleton<ICriarDividaUseCase, CriarDividaUseCase>();
             services.AddSingleton<IRegistrarOperacaoUseCase, RegistrarOperacaoUseCase>();
 
             services.AddSingleton<IUsuarioAtual, UsuarioAtual>();
@@ -56,6 +56,14 @@ namespace ComoEstamos.Core
             services.AddSingleton<IAlterarInvestimentoUseCase, AlterarInvestimentoUseCase>();
             services.AddSingleton<IExcluirInvestimentoUseCase, ExcluirInvestimentoUseCase>();
             services.AddSingleton<IInvestimentoService, InvestimentoService>();
+
+            // Dívidas: fora do CRUD padrão (Spec/07-Crud.md, "Entidades fora do CRUD padrão").
+            services.AddSingleton<IBuscarDividasUseCase, BuscarDividasUseCase>();
+            services.AddSingleton<IBuscarDividaPorIdUseCase, BuscarDividaPorIdUseCase>();
+            services.AddSingleton<ICriarDividaUseCase, CriarDividaUseCase>();
+            services.AddSingleton<IAlterarDividaUseCase, AlterarDividaUseCase>();
+            services.AddSingleton<IExcluirDividaUseCase, ExcluirDividaUseCase>();
+            services.AddSingleton<IDividaService, DividaService>();
 
             return services;
         }
