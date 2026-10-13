@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ComoEstamos.Pages.Investimentos.AlterarInvestimentoPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource ConteudoFormulario}">
+
+                <Label Text="Alterar Investimento" Style="{StaticResource TituloPagina}" />
+
+                <BoxView Style="{StaticResource LinhaTitulo}" />
+
+                <Border Style="{StaticResource Cartao}">
+                    <VerticalStackLayout Spacing="8">
+
+                        <Label Text="Carteira" Style="{StaticResource TituloCampo}" />
+                        <Picker x:Name="CampoCarteira"
+                                Style="{StaticResource CampoEscolha}"
+                                Title="Escolha a carteira" />
+                        <Label x:Name="ErroCarteira" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Nome do Investimento" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoNome"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: PETR4"
+                               MaxLength="50"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroNome" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Quantidade" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoQuantidade"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 100"
+                               Keyboard="Numeric"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroQuantidade" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Cotação (R$)" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoCotacao"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 32,50"
+                               Keyboard="Numeric"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroCotacao" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Observação" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Editor x:Name="CampoObservacao"
+                                Style="{StaticResource CampoTextoLongo}"
+                                Placeholder="Opcional"
+                                MaxLength="500" />
+                        <Label x:Name="ErroObservacao" Style="{StaticResource MensagemErro}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Text="Cancelar"
+                            Style="{StaticResource BotaoSecundario}"
+                            Clicked="Cancelar_Clicked" />
+                    <Button x:Name="BotaoSalvar"
+                            Grid.Column="1"
+                            Text="Salvar"
+                            Style="{StaticResource BotaoPrincipal}"
+                            Clicked="Salvar_Clicked" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

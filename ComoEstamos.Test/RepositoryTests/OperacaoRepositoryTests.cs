@@ -132,5 +132,18 @@ namespace ComoEstamos.Test.RepositoryTests
 
             Assert.IsEmpty(await _repository.ListarPorInvestimentoAsync(_investimento.Id));
         }
+
+        [TestMethod]
+        public async Task ExisteAtivaPorInvestimentoAsync_ConsideraSoOperacoesAtivas()
+        {
+            var outro = new Investimento { IdCarteira = _carteira.Id, Nome = "VALE3" };
+            await SemearAsync(outro);
+            var inativa = NovaOperacao(new DateTime(2026, 9, 1), idInvestimento: outro.Id);
+            inativa.Ativo = false;
+            await SemearAsync(NovaOperacao(new DateTime(2026, 9, 1)), inativa);
+
+            Assert.IsTrue(await _repository.ExisteAtivaPorInvestimentoAsync(_investimento.Id));
+            Assert.IsFalse(await _repository.ExisteAtivaPorInvestimentoAsync(outro.Id));
+        }
     }
 }

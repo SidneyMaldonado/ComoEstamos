@@ -194,5 +194,23 @@ namespace ComoEstamos.Test.RepositoryTests
             await Assert.ThrowsExactlyAsync<KeyNotFoundException>(
                 () => _repository.RegistrarPagamentoAsync(999, DateTime.Today));
         }
+
+        [TestMethod]
+        public async Task ExisteAtivaPorContaECategoria_ConsideramSoParcelasAtivas()
+        {
+            var outraConta = new Conta { IdUsuario = _usuario.Id, Nome = "Poupança" };
+            var outraCategoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Lazer" };
+            await SemearAsync(outraConta, outraCategoria);
+            var inativa = NovaParcela(new DateTime(2026, 10, 10));
+            inativa.IdConta = outraConta.Id;
+            inativa.IdCategoria = outraCategoria.Id;
+            inativa.Ativo = false;
+            await SemearAsync(NovaParcela(new DateTime(2026, 10, 10)), inativa);
+
+            Assert.IsTrue(await _repository.ExisteAtivaPorContaAsync(_conta.Id));
+            Assert.IsTrue(await _repository.ExisteAtivaPorCategoriaAsync(_categoria.Id));
+            Assert.IsFalse(await _repository.ExisteAtivaPorContaAsync(outraConta.Id));
+            Assert.IsFalse(await _repository.ExisteAtivaPorCategoriaAsync(outraCategoria.Id));
+        }
     }
 }

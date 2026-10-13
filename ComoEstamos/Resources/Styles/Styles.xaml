@@ -431,4 +431,128 @@
         <Setter Property="SelectedTabColor" Value="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource Gray200}}" />
     </Style>
 
+    <!--
+        Estilos das telas do ComoEstamos (Spec/05-Telas.md e Spec/07-Crud.md).
+        Usados pelas páginas de lista, visualização, inclusão e alteração.
+    -->
+
+    <!-- Conteúdo da página sobre o fundo.png -->
+    <Style x:Key="Conteudo" TargetType="Grid">
+        <Setter Property="Padding" Value="20,50,20,20" />
+        <Setter Property="RowSpacing" Value="16" />
+    </Style>
+    <Style x:Key="ConteudoFormulario" TargetType="VerticalStackLayout">
+        <Setter Property="Padding" Value="20,50,20,20" />
+        <Setter Property="Spacing" Value="16" />
+    </Style>
+
+    <!-- Topo: título dourado, linha abaixo dele, ☰ e botões redondos (+, lápis, lixeira) -->
+    <Style x:Key="TituloPagina" TargetType="Label">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="TextColor" Value="{StaticResource Dourado}" />
+        <Setter Property="VerticalTextAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="LinhaTitulo" TargetType="BoxView">
+        <Setter Property="HeightRequest" Value="2" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Dourado}" />
+    </Style>
+    <Style x:Key="BotaoMenu" TargetType="ImageButton">
+        <Setter Property="Source" Value="menu_icon.png" />
+        <Setter Property="WidthRequest" Value="40" />
+        <Setter Property="HeightRequest" Value="40" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="SemanticProperties.Description" Value="Abrir menu" />
+    </Style>
+    <Style x:Key="BotaoCirculo" TargetType="Border">
+        <Setter Property="WidthRequest" Value="44" />
+        <Setter Property="HeightRequest" Value="44" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="BackgroundColor" Value="{StaticResource AzulEscuro}" />
+        <Setter Property="Stroke" Value="{StaticResource Dourado}" />
+        <Setter Property="StrokeThickness" Value="2" />
+        <Setter Property="StrokeShape" Value="Ellipse" />
+    </Style>
+    <Style x:Key="SinalMais" TargetType="Label">
+        <Setter Property="Text" Value="+" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="TextColor" Value="{StaticResource Dourado}" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="Margin" Value="0,-3,0,0" />
+    </Style>
+    <Style x:Key="IconeCirculo" TargetType="Image">
+        <Setter Property="WidthRequest" Value="22" />
+        <Setter Property="HeightRequest" Value="22" />
+    </Style>
+
+    <!-- Cartão do formulário e da visualização -->
+    <Style x:Key="Cartao" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource FundoTabela}" />
+        <Setter Property="Stroke" Value="{StaticResource DouradoSuave}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Padding" Value="16,20" />
+    </Style>
+
+    <!-- Campos: título, controle de entrada, mensagem de erro e valor só de leitura -->
+    <Style x:Key="TituloCampo" TargetType="Label">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextColor" Value="{StaticResource Dourado}" />
+    </Style>
+    <!-- Título dos campos depois do primeiro: um respiro acima -->
+    <Style x:Key="TituloCampoSeguinte" TargetType="Label" BasedOn="{StaticResource TituloCampo}">
+        <Setter Property="Margin" Value="0,8,0,0" />
+    </Style>
+    <Style x:Key="Campo" TargetType="Entry">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoClaro}" />
+        <Setter Property="PlaceholderColor" Value="#99F2F4FA" />
+        <Setter Property="BackgroundColor" Value="{StaticResource AzulEscuro}" />
+    </Style>
+    <Style x:Key="CampoTextoLongo" TargetType="Editor">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoClaro}" />
+        <Setter Property="PlaceholderColor" Value="#99F2F4FA" />
+        <Setter Property="BackgroundColor" Value="{StaticResource AzulEscuro}" />
+        <Setter Property="HeightRequest" Value="110" />
+    </Style>
+    <Style x:Key="CampoEscolha" TargetType="Picker">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoClaro}" />
+        <Setter Property="TitleColor" Value="#99F2F4FA" />
+        <Setter Property="BackgroundColor" Value="{StaticResource AzulEscuro}" />
+    </Style>
+    <Style x:Key="MensagemErro" TargetType="Label">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextColor" Value="{StaticResource TextoErro}" />
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style x:Key="ValorCampo" TargetType="Label">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="TextColor" Value="{StaticResource TextoClaro}" />
+    </Style>
+
+    <!-- Botões do fim do formulário -->
+    <Style x:Key="BotaoPrincipal" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource Dourado}" />
+        <Setter Property="TextColor" Value="{StaticResource AzulEscuro}" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="HeightRequest" Value="48" />
+    </Style>
+    <Style x:Key="BotaoSecundario" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BorderColor" Value="{StaticResource Dourado}" />
+        <Setter Property="BorderWidth" Value="2" />
+        <Setter Property="TextColor" Value="{StaticResource Dourado}" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="HeightRequest" Value="48" />
+    </Style>
+
 </ResourceDictionary>

@@ -4,12 +4,9 @@ Ficam em `ComoEstamos.Core/UseCases/`, um arquivo por caso de uso.
 
 ## Quando criar
 
-Crie um caso de uso quando a operação:
-
-- altera **mais de um repositório** (precisa de atomicidade), ou
-- tem **regra de negócio** que não é só persistência (cálculo, validação entre entidades).
-
-CRUD simples de uma entidade continua indo direto ao repositório.
+Toda operação chamada por uma tela tem um caso de uso, inclusive o CRUD simples
+(decisão de 07/10/2026). O CRUD de cada entidade tem 5 casos de uso padrão, descritos em
+[07-Crud.md](07-Crud.md), em `UseCases/<Entidades>/`. Os casos de uso abaixo são os que vão além do CRUD.
 
 ## Convenções
 
@@ -18,8 +15,10 @@ CRUD simples de uma entidade continua indo direto ao repositório.
 - Recebe `IUnitOfWorkFactory` no construtor e usa **uma** unidade de trabalho por execução
   (ver [02-UnitOfWork.md](02-UnitOfWork.md)).
 - Ordem: **validar tudo → alterar → `ConfirmarAsync()`**. Nenhuma alteração antes da última validação.
+- Consultas (buscar) também abrem a unidade de trabalho, mas não chamam `ConfirmarAsync`.
 - Erros:
   - `RegraDeNegocioException`: operação recusada por regra. A mensagem é mostrada ao usuário.
+  - `ValidacaoException` (herda da anterior): campos fora do domínio, com a lista de erros por campo.
   - `KeyNotFoundException`: o Id principal recebido não existe (mesmo padrão dos repositórios).
 - Registro em `ComoEstamos.Core/ServiceCollectionExtensions.cs` (`AddComoEstamosCore`), como singleton.
 - Testes em `ComoEstamos.Test/UseCaseTests/<Nome>Tests.cs` (ver [04-Testes.md](04-Testes.md)).
@@ -89,6 +88,39 @@ Registra a compra ou venda de um investimento e atualiza a quantidade em carteir
 
 **Efeito:** compra → `Investimento.Quantidade += Quantidade`; venda → `-=`. A operação é gravada.
 A cotação do investimento **não** é alterada.
+
+### AtualizarSaldosUseCase
+
+Atualiza de uma vez os saldos de várias contas (tela "Atualizar Saldos", ver [05-Telas.md](05-Telas.md)).
+Fica em `UseCases/Contas/` e é chamado por `IContaService.AtualizarSaldosAsync`.
+
+**Repositórios:** Contas, HistoricosSaldo
+
+**Entrada:** lista de `NovoSaldo(IdConta, Saldo)`. Conta repetida → `ArgumentException`.
+
+**Validações** (antes de gravar qualquer coisa):
+
+- Cada conta deve existir e ser do usuário (`KeyNotFoundException`) e estar ativa (`RegraDeNegocioException`).
+- Cada saldo segue a regra de `nr_saldo` (2 casas, ±99.999.999,99). Os erros vêm juntos numa
+  `ValidacaoException`, com o campo `Saldo:<idConta>` (`AtualizarSaldosUseCase.CampoSaldo`).
+
+**Efeito:** só as contas cujo saldo mudou são gravadas; para cada uma, uma linha em
+`tb_historico_saldo` com o novo saldo, todas com a mesma data/hora. Devolve quantas contas mudaram.
+
+### Histórico de saldo (`tb_historico_saldo`)
+
+Decisão de 13/10/2026: toda mudança de saldo feita pelo usuário fica registrada em `tb_historico_saldo`
+(`HistoricoSaldo`: data, conta, saldo, mais as colunas de `EntidadeBase`).
+
+| Quem grava | Quando |
+|---|---|
+| `AtualizarSaldosUseCase` | Para cada conta cujo saldo mudou |
+| `AlterarContaUseCase` (CRUD de Conta) | Se o saldo mudou |
+
+- A inclusão de conta **não** grava histórico.
+- `PagarParcelaUseCase` ainda **não** grava histórico (decidir junto com as telas de Parcela).
+- O histórico não impede excluir a conta. Ao excluir, ele deve ser desativado junto (pendência em
+  [06-Pendencias.md](06-Pendencias.md)).
 
 ---
 

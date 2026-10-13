@@ -10,8 +10,9 @@ Modelo genérico, tirado de `criar_tela_contas.md` e do que foi decidido na tela
 4. Peça a implementação apontando o arquivo preenchido. Se algum item da Parte 2 ficar em branco,
    a implementação deve perguntar antes de começar.
 
-A referência de código é o CRUD de Contas (`Pages/ContasPage`, `Pages/ContaPage`, `Controls/TabelaContas`),
-e as convenções completas estão em `Spec/05-Telas.md`.
+A estrutura de todo CRUD (página → service → 5 casos de uso → repositório) está em `Spec/07-Crud.md`,
+e as convenções das telas em `Spec/05-Telas.md`. A referência de código é o CRUD de Contas
+(`Pages/Contas/`, `ComoEstamos.Core/UseCases/Contas/`, `ComoEstamos.Core/Services/ContaService.cs`).
 
 ---
 
@@ -37,22 +38,28 @@ e as convenções completas estão em `Spec/05-Telas.md`.
   | `img_` | Imagem (binário) | `img_conta` |
 
 - **Usuário:** se a tabela tem `id_usuario`, ele **não aparece no formulário**. O valor vem de
-  `IUsuarioAtual.ObterIdAsync()` (usuário local padrão, até existir login). As listas filtram por
-  esse usuário (`ListarPorUsuarioAsync`).
+  `IUsuarioAtual.ObterIdAsync()` (usuário local padrão, até existir login), informado pelo service aos
+  casos de uso. As listas filtram por esse usuário (`ListarPorUsuarioAsync`).
 - **Não aparecem no formulário:** `id_` da própria entidade, `dm_ativo`, `dt_criacao`, `dt_alteracao`
   (preenchidas pelo `AppDbContext`) e `img_` (imagens ficam de fora até decidirmos o seletor).
-- **Quem grava:** se a inclusão, alteração ou exclusão mexe em **só uma tabela**, a tela chama o
-  repositório direto. Se mexe em **mais de uma tabela** ou tem regra de negócio, chama um **caso de uso**
-  do Core (`Spec/03-UseCases.md`). Se o caso de uso ainda não existir, ele precisa ser especificado antes.
+- **Quem grava:** sempre página → service → caso de uso → repositório (`Spec/07-Crud.md`), mesmo quando
+  a operação mexe em uma tabela só. Os 5 casos de uso padrão são incluir, alterar, excluir, buscar todos e
+  buscar por Id. Se a entidade precisa de um caso de uso diferente do padrão (ex.: a inclusão gera outras
+  tabelas), ele precisa ser especificado em `Spec/03-UseCases.md` antes.
+- **Domínio:** todo campo do formulário tem o domínio validado no caso de uso (tamanho, faixa, casas
+  decimais, chave estrangeira ativa e do mesmo usuário, nome único entre os ativos).
 
 ### Telas
 
-São **2 páginas** por entidade. A confirmação de exclusão é um popup, não uma página.
+São **4 páginas independentes** por entidade, em `Pages/⟨Entidades⟩/`. A exclusão não tem página:
+é um popup de confirmação na Visualizar.
 
 | Página | Arquivo | Função |
 |---|---|---|
-| Listar | `Pages/⟨Entidades⟩Page` (plural) | Lista dos registros ativos |
-| Incluir / Alterar | `Pages/⟨Entidade⟩Page` (singular) | Formulário. Sem `id` inclui; com `id` altera |
+| Listar | `Listar⟨Entidades⟩Page` | Lista dos registros ativos |
+| Visualizar | `Visualizar⟨Entidade⟩Page` | Campos só de leitura; lápis (alterar) e lixeira (excluir) |
+| Incluir | `Incluir⟨Entidade⟩Page` | Formulário de inclusão |
+| Alterar | `Alterar⟨Entidade⟩Page` | O mesmo formulário, preenchido |
 
 **Visual (igual em todas as páginas):**
 
@@ -61,11 +68,10 @@ São **2 páginas** por entidade. A confirmação de exclusão é um popup, não
 
 **Listar:**
 
-- Tabela no mesmo estilo da MainPage e da lista de Contas: cabeçalho escuro com texto dourado e
-  linhas em dois tons de azul. Se for uma tabela de 2 colunas (texto + valor), **generalize a
-  `TabelaContas`** em vez de copiá-la.
+- Tabela `Controls/TabelaRegistros` (a mesma da MainPage): coluna de texto, com um detalhe opcional
+  abaixo, e coluna de valor opcional.
 - Quando não há registros, mostra "Nenhum(a) ⟨entidade⟩ cadastrado(a)."
-- Tocar numa linha abre a página **Alterar** com aquele registro.
+- Tocar numa linha abre a página **Visualizar** com aquele registro.
 - No canto superior direito, um **sinal de mais dourado sobre um círculo**, que abre a página **Incluir**.
 - No canto superior esquerdo, o ícone **☰** dourado, que abre o menu lateral.
 - A lista recarrega sempre que a página aparece, para refletir inclusões, alterações e exclusões.
@@ -81,15 +87,22 @@ São **2 páginas** por entidade. A confirmação de exclusão é um popup, não
 - Antes de gravar, **valida todos os campos**. Cada campo errado mostra a mensagem logo abaixo dele,
   em vermelho claro, e nada é gravado.
 
-**Alterar** (mesma página do Incluir):
+**Visualizar:**
 
-- Título "Alterar ⟨Entidade⟩".
-- Carrega os dados do registro tocado na lista. Se ele não existir mais ou estiver inativo, avisa e volta.
-- Salvar **atualiza** o registro e não inclui um novo. A validação é a mesma da inclusão.
-- No canto superior direito, uma **lixeira dourada sobre um círculo**. Ao tocar, abre um popup:
-  "Confirma a exclusão de ⟨entidade⟩ "⟨nome⟩"?"
-  - **Sim**: grava `dm_ativo = false` e volta para a lista.
-  - **Não**: fecha o popup e continua na página Alterar.
+- Título "⟨Entidade⟩". Mostra cada campo (título e valor), mais "Data de Cadastro" e "Última Alteração".
+- Recarrega sempre que aparece. Se o registro não existir mais ou estiver inativo, avisa e volta.
+- No canto superior direito, um **lápis** (abre a Alterar) e uma **lixeira** dourados sobre círculos.
+  A lixeira abre um popup: "Confirma a exclusão de ⟨entidade⟩ "⟨nome⟩"?"
+  - **Sim**: exclui (`dm_ativo = false`) e volta para a lista. Se houver dependentes ativos, mostra a
+    mensagem da Parte 2 e fica na Visualizar.
+  - **Não**: fecha o popup e continua na Visualizar.
+- Botão **Voltar** no fim.
+
+**Alterar:**
+
+- Título "Alterar ⟨Entidade⟩", o mesmo formulário do Incluir, preenchido.
+- Carrega os dados do registro. Se ele não existir mais ou estiver inativo, avisa e volta.
+- Salvar **atualiza** o registro e volta para a Visualizar. A validação é a mesma da inclusão.
 
 ### Menu lateral
 
@@ -115,17 +128,15 @@ Na lista e na exibição, valores em dinheiro usam `R$` no formato pt-BR, e valo
 
 ### Checklist de implementação
 
-- [ ] `Pages/⟨Entidades⟩Page.xaml(.cs)`: a lista
-- [ ] `Pages/⟨Entidade⟩Page.xaml(.cs)`: o formulário, com `public const string Rota`
-- [ ] Tabela da lista: generalizar a `TabelaContas` ou criar um controle em `Controls/`
-- [ ] `Resources/Images/⟨entidade⟩_icon.svg`
-- [ ] `AppShell.xaml`: `FlyoutItem` no menu
-- [ ] `AppShell.xaml.cs`: `Routing.RegisterRoute(⟨Entidade⟩Page.Rota, ...)`
-- [ ] `MauiProgram.cs`: `AddTransient` das duas páginas
-- [ ] Caso de uso no Core, se a gravação envolver mais de uma tabela, com testes em `UseCaseTests/`
-- [ ] Método novo no repositório, se precisar (ex.: listar por chave estrangeira), com testes em `RepositoryTests/`
-- [ ] `Spec/05-Telas.md`: tabela "⟨Entidade⟩: regras do formulário"
-- [ ] Compilar sem avisos e testar no app: incluir, validar, alterar, cancelar, excluir (Sim e Não) e menu
+Siga o checklist completo de `Spec/07-Crud.md` (Data, Core, Testes e MAUI). Em resumo:
+
+- [ ] Core: `⟨Entidade⟩Validador`, os 5 casos de uso e o `⟨Entidade⟩Service`, registrados em `AddComoEstamosCore`
+- [ ] Data: métodos `ExisteAtivo...Por⟨Entidade⟩Async` nos repositórios dos dependentes, se houver
+- [ ] Testes: `UseCaseTests/Crud⟨Entidade⟩Tests.cs`, `ServiceTests/⟨Entidade⟩ServiceTests.cs` e os dos métodos novos de repositório
+- [ ] MAUI: as 4 páginas em `Pages/⟨Entidades⟩/`, rotas, menu, ícone e `AddTransient`
+- [ ] `Spec/05-Telas.md`: regras do formulário da entidade
+- [ ] Compilar sem avisos, rodar os testes e testar no app: incluir, validar, visualizar, alterar, cancelar,
+  excluir (Sim e Não), exclusão impedida e menu
 
 ---
 
@@ -170,23 +181,23 @@ Liste **todas** as colunas da tabela. Na coluna "No formulário?", marque "não"
 | Filtro | ⟨só ativos do usuário (padrão)⟩ |
 | Linha de total no fim? | ⟨não⟩ |
 
-### Gravação
+### Casos de uso
 
-| Operação | Como grava |
+| Operação | Caso de uso |
 |---|---|
-| Incluir | ⟨repositório direto / caso de uso `⟨Nome⟩UseCase`⟩ |
-| Alterar | ⟨repositório direto / caso de uso⟩ |
-| Excluir | ⟨`DesativarAsync` direto / caso de uso⟩ |
+| Incluir | ⟨padrão (`Incluir⟨Entidade⟩UseCase`) / específico: `⟨Nome⟩UseCase`⟩ |
+| Alterar | ⟨padrão / específico⟩ |
+| Excluir | ⟨padrão / específico⟩ |
 
 ### Exclusão
 
-- O que acontece com os registros que dependem deste? ⟨nada / desativar junto / impedir a exclusão se houver dependentes ativos⟩
+- O que acontece com os registros que dependem deste? ⟨impedir a exclusão se houver dependentes ativos (padrão) / outro⟩
 - Mensagem quando a exclusão é impedida: ⟨"Não é possível excluir: existem investimentos nesta carteira."⟩
 
 ### Validações extras
 
-⟨Regras que vão além do tipo do campo. Ex.: "não pode haver duas carteiras ativas com o mesmo nome",
-"a data não pode ser futura". Escreva "nenhuma" se não houver.⟩
+⟨Regras que vão além do tipo do campo e do nome único (que é padrão). Ex.: "a data não pode ser futura".
+Escreva "nenhuma" se não houver.⟩
 
 ---
 
@@ -206,10 +217,12 @@ Liste **todas** as colunas da tabela. Na coluna "No formulário?", marque "não"
 | `dm_ativo` | — | não | — | — | — | — |
 
 - **Lista:** Carteira (Nome), ordenada por Nome, sem total.
-- **Gravação:** repositório direto nas três operações.
+- **Casos de uso:** os 5 padrão.
 - **Exclusão:** impedir se houver investimentos ativos na carteira. Mensagem: "Não é possível excluir:
   existem investimentos ativos nesta carteira."
-- **Validações extras:** nenhuma.
+- **Validações extras:** nenhuma (o nome único é padrão).
+
+Implementado em 07/10/2026, junto com Conta, Categoria, Credor e Investimento.
 
 ### Lembretes para as outras entidades
 
@@ -220,7 +233,5 @@ Liste **todas** as colunas da tabela. Na coluna "No formulário?", marque "não"
   O campo de valor é o **valor total** da operação (`ValorTotal`), não o preço unitário.
 - **Parcela:** é gerada pela dívida. Normalmente não tem tela de inclusão própria, só a de pagamento
   (`PagarParcelaUseCase`).
-- **Investimento:** depende de Carteira (`id_carteira`), que não tem `id_usuario` direto; o Picker
-  lista as carteiras do usuário atual.
 - **Historico:** é um retrato gerado pelo sistema (`RegistrarHistoricoUseCase`, em aberto). Normalmente
   só tem tela de consulta.

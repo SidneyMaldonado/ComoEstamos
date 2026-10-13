@@ -4,7 +4,11 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:ComoEstamos"
-    xmlns:pages="clr-namespace:ComoEstamos.Pages"
+    xmlns:carteiras="clr-namespace:ComoEstamos.Pages.Carteiras"
+    xmlns:categorias="clr-namespace:ComoEstamos.Pages.Categorias"
+    xmlns:contas="clr-namespace:ComoEstamos.Pages.Contas"
+    xmlns:credores="clr-namespace:ComoEstamos.Pages.Credores"
+    xmlns:investimentos="clr-namespace:ComoEstamos.Pages.Investimentos"
     Shell.BackgroundColor="#1A2E6E"
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="{StaticResource AzulEscuro}"
@@ -38,7 +42,23 @@
     </FlyoutItem>
 
     <FlyoutItem Title="Contas" Icon="contas_icon.png">
-        <ShellContent ContentTemplate="{DataTemplate pages:ContasPage}" Route="contas" />
+        <ShellContent ContentTemplate="{DataTemplate contas:ListarContasPage}" Route="contas" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Categorias" Icon="categoria_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate categorias:ListarCategoriasPage}" Route="categorias" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Credores" Icon="credor_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate credores:ListarCredoresPage}" Route="credores" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Carteiras" Icon="carteira_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate carteiras:ListarCarteirasPage}" Route="carteiras" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Investimentos" Icon="investimento_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate investimentos:ListarInvestimentosPage}" Route="investimentos" />
     </FlyoutItem>
 
 </Shell>

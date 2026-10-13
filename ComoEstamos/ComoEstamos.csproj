@@ -77,12 +77,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Pages\ContasPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\ComoEstamos.Data\ComoEstamos.Data.csproj" />
 	  <ProjectReference Include="..\ComoEstamos.Core\ComoEstamos.Core.csproj" />
 	</ItemGroup>

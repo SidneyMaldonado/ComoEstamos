@@ -12,33 +12,43 @@
                HorizontalOptions="Fill"
                VerticalOptions="Fill" />
 
-        <Grid RowDefinitions="Auto,Auto,*"
+        <Grid RowDefinitions="Auto,Auto,*,Auto"
               Padding="20,50,20,20"
               RowSpacing="16">
 
             <!-- Título -->
-            <HorizontalStackLayout Spacing="12">
-                <ImageButton Source="menu_icon.png"
-                             WidthRequest="40"
-                             HeightRequest="40"
-                             Padding="8"
-                             BackgroundColor="Transparent"
-                             VerticalOptions="Center"
-                             Clicked="Menu_Clicked"
-                             SemanticProperties.Description="Abrir menu" />
-                <Label Text="Como Estamos"
-                       FontFamily="OpenSansSemibold"
-                       FontSize="32"
-                       TextColor="{StaticResource Dourado}"
-                       VerticalTextAlignment="Center" />
-            </HorizontalStackLayout>
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <ImageButton Style="{StaticResource BotaoMenu}" Clicked="Menu_Clicked" />
+                <Label Grid.Column="1"
+                       Text="Como Estamos"
+                       Style="{StaticResource TituloPagina}" />
+                <!-- Compartilhar: gera a imagem da tabela de saldos e abre o compartilhamento do sistema -->
+                <Border x:Name="BotaoCompartilhar"
+                        Grid.Column="2"
+                        Style="{StaticResource BotaoCirculo}"
+                        SemanticProperties.Description="Compartilhar saldos">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Compartilhar_Tapped" />
+                    </Border.GestureRecognizers>
+                    <Image Source="share_icon.png" Style="{StaticResource IconeCirculo}" />
+                </Border>
+            </Grid>
 
             <BoxView Grid.Row="1"
                      HeightRequest="2"
                      BackgroundColor="{StaticResource Dourado}" />
 
             <!-- Tabela de contas -->
-            <controls:TabelaContas x:Name="Tabela" Grid.Row="2" />
+            <controls:TabelaRegistros x:Name="Tabela"
+                                   Grid.Row="2"
+                                   TituloTexto="Conta"
+                                   TituloValor="Saldo"
+                                   MensagemVazia="Nenhuma conta cadastrada." />
+
+            <Button Grid.Row="3"
+                    Text="Atualizar Saldos"
+                    Style="{StaticResource BotaoPrincipal}"
+                    Clicked="AtualizarSaldos_Clicked" />
         </Grid>
     </Grid>
 

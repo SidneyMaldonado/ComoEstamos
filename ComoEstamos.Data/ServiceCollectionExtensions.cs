@@ -23,6 +23,7 @@ namespace ComoEstamos.Data
             services.AddSingleton<IInvestimentoRepository, InvestimentoRepository>();
             services.AddSingleton<IOperacaoRepository, OperacaoRepository>();
             services.AddSingleton<IHistoricoRepository, HistoricoRepository>();
+            services.AddSingleton<IHistoricoSaldoRepository, HistoricoSaldoRepository>();
 
             return services;
         }

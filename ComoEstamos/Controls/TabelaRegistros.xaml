@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
+             x:Class="ComoEstamos.Controls.TabelaRegistros"
+             x:Name="Raiz">
+
+    <Border x:DataType="controls:TabelaRegistros"
+            BindingContext="{x:Reference Raiz}"
+            VerticalOptions="Start"
+            BackgroundColor="{StaticResource FundoTabela}"
+            Stroke="{StaticResource DouradoSuave}"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 12"
+            Padding="0">
+
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+
+            <!-- Cabeçalho -->
+            <Grid ColumnDefinitions="*,Auto"
+                  Padding="16,12"
+                  BackgroundColor="{StaticResource AzulEscuro}">
+                <Label Text="{Binding TituloTexto}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       TextColor="{StaticResource Dourado}" />
+                <Label Grid.Column="1"
+                       Text="{Binding TituloValor}"
+                       IsVisible="{Binding TemColunaValor}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       TextColor="{StaticResource Dourado}"
+                       HorizontalTextAlignment="End" />
+            </Grid>
+
+            <BoxView Grid.Row="1"
+                     HeightRequest="1"
+                     BackgroundColor="{StaticResource Dourado}" />
+
+            <!-- Linhas -->
+            <CollectionView Grid.Row="2"
+                            ItemsSource="{Binding Linhas}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="controls:LinhaTabela">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12"
+                              Padding="16,12"
+                              BackgroundColor="{Binding Fundo}">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Linha_Tocada" />
+                            </Grid.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center">
+                                <Label Text="{Binding Texto}"
+                                       FontSize="15"
+                                       TextColor="{StaticResource TextoClaro}"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding Detalhe}"
+                                       IsVisible="{Binding TemDetalhe}"
+                                       FontSize="12"
+                                       TextColor="{StaticResource TextoClaro}"
+                                       Opacity="0.7"
+                                       LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1"
+                                   Text="{Binding Valor}"
+                                   IsVisible="{Binding TemValor}"
+                                   FontSize="15"
+                                   TextColor="{Binding CorValor}"
+                                   HorizontalTextAlignment="End"
+                                   VerticalTextAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Lista vazia -->
+            <Label Grid.Row="3"
+                   Text="{Binding MensagemVazia}"
+                   IsVisible="{Binding Vazia}"
+                   FontSize="15"
+                   TextColor="{StaticResource TextoClaro}"
+                   Opacity="0.7"
+                   HorizontalTextAlignment="Center"
+                   Padding="16,20" />
+
+            <!-- Rodapé: total da coluna de valor -->
+            <Grid Grid.Row="4"
+                  ColumnDefinitions="*,Auto"
+                  ColumnSpacing="12"
+                  Padding="16,12"
+                  BackgroundColor="{StaticResource AzulEscuro}"
+                  IsVisible="{Binding TemTotal}">
+                <Label Text="{Binding TituloTotal}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       TextColor="{StaticResource Dourado}" />
+                <Label Grid.Column="1"
+                       Text="{Binding TotalFormatado}"
+                       TextColor="{Binding CorTotal}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       HorizontalTextAlignment="End" />
+            </Grid>
+        </Grid>
+    </Border>
+
+</ContentView>

@@ -92,6 +92,13 @@ namespace ComoEstamos.Data.Repository
             return await consulta.ToListAsync();
         }
 
+        /// <summary>Indica se existe algum registro <b>ativo</b> que atende ao filtro. Lê só o que já está gravado.</summary>
+        protected async Task<bool> ExisteAtivoAsync(Expression<Func<T, bool>> filtro)
+        {
+            await using var ctx = await AbrirContextoAsync();
+            return await ctx.Db.Set<T>().AsNoTracking().Where(filtro).AnyAsync(e => e.Ativo);
+        }
+
         private async Task DefinirAtivoAsync(int id, bool ativo)
         {
             await using var ctx = await AbrirContextoAsync();

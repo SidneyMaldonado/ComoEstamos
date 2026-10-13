@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ComoEstamos.Pages.Credores.VisualizarCredorPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource ConteudoFormulario}">
+
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                    <Label Text="Credor" Style="{StaticResource TituloPagina}" />
+                    <!-- Alterar: lápis dourado sobre um círculo -->
+                    <Border Grid.Column="1"
+                            Style="{StaticResource BotaoCirculo}"
+                            SemanticProperties.Description="Alterar credor">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Alterar_Tapped" />
+                        </Border.GestureRecognizers>
+                        <Image Source="editar_icon.png" Style="{StaticResource IconeCirculo}" />
+                    </Border>
+                    <!-- Excluir: lixeira dourada sobre um círculo; pede confirmação -->
+                    <Border Grid.Column="2"
+                            Style="{StaticResource BotaoCirculo}"
+                            SemanticProperties.Description="Excluir credor">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Excluir_Tapped" />
+                        </Border.GestureRecognizers>
+                        <Image Source="lixeira_icon.png" Style="{StaticResource IconeCirculo}" />
+                    </Border>
+                </Grid>
+
+                <BoxView Style="{StaticResource LinhaTitulo}" />
+
+                <Border Style="{StaticResource Cartao}">
+                    <VerticalStackLayout Spacing="4">
+
+                        <Label Text="Nome do Credor" Style="{StaticResource TituloCampo}" />
+                        <Label x:Name="ValorNome" Style="{StaticResource ValorCampo}" />
+
+                        <Label Text="Observações" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Label x:Name="ValorObservacoes" Style="{StaticResource ValorCampo}" />
+
+                        <Label Text="Data de Cadastro" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Label x:Name="ValorDataCriacao" Style="{StaticResource ValorCampo}" />
+
+                        <Label Text="Última Alteração" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Label x:Name="ValorDataAlteracao" Style="{StaticResource ValorCampo}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="Voltar"
+                        Style="{StaticResource BotaoSecundario}"
+                        Clicked="Voltar_Clicked" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

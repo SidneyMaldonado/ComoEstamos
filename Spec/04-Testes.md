@@ -7,13 +7,15 @@ Projeto `ComoEstamos.Test` (MSTest 4, paralelismo por método, configurado em `M
 | Pasta | O que testa |
 |---|---|
 | `RepositoryTests/` | Um arquivo `<Nome>RepositoryTests.cs` por repositório, mais `RepositoryBaseTests` e `UnitOfWorkTests` |
-| `UseCaseTests/` | Um arquivo `<Nome>UseCaseTests.cs` por caso de uso |
+| `UseCaseTests/` | Um arquivo `<Nome>UseCaseTests.cs` por caso de uso; os 5 do CRUD de uma entidade ficam juntos em `Crud<X>Tests.cs` (ver [07-Crud.md](07-Crud.md#testes-obrigatórios)) |
+| `ServiceTests/` | `<X>ServiceTests.cs` (o service usa o usuário atual) e `UsuarioAtualTests` |
+| `ValidacaoTests/` | `ValidadorCampos` e `FormatoBr`, sem banco |
 
 ## Regras
 
 - **Banco:** EF Core **InMemory** (`Microsoft.EntityFrameworkCore.InMemory`). **Não use fakes nem mocks**
   de repositório ou de `DbContext`: os testes exercitam as classes reais.
-- **Base:** toda classe de teste herda `RepositoryTestBase`, que cria um banco novo e isolado
+- **Base:** toda classe de teste que usa banco herda `RepositoryTestBase`, que cria um banco novo e isolado
   por teste (nome com `Guid`), já que os testes rodam em paralelo.
   - `ContextFactory`: a factory real para construir repositórios (`new XRepository(ContextFactory)`)
     e a unidade de trabalho (`new UnitOfWorkFactory(ContextFactory)`).
