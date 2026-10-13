@@ -16,6 +16,7 @@ namespace ComoEstamos
             Routing.RegisterRoute(IncluirContaPage.Rota, typeof(IncluirContaPage));
             Routing.RegisterRoute(AlterarContaPage.Rota, typeof(AlterarContaPage));
             Routing.RegisterRoute(VisualizarContaPage.Rota, typeof(VisualizarContaPage));
+            Routing.RegisterRoute(AtualizarSaldosPage.Rota, typeof(AtualizarSaldosPage));
 
             Routing.RegisterRoute(IncluirCategoriaPage.Rota, typeof(IncluirCategoriaPage));
             Routing.RegisterRoute(AlterarCategoriaPage.Rota, typeof(AlterarCategoriaPage));

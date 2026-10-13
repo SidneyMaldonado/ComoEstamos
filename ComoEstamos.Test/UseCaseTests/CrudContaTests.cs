@@ -153,6 +153,30 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
+        public async Task Alterar_SaldoDiferenteGravaHistorico()
+        {
+            var conta = await SemearContaAsync("Nubank", saldo: 10m);
+
+            await new AlterarContaUseCase(_uow).ExecutarAsync(new Conta { Id = conta.Id, Nome = "Nubank", Saldo = -3.5m }, _usuario.Id);
+
+            await using var db = CriarContexto();
+            var historico = await db.HistoricosSaldo.AsNoTracking().SingleAsync();
+            Assert.AreEqual(conta.Id, historico.IdConta);
+            Assert.AreEqual(-3.5m, historico.Saldo);
+        }
+
+        [TestMethod]
+        public async Task Alterar_MesmoSaldoNaoGravaHistorico()
+        {
+            var conta = await SemearContaAsync("Nubank", saldo: 10m);
+
+            await new AlterarContaUseCase(_uow).ExecutarAsync(new Conta { Id = conta.Id, Nome = "Nubank PJ", Saldo = 10m }, _usuario.Id);
+
+            await using var db = CriarContexto();
+            Assert.IsFalse(await db.HistoricosSaldo.AnyAsync());
+        }
+
+        [TestMethod]
         public async Task Alterar_AceitaManterOProprioNome()
         {
             var conta = await SemearContaAsync("Nubank");
@@ -185,6 +209,8 @@ namespace ComoEstamos.Test.UseCaseTests
             var gravada = (await GravadasAsync()).Single();
             Assert.AreEqual("Nubank", gravada.Nome);
             Assert.AreEqual(10m, gravada.Saldo);
+            await using var db = CriarContexto();
+            Assert.IsFalse(await db.HistoricosSaldo.AnyAsync());
         }
 
         [TestMethod]

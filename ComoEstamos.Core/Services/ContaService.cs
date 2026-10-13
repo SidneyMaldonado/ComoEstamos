@@ -11,6 +11,9 @@ namespace ComoEstamos.Core.Services
         Task<Conta> IncluirAsync(Conta conta);
         Task AlterarAsync(Conta conta);
         Task ExcluirAsync(int id);
+
+        /// <summary>Grava de uma vez os saldos que mudaram, com histórico. Devolve quantas contas mudaram.</summary>
+        Task<int> AtualizarSaldosAsync(IReadOnlyList<NovoSaldo> saldos);
     }
 
     public class ContaService(
@@ -19,7 +22,8 @@ namespace ComoEstamos.Core.Services
         IBuscarContaPorIdUseCase buscarPorId,
         IIncluirContaUseCase incluir,
         IAlterarContaUseCase alterar,
-        IExcluirContaUseCase excluir) : IContaService
+        IExcluirContaUseCase excluir,
+        IAtualizarSaldosUseCase atualizarSaldos) : IContaService
     {
         public async Task<List<Conta>> BuscarTodasAsync() =>
             await buscarTodas.ExecutarAsync(await usuarioAtual.ObterIdAsync());
@@ -35,5 +39,8 @@ namespace ComoEstamos.Core.Services
 
         public async Task ExcluirAsync(int id) =>
             await excluir.ExecutarAsync(id, await usuarioAtual.ObterIdAsync());
+
+        public async Task<int> AtualizarSaldosAsync(IReadOnlyList<NovoSaldo> saldos) =>
+            await atualizarSaldos.ExecutarAsync(saldos, await usuarioAtual.ObterIdAsync());
     }
 }

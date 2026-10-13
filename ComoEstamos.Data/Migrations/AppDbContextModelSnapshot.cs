@@ -317,6 +317,45 @@ namespace ComoEstamos.Data.Migrations
                     b.ToTable("tb_historico");
                 });
 
+            modelBuilder.Entity("ComoEstamos.Data.Model.HistoricoSaldo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id_historico_saldo");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("dm_ativo");
+
+                    b.Property<DateTime?>("DataAlteracao")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("dt_alteracao");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("dt_criacao");
+
+                    b.Property<DateTime>("DataHistoricoSaldo")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("dt_historico_saldo");
+
+                    b.Property<int>("IdConta")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id_conta");
+
+                    b.Property<decimal>("Saldo")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("nr_saldo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdConta");
+
+                    b.ToTable("tb_historico_saldo");
+                });
+
             modelBuilder.Entity("ComoEstamos.Data.Model.Investimento", b =>
                 {
                     b.Property<int>("Id")
@@ -611,6 +650,17 @@ namespace ComoEstamos.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Investimento");
+                });
+
+            modelBuilder.Entity("ComoEstamos.Data.Model.HistoricoSaldo", b =>
+                {
+                    b.HasOne("ComoEstamos.Data.Model.Conta", "Conta")
+                        .WithMany()
+                        .HasForeignKey("IdConta")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conta");
                 });
 
             modelBuilder.Entity("ComoEstamos.Data.Model.Investimento", b =>

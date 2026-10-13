@@ -35,6 +35,7 @@ namespace ComoEstamos
             builder.Services.AddTransient<VisualizarContaPage>();
             builder.Services.AddTransient<IncluirContaPage>();
             builder.Services.AddTransient<AlterarContaPage>();
+            builder.Services.AddTransient<AtualizarSaldosPage>();
 
             builder.Services.AddTransient<ListarCategoriasPage>();
             builder.Services.AddTransient<VisualizarCategoriaPage>();

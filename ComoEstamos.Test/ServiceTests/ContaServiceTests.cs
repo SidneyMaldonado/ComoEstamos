@@ -26,7 +26,8 @@ namespace ComoEstamos.Test.ServiceTests
                 new BuscarContaPorIdUseCase(uow),
                 new IncluirContaUseCase(uow),
                 new AlterarContaUseCase(uow),
-                new ExcluirContaUseCase(uow));
+                new ExcluirContaUseCase(uow),
+                new AtualizarSaldosUseCase(uow));
         }
 
         [TestMethod]
@@ -62,6 +63,20 @@ namespace ComoEstamos.Test.ServiceTests
 
             await _service.ExcluirAsync(conta.Id);
             Assert.IsNull(await _service.BuscarPorIdAsync(conta.Id));
+        }
+
+        [TestMethod]
+        public async Task AtualizarSaldosAsync_UsaOUsuarioAtual()
+        {
+            var conta = await _service.IncluirAsync(new Conta { Nome = "Nubank" });
+            var outro = await CriarUsuarioAsync("outro@teste.com");
+            var alheia = new Conta { IdUsuario = outro.Id, Nome = "Inter" };
+            await SemearAsync(alheia);
+
+            Assert.AreEqual(1, await _service.AtualizarSaldosAsync([new NovoSaldo(conta.Id, 10m)]));
+            Assert.AreEqual(10m, (await _service.BuscarPorIdAsync(conta.Id))?.Saldo);
+            await Assert.ThrowsExactlyAsync<KeyNotFoundException>(
+                () => _service.AtualizarSaldosAsync([new NovoSaldo(alheia.Id, 10m)]));
         }
 
         [TestMethod]

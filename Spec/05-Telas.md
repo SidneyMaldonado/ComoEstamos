@@ -4,10 +4,11 @@
 
 | Onde | O quê |
 |---|---|
-| `MainPage.xaml` | Tela inicial: título e tabela de contas com saldo |
+| `MainPage.xaml` | Tela inicial: título, tabela de contas com saldo e total no rodapé, botão "Atualizar Saldos" |
+| `Compartilhamento/ImagemSaldos.cs` | PNG da tabela de saldos compartilhada pela tela inicial (SkiaSharp) |
 | `Pages/<Entidades>/` | As 4 páginas do CRUD de cada entidade (`ListarContasPage`, `VisualizarContaPage`, `IncluirContaPage`, `AlterarContaPage`). Ver [07-Crud.md](07-Crud.md) |
 | `Pages/Formulario.cs` | Passos repetidos das páginas: ler o Id da rota, ler números, mostrar erros nos campos, salvar, excluir, voltar |
-| `Controls/TabelaRegistros` | Tabela das listas: coluna de texto (com detalhe opcional) e coluna de valor opcional |
+| `Controls/TabelaRegistros` | Tabela das listas: coluna de texto (com detalhe opcional), coluna de valor opcional e rodapé de total opcional (`Total`; nulo esconde) |
 | `Resources/Styles/Styles.xaml` | Estilos com chave usados pelas páginas (ver "Visual") |
 | `Resources/Styles/Colors.xaml` | Paleta do app |
 
@@ -58,12 +59,28 @@ Todas as entidades abaixo: o nome é obrigatório, sem espaços nas pontas e **�
 usuário**, sem diferenciar maiúsculas (Investimento: único na carteira). As imagens (`img_`) ainda não
 aparecem nos formulários e são preservadas na alteração.
 
-**Conta** — exclusão impedida se houver dívidas ou parcelas ativas na conta.
+**Conta** — exclusão impedida se houver dívidas ou parcelas ativas na conta. Alterar o saldo grava
+`tb_historico_saldo` ([03-UseCases.md](03-UseCases.md#histórico-de-saldo-tb_historico_saldo)).
 
 | Campo | Título | Regra |
 |---|---|---|
 | `nm_conta` | Nome da Conta | Até 100 caracteres |
 | `nr_saldo` | Saldo (R$) | Obrigatório, até 2 casas, entre -99.999.999,99 e 99.999.999,99; negativo é permitido |
+
+**Atualizar Saldos** (`Pages/Contas/AtualizarSaldosPage`, rota `atualizar-saldos`, aberta pelo botão
+"Atualizar Saldos" da MainPage). Uma linha por conta ativa: nome à esquerda e o saldo (mesma regra de
+`nr_saldo`) à direita, já preenchido. Cancelar e Salvar no fim; o total não é recalculado na digitação.
+O Salvar chama `IContaService.AtualizarSaldosAsync` (`AtualizarSaldosUseCase`):
+
+- valida todos os saldos antes de gravar; se algum tiver erro, **nada** é gravado e a mensagem aparece
+  abaixo da conta (campo `Saldo:<id>` no `ErroValidacao`);
+- grava só as contas cujo saldo mudou e, para cada uma, uma linha em `tb_historico_saldo` (todas com a
+  mesma data/hora), numa única unidade de trabalho;
+- o histórico **não** impede a exclusão da conta (desativar o histórico junto com a conta está em
+  [06-Pendencias.md](06-Pendencias.md)).
+
+A alteração pelo CRUD de Conta (`AlterarContaUseCase`) também grava uma linha em `tb_historico_saldo`
+quando o saldo muda. A inclusão da conta não grava histórico.
 
 **Categoria** — exclusão impedida se houver dívidas ou parcelas ativas na categoria.
 
@@ -94,6 +111,17 @@ Lista: nome, carteira (abaixo, em letra menor) e valor (quantidade × cotação)
 | `nr_quantidade` | Quantidade | Obrigatória, até 6 casas, de 0 a 999.999.999.999,999999 |
 | `vl_cotacao` | Cotação (R$) | Obrigatória, até 6 casas, de 0 a 999.999.999.999,999999 |
 | `ds_observacao` | Observação | Opcional (`Editor`), até 500 caracteres; vazio grava `null` |
+
+## Compartilhar saldos
+
+O ícone de compartilhar (canto superior direito da MainPage, `share_icon`) gera um **PNG** (não PDF) com
+as contas ativas, os saldos e o total, e abre o compartilhamento do sistema (`Share.Default`,
+`ShareFileRequest`, `image/png`). O arquivo fica em `FileSystem.CacheDirectory` (`como-estamos-AAAA-MM-DD.png`).
+
+Visual de planilha, independente do tema do app: fundo branco, grade preta; cabeçalho "Como Estamos" com
+a data à direita (`14/out`) e linha "Total" em negrito sobre verde claro `#C6E0B4`; valores à direita no
+formato `1.447,75`, sem "R$". Fonte Calibri quando existir (Windows); senão, a padrão do sistema.
+Gerada em 3× para não borrar no celular.
 
 ## Visual
 

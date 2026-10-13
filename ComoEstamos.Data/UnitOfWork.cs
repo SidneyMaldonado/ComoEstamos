@@ -26,6 +26,7 @@ namespace ComoEstamos.Data
         IInvestimentoRepository Investimentos { get; }
         IOperacaoRepository Operacoes { get; }
         IHistoricoRepository Historicos { get; }
+        IHistoricoSaldoRepository HistoricosSaldo { get; }
 
         /// <summary>Grava todas as alterações pendentes de uma só vez (tudo ou nada).</summary>
         Task ConfirmarAsync();
@@ -55,6 +56,7 @@ namespace ComoEstamos.Data
         private IInvestimentoRepository? _investimentos;
         private IOperacaoRepository? _operacoes;
         private IHistoricoRepository? _historicos;
+        private IHistoricoSaldoRepository? _historicosSaldo;
 
         public IUsuarioRepository Usuarios => _usuarios ??= new UsuarioRepository(db);
         public ICarteiraRepository Carteiras => _carteiras ??= new CarteiraRepository(db);
@@ -66,6 +68,7 @@ namespace ComoEstamos.Data
         public IInvestimentoRepository Investimentos => _investimentos ??= new InvestimentoRepository(db);
         public IOperacaoRepository Operacoes => _operacoes ??= new OperacaoRepository(db);
         public IHistoricoRepository Historicos => _historicos ??= new HistoricoRepository(db);
+        public IHistoricoSaldoRepository HistoricosSaldo => _historicosSaldo ??= new HistoricoSaldoRepository(db);
 
         public Task ConfirmarAsync() => db.SaveChangesAsync();
 

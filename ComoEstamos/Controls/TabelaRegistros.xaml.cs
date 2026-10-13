@@ -39,6 +39,7 @@ namespace ComoEstamos.Controls
     /// <summary>
     /// Tabela das listas (MainPage e páginas Listar): uma coluna de texto, com detalhe opcional,
     /// e uma coluna de valor opcional, que só aparece quando <see cref="TituloValor"/> é informado.
+    /// O rodapé com o total só aparece quando <see cref="Total"/> é informado.
     /// </summary>
     public partial class TabelaRegistros : ContentView
     {
@@ -55,6 +56,19 @@ namespace ComoEstamos.Controls
         public static readonly BindableProperty LinhasProperty = BindableProperty.Create(
             nameof(Linhas), typeof(IReadOnlyList<LinhaTabela>), typeof(TabelaRegistros),
             propertyChanged: (b, _, _) => ((TabelaRegistros)b).OnPropertyChanged(nameof(Vazia)));
+
+        public static readonly BindableProperty TituloTotalProperty = BindableProperty.Create(
+            nameof(TituloTotal), typeof(string), typeof(TabelaRegistros), "Total");
+
+        public static readonly BindableProperty TotalProperty = BindableProperty.Create(
+            nameof(Total), typeof(decimal?), typeof(TabelaRegistros),
+            propertyChanged: (b, _, _) =>
+            {
+                var tabela = (TabelaRegistros)b;
+                tabela.OnPropertyChanged(nameof(TemTotal));
+                tabela.OnPropertyChanged(nameof(TotalFormatado));
+                tabela.OnPropertyChanged(nameof(CorTotal));
+            });
 
         /// <summary>Título da coluna de texto (ex.: "Conta").</summary>
         public string TituloTexto
@@ -83,6 +97,26 @@ namespace ComoEstamos.Controls
             get => (IReadOnlyList<LinhaTabela>?)GetValue(LinhasProperty);
             set => SetValue(LinhasProperty, value);
         }
+
+        /// <summary>Texto do rodapé (padrão "Total").</summary>
+        public string TituloTotal
+        {
+            get => (string)GetValue(TituloTotalProperty);
+            set => SetValue(TituloTotalProperty, value);
+        }
+
+        /// <summary>Total exibido no rodapé, em reais. Nulo esconde o rodapé.</summary>
+        public decimal? Total
+        {
+            get => (decimal?)GetValue(TotalProperty);
+            set => SetValue(TotalProperty, value);
+        }
+
+        public bool TemTotal => Total is not null;
+
+        public string TotalFormatado => Total is decimal total ? FormatoBr.Moeda(total) : string.Empty;
+
+        public Color CorTotal => LinhaTabela.CorDoValor(Total ?? 0);
 
         public bool TemColunaValor => !string.IsNullOrEmpty(TituloValor);
 

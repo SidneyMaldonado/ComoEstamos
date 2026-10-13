@@ -89,6 +89,39 @@ Registra a compra ou venda de um investimento e atualiza a quantidade em carteir
 **Efeito:** compra → `Investimento.Quantidade += Quantidade`; venda → `-=`. A operação é gravada.
 A cotação do investimento **não** é alterada.
 
+### AtualizarSaldosUseCase
+
+Atualiza de uma vez os saldos de várias contas (tela "Atualizar Saldos", ver [05-Telas.md](05-Telas.md)).
+Fica em `UseCases/Contas/` e é chamado por `IContaService.AtualizarSaldosAsync`.
+
+**Repositórios:** Contas, HistoricosSaldo
+
+**Entrada:** lista de `NovoSaldo(IdConta, Saldo)`. Conta repetida → `ArgumentException`.
+
+**Validações** (antes de gravar qualquer coisa):
+
+- Cada conta deve existir e ser do usuário (`KeyNotFoundException`) e estar ativa (`RegraDeNegocioException`).
+- Cada saldo segue a regra de `nr_saldo` (2 casas, ±99.999.999,99). Os erros vêm juntos numa
+  `ValidacaoException`, com o campo `Saldo:<idConta>` (`AtualizarSaldosUseCase.CampoSaldo`).
+
+**Efeito:** só as contas cujo saldo mudou são gravadas; para cada uma, uma linha em
+`tb_historico_saldo` com o novo saldo, todas com a mesma data/hora. Devolve quantas contas mudaram.
+
+### Histórico de saldo (`tb_historico_saldo`)
+
+Decisão de 13/10/2026: toda mudança de saldo feita pelo usuário fica registrada em `tb_historico_saldo`
+(`HistoricoSaldo`: data, conta, saldo, mais as colunas de `EntidadeBase`).
+
+| Quem grava | Quando |
+|---|---|
+| `AtualizarSaldosUseCase` | Para cada conta cujo saldo mudou |
+| `AlterarContaUseCase` (CRUD de Conta) | Se o saldo mudou |
+
+- A inclusão de conta **não** grava histórico.
+- `PagarParcelaUseCase` ainda **não** grava histórico (decidir junto com as telas de Parcela).
+- O histórico não impede excluir a conta. Ao excluir, ele deve ser desativado junto (pendência em
+  [06-Pendencias.md](06-Pendencias.md)).
+
 ---
 
 ## Catálogo — candidatos futuros

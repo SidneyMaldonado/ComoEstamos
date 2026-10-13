@@ -15,6 +15,7 @@ namespace ComoEstamos.Data
         public DbSet<Investimento> Investimentos => Set<Investimento>();
         public DbSet<Operacao> Operacoes => Set<Operacao>();
         public DbSet<Historico> Historicos => Set<Historico>();
+        public DbSet<HistoricoSaldo> HistoricosSaldo => Set<HistoricoSaldo>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,6 +1,6 @@
 # Pendências (próxima etapa)
 
-Atualizado em 07/10/2026. Ao resolver um item, remova-o daqui e registre a decisão no documento correspondente.
+Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decisão no documento correspondente.
 
 ## Git
 
@@ -21,6 +21,13 @@ Atualizado em 07/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 - [ ] **Casos de uso candidatos** em [03-UseCases.md](03-UseCases.md#catálogo--candidatos-futuros): estornar
   pagamento, desativar/alterar dívida, transferir entre contas, registrar histórico, desativar operação.
   Cada um tem decisões em aberto. Os CRUDs de Dívida e Operação dependem deles.
+
+## Regras a implementar
+
+- [ ] **Excluir conta desativa o histórico de saldo.** Ao excluir uma conta (exclusão lógica no
+  `ExcluirContaUseCase`), os registros dela em `tb_historico_saldo` também passam a `dm_ativo = false`,
+  na mesma unidade de trabalho. O histórico continua **sem impedir** a exclusão da conta. Precisa de um
+  método no `HistoricoSaldoRepository` (ex.: `DesativarPorContaAsync`) e dos testes correspondentes.
 
 ## Telas
 
@@ -45,6 +52,11 @@ Atualizado em 07/10/2026. Ao resolver um item, remova-o daqui e registre a decis
   - o menu lateral com a barra de navegação escondida (o ☰ da página é o único jeito de abrir, além do gesto);
   - os popups de confirmação de exclusão.
 - [ ] **Windows:** o Shell mostra um ☰ próprio na barra de título além do ☰ da página. Decidir se mantém os dois.
+
+- [ ] **Windows e Android — 13/10/2026:** testar no app o total da tela inicial, a tela "Atualizar Saldos"
+  (Salvar, Cancelar, erro de formato e de faixa abaixo da conta, nada gravado quando há erro) e o
+  compartilhamento da imagem dos saldos (no Android, conferir a fonte, que não é Calibri, e o app de destino).
+- [ ] **Android:** aviso `CS8602` em `Platforms/Android/MainActivity.cs` (linha 27), anterior a 13/10/2026.
 
 ## Limpeza
 

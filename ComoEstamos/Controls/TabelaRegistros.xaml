@@ -14,7 +14,7 @@
             StrokeShape="RoundRectangle 12"
             Padding="0">
 
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto">
 
             <!-- Cabeçalho -->
             <Grid ColumnDefinitions="*,Auto"
@@ -83,6 +83,25 @@
                    Opacity="0.7"
                    HorizontalTextAlignment="Center"
                    Padding="16,20" />
+
+            <!-- Rodapé: total da coluna de valor -->
+            <Grid Grid.Row="4"
+                  ColumnDefinitions="*,Auto"
+                  ColumnSpacing="12"
+                  Padding="16,12"
+                  BackgroundColor="{StaticResource AzulEscuro}"
+                  IsVisible="{Binding TemTotal}">
+                <Label Text="{Binding TituloTotal}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       TextColor="{StaticResource Dourado}" />
+                <Label Grid.Column="1"
+                       Text="{Binding TotalFormatado}"
+                       TextColor="{Binding CorTotal}"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="15"
+                       HorizontalTextAlignment="End" />
+            </Grid>
         </Grid>
     </Border>
 

@@ -26,6 +26,7 @@ namespace ComoEstamos.Core
             services.AddSingleton<IIncluirContaUseCase, IncluirContaUseCase>();
             services.AddSingleton<IAlterarContaUseCase, AlterarContaUseCase>();
             services.AddSingleton<IExcluirContaUseCase, ExcluirContaUseCase>();
+            services.AddSingleton<IAtualizarSaldosUseCase, AtualizarSaldosUseCase>();
             services.AddSingleton<IContaService, ContaService>();
 
             services.AddSingleton<IBuscarTodasCarteirasUseCase, BuscarTodasCarteirasUseCase>();
