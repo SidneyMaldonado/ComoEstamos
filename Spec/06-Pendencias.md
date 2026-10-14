@@ -1,6 +1,6 @@
 # Pendências (próxima etapa)
 
-Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decisão no documento correspondente.
+Atualizado em 14/10/2026. Ao resolver um item, remova-o daqui e registre a decisão no documento correspondente.
 
 ## Decisões em aberto
 
@@ -15,6 +15,23 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 - [ ] **Casos de uso candidatos** em [03-UseCases.md](03-UseCases.md#catálogo--candidatos-futuros): estornar
   pagamento, transferir entre contas, registrar histórico, desativar operação.
   Cada um tem decisões em aberto. O CRUD de Operação depende deles.
+
+## Atualização do app (migrations)
+
+Hoje o banco fica em `FileSystem.AppDataDirectory`, que o sistema preserva nas atualizações, e o
+`AplicarMigrations()` (em `MauiProgram`) roda as migrations pendentes ao abrir, sem tratamento de erro.
+
+- [ ] **Cópia de segurança antes das migrations.** Ao abrir, se houver migration pendente
+  (`GetPendingMigrations()`), gravar antes uma cópia do banco no estilo do `backup-antes-do-restore.zip`
+  (ex.: `backup-antes-da-atualizacao.zip`, só o último), reaproveitando o `PacoteBackup` e o `IArquivoBanco`
+  ([03-UseCases.md](03-UseCases.md#backup-e-restore-usecasesbackup)). Assim, uma migration que dê errado pode ser
+  desfeita. Decidir: guardar só a última ou uma por versão; se a cópia falhar, abrir o app mesmo assim ou não.
+- [ ] **Falha na migration ao abrir.** Hoje, se o `Migrate()` falhar, o app fecha ao abrir e o usuário fica sem
+  acesso. Tratar a falha: mostrar uma tela com a mensagem e as opções de restaurar a cópia de antes da atualização
+  (item acima) ou um backup escolhido (Configurações → Restaurar), em vez de fechar. Decidir o que a tela mostra e se
+  dá para enviar o erro (ex.: compartilhar o texto do erro).
+- Regra para as próximas migrations: nada destrutivo sem conversão dos dados (apagar ou renomear coluna de verdade
+  perde o dado; renomear propriedade mantendo a coluna, como em `OperacaoValorTotal`, não perde).
 
 ## Telas
 
