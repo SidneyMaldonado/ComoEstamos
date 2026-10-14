@@ -24,6 +24,7 @@ namespace ComoEstamos.Test.ServiceTests
                 _usuarioAtual,
                 new BuscarDividasUseCase(uow),
                 new BuscarDividaPorIdUseCase(uow),
+                new BuscarResumoMesUseCase(uow),
                 new CriarDividaUseCase(uow),
                 new AlterarDividaUseCase(uow),
                 new ExcluirDividaUseCase(uow));
@@ -74,6 +75,21 @@ namespace ComoEstamos.Test.ServiceTests
             Assert.AreEqual("Notebook", lista.Single().Nome);
             Assert.HasCount(3, (await _service.BuscarPorIdAsync(divida.Id))!.Parcelas);
             Assert.IsNull(await _service.BuscarPorIdAsync(deOutro.Id));
+        }
+
+        [TestMethod]
+        public async Task BuscarResumoMes_UsaOUsuarioAtual()
+        {
+            var outro = await CriarUsuarioAsync("outro@teste.com");
+            var deOutro = new Divida { IdUsuario = outro.Id, Nome = "De outro", DataPrimeiroVencimento = new DateTime(2026, 10, 10) };
+            deOutro.Parcelas.Add(new Parcela { Divida = deOutro, Descricao = "De outro 1/1", Valor = 50m, DataVencimento = new DateTime(2026, 10, 10) });
+            await SemearAsync(deOutro);
+            await _service.IncluirAsync(await NovaDividaAsync());
+
+            var resumo = await _service.BuscarResumoMesAsync(new DateTime(2026, 10, 1));
+
+            Assert.AreEqual("Notebook", resumo.Despesas.Single().Nome);
+            Assert.AreEqual(100m, resumo.TotalDespesas);
         }
 
         [TestMethod]

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
+             x:Class="ComoEstamos.Pages.Resumo.ResumoMesPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <Grid RowDefinitions="Auto,Auto,Auto,*" Style="{StaticResource Conteudo}">
+
+            <!-- Atalhos (Início ↑ Resumo ↑ Dívidas): para cima abre as dívidas; para baixo volta para a tela inicial.
+                 Dentro da rolagem das tabelas o arrasto rola a lista: os gestos valem no título e na linha do mês. -->
+            <Grid.GestureRecognizers>
+                <SwipeGestureRecognizer Direction="Up" Swiped="ArrastarParaCima_Swiped" />
+                <SwipeGestureRecognizer Direction="Down" Swiped="ArrastarParaBaixo_Swiped" />
+            </Grid.GestureRecognizers>
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <ImageButton Style="{StaticResource BotaoMenu}" Clicked="Menu_Clicked" />
+                <Label Grid.Column="1"
+                       Text="Resumo do Mês"
+                       Style="{StaticResource TituloPagina}" />
+            </Grid>
+
+            <BoxView Grid.Row="1" Style="{StaticResource LinhaTitulo}" />
+
+            <!-- Mês: ‹ Outubro/2026 ›. Tocar no texto volta para o mês atual. -->
+            <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                <Button Text="‹"
+                        Style="{StaticResource BotaoSecundario}"
+                        WidthRequest="48"
+                        Padding="0"
+                        FontSize="22"
+                        SemanticProperties.Description="Mês anterior"
+                        Clicked="MesAnterior_Clicked" />
+                <Label x:Name="TextoMes"
+                       Grid.Column="1"
+                       FontFamily="OpenSansSemibold"
+                       FontSize="18"
+                       TextColor="{StaticResource TextoClaro}"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Mes_Tapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Button Grid.Column="2"
+                        Text="›"
+                        Style="{StaticResource BotaoSecundario}"
+                        WidthRequest="48"
+                        Padding="0"
+                        FontSize="22"
+                        SemanticProperties.Description="Próximo mês"
+                        Clicked="ProximoMes_Clicked" />
+            </Grid>
+
+            <!-- Uma rolagem só para as três tabelas: elas crescem com as linhas (RolaSozinha = False). -->
+            <ScrollView Grid.Row="3">
+                <VerticalStackLayout Spacing="16">
+
+                    <controls:TabelaRegistros x:Name="TabelaDespesas"
+                                           TituloTexto="Dívidas"
+                                           TituloTotal="Total"
+                                           MensagemVazia="Nenhuma dívida vence neste mês."
+                                           RolaSozinha="False"
+                                           LinhaTocada="Tabela_LinhaTocada" />
+
+                    <controls:TabelaRegistros x:Name="TabelaReceitas"
+                                           TituloTexto="Receitas"
+                                           TituloTotal="Total"
+                                           MensagemVazia="Nenhuma receita neste mês."
+                                           RolaSozinha="False"
+                                           LinhaTocada="Tabela_LinhaTocada" />
+
+                    <!-- Receitas, Despesas e, no rodapé, a Diferença (vermelha quando negativa) -->
+                    <controls:TabelaRegistros x:Name="TabelaResumo"
+                                           TituloTexto="Resumo"
+                                           TituloTotal="Diferença"
+                                           RolaSozinha="False" />
+
+                    <!-- Dica do atalho; tocar também abre as dívidas (no Windows, o arrasto com o mouse não dispara o gesto). -->
+                    <Label Text="︿  Arraste para cima para ver as dívidas"
+                           FontSize="12"
+                           TextColor="{StaticResource Dourado}"
+                           Opacity="0.8"
+                           HorizontalTextAlignment="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Dividas_Tapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+    </Grid>
+
+</ContentPage>

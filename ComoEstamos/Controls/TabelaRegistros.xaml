@@ -5,6 +5,39 @@
              x:Class="ComoEstamos.Controls.TabelaRegistros"
              x:Name="Raiz">
 
+    <ContentView.Resources>
+        <!-- Uma linha: texto (com detalhe opcional) à esquerda e valor à direita. Usada pelas duas formas de listar. -->
+        <DataTemplate x:Key="ModeloLinha" x:DataType="controls:LinhaTabela">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="12"
+                  Padding="16,12"
+                  BackgroundColor="{Binding Fundo}">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="Linha_Tocada" />
+                </Grid.GestureRecognizers>
+                <VerticalStackLayout VerticalOptions="Center">
+                    <Label Text="{Binding Texto}"
+                           FontSize="15"
+                           TextColor="{StaticResource TextoClaro}"
+                           LineBreakMode="TailTruncation" />
+                    <Label Text="{Binding Detalhe}"
+                           IsVisible="{Binding TemDetalhe}"
+                           FontSize="12"
+                           TextColor="{StaticResource TextoClaro}"
+                           Opacity="0.7"
+                           LineBreakMode="TailTruncation" />
+                </VerticalStackLayout>
+                <Label Grid.Column="1"
+                       Text="{Binding Valor}"
+                       IsVisible="{Binding TemValor}"
+                       FontSize="15"
+                       TextColor="{Binding CorValor}"
+                       HorizontalTextAlignment="End"
+                       VerticalTextAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+    </ContentView.Resources>
+
     <Border x:DataType="controls:TabelaRegistros"
             BindingContext="{x:Reference Raiz}"
             VerticalOptions="Start"
@@ -37,42 +70,17 @@
                      HeightRequest="1"
                      BackgroundColor="{StaticResource Dourado}" />
 
-            <!-- Linhas -->
+            <!-- Linhas: a CollectionView rola sozinha; sem rolagem própria (RolaSozinha = False), as linhas
+                 ficam numa pilha simples, para a tabela ficar dentro da ScrollView da página. -->
             <CollectionView Grid.Row="2"
-                            ItemsSource="{Binding Linhas}"
-                            SelectionMode="None">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="controls:LinhaTabela">
-                        <Grid ColumnDefinitions="*,Auto"
-                              ColumnSpacing="12"
-                              Padding="16,12"
-                              BackgroundColor="{Binding Fundo}">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="Linha_Tocada" />
-                            </Grid.GestureRecognizers>
-                            <VerticalStackLayout VerticalOptions="Center">
-                                <Label Text="{Binding Texto}"
-                                       FontSize="15"
-                                       TextColor="{StaticResource TextoClaro}"
-                                       LineBreakMode="TailTruncation" />
-                                <Label Text="{Binding Detalhe}"
-                                       IsVisible="{Binding TemDetalhe}"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextoClaro}"
-                                       Opacity="0.7"
-                                       LineBreakMode="TailTruncation" />
-                            </VerticalStackLayout>
-                            <Label Grid.Column="1"
-                                   Text="{Binding Valor}"
-                                   IsVisible="{Binding TemValor}"
-                                   FontSize="15"
-                                   TextColor="{Binding CorValor}"
-                                   HorizontalTextAlignment="End"
-                                   VerticalTextAlignment="Center" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                            ItemsSource="{Binding LinhasComRolagem}"
+                            IsVisible="{Binding RolaSozinha}"
+                            ItemTemplate="{StaticResource ModeloLinha}"
+                            SelectionMode="None" />
+            <VerticalStackLayout Grid.Row="2"
+                                 BindableLayout.ItemsSource="{Binding LinhasSemRolagem}"
+                                 BindableLayout.ItemTemplate="{StaticResource ModeloLinha}"
+                                 IsVisible="{Binding SemRolagem}" />
 
             <!-- Lista vazia -->
             <Label Grid.Row="3"

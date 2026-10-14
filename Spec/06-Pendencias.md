@@ -39,7 +39,7 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 
   | Entidade | Observação |
   |---|---|
-  | Dívida | Listar, Visualizar, Incluir, Alterar e Excluir feitos em 13/10/2026 ([05-Telas.md](05-Telas.md#dívidas)). Falta a tela de **créditos** (`EhDivida = false`) |
+  | Dívida | Listar, Visualizar, Incluir, Alterar e Excluir feitos em 13/10/2026 ([05-Telas.md](05-Telas.md#dívidas)). Falta a tela de **créditos** (`EhDivida = false`): hoje eles só aparecem nas Receitas do Resumo do Mês e abrem na Visualizar Dívida |
   | Operação | Inclusão pelo `RegistrarOperacaoUseCase`; excluir depende de `DesativarOperacaoUseCase` |
   | Parcela | Visualizar (com Pagar), Incluir, Alterar e Excluir feitos em 14/10/2026 ([05-Telas.md](05-Telas.md#parcelas)). Falta o **estorno** do pagamento (`EstornarPagamentoParcelaUseCase`) |
   | Histórico | Só consulta; depende de `RegistrarHistoricoUseCase` |
@@ -66,6 +66,13 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
   exclusão (Sim e Não, mensagem extra quando há parcela paga). Na tela inicial, o atalho para as dívidas: arrastar
   para cima (Android: em cima da tabela, fora dela e com muitas contas) e tocar na dica; e a volta, arrastando para
   baixo na lista de dívidas.
+- [ ] **Windows e Android — Resumo do Mês (14/10/2026):** testar no app o item do menu e o atalho da tela inicial
+  (arrastar para cima e tocar na dica, agora para o resumo), do resumo para as dívidas (arrastar no título e na linha
+  do mês, e tocar na dica no fim da rolagem), a volta na mesma ordem (dívidas → resumo → início), as setas e o toque no mês,
+  a ida para os investimentos (arrastar para baixo na tela inicial) e a volta (arrastar para cima nos investimentos),
+  a rolagem das três tabelas juntas (`RolaSozinha="False"`, em tela pequena e com muitas dívidas), o tom das pagas, os
+  textos Paga/Vencida/Vence, a Diferença negativa em vermelho e o toque na linha abrindo a dívida. Conferir também
+  que as tabelas das outras telas continuam rolando.
 - [ ] **Windows e Android — Parcelas (14/10/2026):** testar no app o + da seção Parcelas (tamanho e alinhamento com o
   título; a Incluir preenchida, erros, a nova parcela na ordem certa e o total recalculado), o toque na parcela da Visualizar Dívida, a
   Visualizar Parcela (em aberto, vencida e paga: lápis e lixeira apagados), o Pagar (Sim e Não, data de hoje e

@@ -10,6 +10,7 @@
     xmlns:credores="clr-namespace:ComoEstamos.Pages.Credores"
     xmlns:dividas="clr-namespace:ComoEstamos.Pages.Dividas"
     xmlns:investimentos="clr-namespace:ComoEstamos.Pages.Investimentos"
+    xmlns:resumo="clr-namespace:ComoEstamos.Pages.Resumo"
     Shell.BackgroundColor="#1A2E6E"
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="{StaticResource AzulEscuro}"
@@ -40,6 +41,10 @@
 
     <FlyoutItem Title="Início" Icon="inicio_icon.png">
         <ShellContent ContentTemplate="{DataTemplate local:MainPage}" Route="MainPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Resumo do Mês" Icon="resumo_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate resumo:ResumoMesPage}" Route="resumo" />
     </FlyoutItem>
 
     <FlyoutItem Title="Contas" Icon="contas_icon.png">

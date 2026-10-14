@@ -8,7 +8,7 @@
 | `Compartilhamento/ImagemSaldos.cs` | PNG da tabela de saldos compartilhada pela tela inicial (SkiaSharp) |
 | `Pages/<Entidades>/` | As 4 páginas do CRUD de cada entidade (`ListarContasPage`, `VisualizarContaPage`, `IncluirContaPage`, `AlterarContaPage`). Ver [07-Crud.md](07-Crud.md) |
 | `Pages/Formulario.cs` | Passos repetidos das páginas: ler o Id da rota, ler números, mostrar erros nos campos, salvar, excluir, voltar |
-| `Controls/TabelaRegistros` | Tabela das listas: coluna de texto (com detalhe opcional), coluna de valor opcional e rodapé de total opcional (`Total`; nulo esconde) |
+| `Controls/TabelaRegistros` | Tabela das listas: coluna de texto (com detalhe opcional), coluna de valor opcional e rodapé de total opcional (`Total`; nulo esconde). `RolaSozinha` (padrão `true`): as linhas rolam dentro da tabela; `false`: a tabela cresce com as linhas (pilha com `BindableLayout`), para ficar numa `ScrollView` da página. `Montar(..., apagado:)` deixa o valor da linha num tom mais fraco |
 | `Resources/Styles/Styles.xaml` | Estilos com chave usados pelas páginas (ver "Visual") |
 | `Resources/Styles/Colors.xaml` | Paleta do app |
 
@@ -26,7 +26,7 @@ só o `UsuarioAtual` muda.
 
 ## Navegação
 
-- `AppShell` tem um **menu lateral (flyout)**: Início, Contas, Dívidas, Categorias, Credores, Carteiras e Investimentos.
+- `AppShell` tem um **menu lateral (flyout)**: Início, Resumo do Mês, Contas, Dívidas, Categorias, Credores, Carteiras e Investimentos.
   Cada item de CRUD abre a página Listar (rota no plural: `contas`, `carteiras`...).
 - As páginas escondem a barra de navegação (`Shell.NavBarIsVisible="False"`). As páginas do menu
   têm o ícone ☰ dourado no canto superior esquerdo, que abre o menu (`Shell.Current.FlyoutIsPresented = true`).
@@ -35,13 +35,20 @@ só o `UsuarioAtual` muda.
   query (`alterar-conta?id=3`) e são lidos com `IQueryAttributable` + `Formulario.LerId`. Para voltar,
   `Formulario.VoltarAsync()` (`GoToAsync("..")`).
 
-- **Atalho da tela inicial para as dívidas**: arrastar o dedo para cima na MainPage (`SwipeGestureRecognizer`
-  `Up` no conteúdo) abre `//dividas`, como o item do menu. As linhas da tabela de saldos continuam rolando: o
-  gesto vale fora delas (título, espaço abaixo da tabela, botão). A dica "︿ Arraste para cima para ver as
-  dívidas", abaixo do botão "Atualizar Saldos", também abre as dívidas ao ser tocada (no Windows, o arrasto com
-  o mouse não dispara o gesto).
-- **Volta das dívidas para a tela inicial**: o contrário — arrastar o dedo para baixo na `ListarDividasPage` abre
-  `//MainPage`. Vale fora das linhas da tabela e do campo de busca. Sem dica na tela.
+- **Atalho da tela inicial para o resumo do mês** (até 14/10/2026 abria as dívidas): arrastar o dedo para cima na
+  MainPage (`SwipeGestureRecognizer` `Up` no conteúdo) abre `//resumo`, como o item do menu. As linhas da tabela de
+  saldos continuam rolando: o gesto vale fora delas (título, espaço abaixo da tabela, botão). A dica "︿ Arraste
+  para cima para ver o resumo do mês", abaixo do botão "Atualizar Saldos", também abre o resumo ao ser tocada (no
+  Windows, o arrasto com o mouse não dispara o gesto).
+- **Do resumo para as dívidas**: arrastar o dedo para cima na `ResumoMesPage` abre `//dividas`. A rolagem das
+  tabelas consome o arrasto, então o gesto vale no título e na linha do mês; no fim da rolagem, a dica "︿ Arraste
+  para cima para ver as dívidas" também abre as dívidas ao ser tocada.
+- **Volta, na mesma ordem** (Dívidas ↓ Resumo ↓ Início): arrastar o dedo para baixo na `ListarDividasPage` abre
+  `//resumo` (vale fora das linhas da tabela e do campo de busca); na `ResumoMesPage`, abre `//MainPage` (no título e
+  na linha do mês). Sem dica na tela.
+- **Da tela inicial para os investimentos**: arrastar o dedo para baixo na MainPage abre `//investimentos`; na
+  `ListarInvestimentosPage`, arrastar para cima volta para `//MainPage`. Valem fora das linhas da tabela. Sem dica
+  na tela (no Windows, os investimentos ficam no menu).
 
 ## Padrão de CRUD
 
@@ -212,6 +219,27 @@ estiver paga ao abrir, avisa e volta.
 | `dt_vencimento` | Vencimento | `DatePicker`; livre (pode mudar a ordem das parcelas) |
 | `id_conta` | Conta | Obrigatória (`Picker` com as contas ativas) |
 | `id_categoria` | Categoria | Obrigatória (`Picker` com as categorias ativas) |
+
+## Resumo do Mês
+
+`Pages/Resumo/ResumoMesPage`, rota `resumo` (item "Resumo do Mês" do menu, logo abaixo de Início, ícone
+`resumo_icon.svg`, e o atalho da tela inicial). Versão no app da planilha "Como Estamos": o que vence no mês, as
+receitas e a diferença. Usa o `IDividaService.BuscarResumoMesAsync` ([03-UseCases.md](03-UseCases.md#buscarresumomesusecase)).
+
+- Atalhos: para cima abre as dívidas, para baixo volta para a tela inicial (ver "Navegação"); dica no fim da rolagem.
+- Topo: ☰ e "Resumo do Mês". Abaixo, o mês: `‹ Outubro/2026 ›`. Começa no mês atual; as setas andam um mês; tocar no
+  texto volta para o mês atual. O mês continua ao voltar para a página. Recarrega em `OnAppearing`.
+- Uma `ScrollView` com três `TabelaRegistros` (`RolaSozinha="False"`), todas com o nome do mês no título da coluna
+  de valor (como a planilha):
+  - **Dívidas**: uma linha por dívida (`EhDivida = true`) com parcela vencendo no mês, com o nome e, abaixo,
+    "Paga em 05/10", "Vencida em 10/10" ou "Vence em 10/10"; à direita, a soma das parcelas do mês. O valor das
+    pagas fica num tom mais fraco. Rodapé "Total". Vazia: "Nenhuma dívida vence neste mês.";
+  - **Receitas**: o mesmo para os créditos (`EhDivida = false`). Vazia: "Nenhuma receita neste mês.";
+  - **Resumo**: linhas Receitas e Despesas e, no rodapé, a **Diferença** (receitas − despesas; vermelha quando
+    negativa).
+- Tocar numa linha de Dívidas ou Receitas abre a Visualizar Dívida (de onde se paga a parcela). As linhas do Resumo
+  não abrem nada.
+- Dívidas sem parcela no mês não aparecem (na planilha aparecem com "-").
 
 ## Compartilhar saldos
 

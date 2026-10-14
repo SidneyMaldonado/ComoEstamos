@@ -23,6 +23,10 @@ namespace ComoEstamos.Pages.Investimentos
 
         private void Menu_Clicked(object? sender, EventArgs e) => Shell.Current.FlyoutIsPresented = true;
 
+        /// <summary>Volta para a tela inicial, como o item "Início" do menu.</summary>
+        private async void ArrastarParaCima_Swiped(object? sender, SwipedEventArgs e) =>
+            await Shell.Current.GoToAsync("//MainPage");
+
         private async void Incluir_Tapped(object? sender, TappedEventArgs e) =>
             await Shell.Current.GoToAsync(IncluirInvestimentoPage.Rota);
 

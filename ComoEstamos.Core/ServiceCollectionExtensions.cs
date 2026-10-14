@@ -60,6 +60,7 @@ namespace ComoEstamos.Core
             // Dívidas: fora do CRUD padrão (Spec/07-Crud.md, "Entidades fora do CRUD padrão").
             services.AddSingleton<IBuscarDividasUseCase, BuscarDividasUseCase>();
             services.AddSingleton<IBuscarDividaPorIdUseCase, BuscarDividaPorIdUseCase>();
+            services.AddSingleton<IBuscarResumoMesUseCase, BuscarResumoMesUseCase>();
             services.AddSingleton<ICriarDividaUseCase, CriarDividaUseCase>();
             services.AddSingleton<IAlterarDividaUseCase, AlterarDividaUseCase>();
             services.AddSingleton<IExcluirDividaUseCase, ExcluirDividaUseCase>();

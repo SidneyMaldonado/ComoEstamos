@@ -64,11 +64,15 @@ namespace ComoEstamos
 
         private void Menu_Clicked(object? sender, EventArgs e) => Shell.Current.FlyoutIsPresented = true;
 
-        private async void ArrastarParaCima_Swiped(object? sender, SwipedEventArgs e) => await AbrirDividasAsync();
+        private async void ArrastarParaCima_Swiped(object? sender, SwipedEventArgs e) => await AbrirResumoAsync();
 
-        private async void Dividas_Tapped(object? sender, TappedEventArgs e) => await AbrirDividasAsync();
+        private async void Resumo_Tapped(object? sender, TappedEventArgs e) => await AbrirResumoAsync();
 
-        /// <summary>Abre a lista de dívidas como o item "Dívidas" do menu (rota absoluta do Shell).</summary>
-        private static Task AbrirDividasAsync() => Shell.Current.GoToAsync("//dividas");
+        /// <summary>Abre os investimentos como o item "Investimentos" do menu.</summary>
+        private async void ArrastarParaBaixo_Swiped(object? sender, SwipedEventArgs e) =>
+            await Shell.Current.GoToAsync("//investimentos");
+
+        /// <summary>Abre o resumo do mês como o item "Resumo do Mês" do menu (rota absoluta do Shell).</summary>
+        private static Task AbrirResumoAsync() => Shell.Current.GoToAsync("//resumo");
     }
 }
