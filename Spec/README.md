@@ -19,6 +19,6 @@ implementação exigir uma decisão diferente, atualize o documento no mesmo com
 | Termo | Significado |
 |---|---|
 | Dívida | Registro em `tb_divida` com `EhDivida = true`: valor **a pagar** |
-| Crédito | Registro em `tb_divida` com `EhDivida = false`: valor **a receber** |
-| Parcela | Cada vencimento de uma dívida ou crédito |
+| Receita (crédito) | Registro em `tb_divida` com `EhDivida = false`: valor **a receber**. Tem telas próprias (Receitas) |
+| Parcela | Cada vencimento de uma dívida ou receita |
 | Desativar | Exclusão lógica (`dm_ativo = 0`). Nada é apagado do banco |
