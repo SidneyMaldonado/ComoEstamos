@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ComoEstamos.Pages.Configuracoes.ConfiguracoesPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource ConteudoFormulario}">
+
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    <ImageButton Style="{StaticResource BotaoMenu}" Clicked="Menu_Clicked" />
+                    <Label Grid.Column="1"
+                           Text="Configurações"
+                           Style="{StaticResource TituloPagina}" />
+                </Grid>
+
+                <BoxView Style="{StaticResource LinhaTitulo}" />
+
+                <!-- Backup: só manual. Gerar e compartilhar, ou restaurar (substitui todos os dados). -->
+                <Border Style="{StaticResource Cartao}">
+                    <VerticalStackLayout Spacing="12">
+
+                        <Label Text="Backup" Style="{StaticResource TituloSecao}" />
+
+                        <Label Text="Guarde uma cópia de todos os seus dados fora do aparelho (Drive, e-mail...). Para trazer os dados de volta, restaure o arquivo de backup."
+                               FontSize="14"
+                               TextColor="{StaticResource TextoClaro}" />
+
+                        <Label x:Name="TextoUltimoBackup"
+                               FontSize="14"
+                               TextColor="{StaticResource TextoClaro}"
+                               Opacity="0.7" />
+
+                        <Button x:Name="BotaoBackup"
+                                Text="Fazer backup e compartilhar"
+                                Style="{StaticResource BotaoPrincipal}"
+                                Clicked="Backup_Clicked" />
+
+                        <Button x:Name="BotaoRestaurar"
+                                Text="Restaurar backup"
+                                Style="{StaticResource BotaoSecundario}"
+                                Clicked="Restaurar_Clicked" />
+
+                        <ActivityIndicator x:Name="Carregando"
+                                           IsRunning="False"
+                                           IsVisible="False"
+                                           Color="{StaticResource Dourado}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

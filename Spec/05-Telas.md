@@ -26,7 +26,8 @@ só o `UsuarioAtual` muda.
 
 ## Navegação
 
-- `AppShell` tem um **menu lateral (flyout)**: Início, Resumo do Mês, Contas, Dívidas, Receitas, Categorias, Credores, Carteiras e Investimentos.
+- `AppShell` tem um **menu lateral (flyout)**: Início, Resumo do Mês, Contas, Dívidas, Receitas, Categorias, Credores, Carteiras,
+  Investimentos e Configurações ([Configurações](#configurações)).
   Cada item de CRUD abre a página Listar (rota no plural: `contas`, `carteiras`...).
 - As páginas escondem a barra de navegação (`Shell.NavBarIsVisible="False"`). As páginas do menu
   têm o ícone ☰ dourado no canto superior esquerdo, que abre o menu (`Shell.Current.FlyoutIsPresented = true`).
@@ -270,6 +271,27 @@ Visual de planilha, independente do tema do app: fundo branco, grade preta; cabe
 a data à direita (`14/out`) e linha "Total" em negrito sobre verde claro `#C6E0B4`; valores à direita no
 formato `1.447,75`, sem "R$". Fonte Calibri quando existir (Windows); senão, a padrão do sistema.
 Gerada em 3× para não borrar no celular.
+
+## Configurações
+
+Decisão e implementação de 14/10/2026. Item **Configurações** no fim do menu (ícone `configuracoes_icon.svg`, rota
+`configuracoes`), em `Pages/Configuracoes/ConfiguracoesPage`. É o lugar das opções gerais do app; por enquanto, só a seção **Backup**.
+Regras dos casos de uso em [03-UseCases.md](03-UseCases.md#backup-e-restore-usecasesbackup).
+
+- Topo: ☰ e "Configurações". Cartão **Backup** com o texto "Último backup: 14/10/2026 às 15:30" (ou "Nenhum backup
+  feito neste aparelho"; a data fica em `Preferences`, só para exibir) e dois botões:
+- **Fazer backup e compartilhar**: antes de gerar, avisa (Sim/Não): "O arquivo de backup tem todos os seus dados
+  financeiros e não é protegido por senha. Compartilhe só com destinos de sua confiança (seu Drive, seu e-mail).
+  Continuar?". Sim gera o `.zip` em `FileSystem.CacheDirectory` e abre o compartilhamento do sistema
+  (`Share.Default`, `ShareFileRequest`, `application/zip`), como no [Compartilhar saldos](#compartilhar-saldos).
+  O usuário escolhe o destino (Drive, WhatsApp, e-mail, Arquivos...). Só **manual**: não há backup automático.
+- **Restaurar backup**: abre o seletor de arquivos (`FilePicker`, aceita `.zip`; no Android também
+  `application/octet-stream`, porque alguns provedores não informam o tipo) → copia o arquivo escolhido para o cache
+  (ele pode estar num provedor sem caminho direto) → valida (`ValidarBackupUseCase`); se
+  recusar, mostra a mensagem num alerta e nada muda → mostra o resumo e pede confirmação: "Backup de 14/10/2026 às
+  15:30: 5 contas, 12 dívidas, 3 receitas, 48 parcelas e 2 investimentos. **Todos os dados atuais serão substituídos** por este backup.
+  Confirma?" (Sim/Não) → Sim restaura (`RestaurarBackupUseCase`), avisa "Backup restaurado." e abre `//MainPage`.
+  Os botões ficam desabilitados enquanto o backup ou o restore roda.
 
 ## Visual
 

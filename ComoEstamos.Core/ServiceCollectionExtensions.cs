@@ -1,5 +1,6 @@
 using ComoEstamos.Core.Services;
 using ComoEstamos.Core.UseCases;
+using ComoEstamos.Core.UseCases.Backup;
 using ComoEstamos.Core.UseCases.Carteiras;
 using ComoEstamos.Core.UseCases.Categorias;
 using ComoEstamos.Core.UseCases.Contas;
@@ -72,6 +73,12 @@ namespace ComoEstamos.Core
             services.AddSingleton<IExcluirParcelaUseCase, ExcluirParcelaUseCase>();
             services.AddSingleton<IPagarParcelaUseCase, PagarParcelaUseCase>();
             services.AddSingleton<IParcelaService, ParcelaService>();
+
+            // Backup e restore do banco inteiro (tela Configurações).
+            services.AddSingleton<IGerarBackupUseCase, GerarBackupUseCase>();
+            services.AddSingleton<IValidarBackupUseCase, ValidarBackupUseCase>();
+            services.AddSingleton<IRestaurarBackupUseCase, RestaurarBackupUseCase>();
+            services.AddSingleton<IBackupService, BackupService>();
 
             return services;
         }

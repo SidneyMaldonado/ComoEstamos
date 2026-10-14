@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:ComoEstamos"
     xmlns:carteiras="clr-namespace:ComoEstamos.Pages.Carteiras"
+    xmlns:configuracoes="clr-namespace:ComoEstamos.Pages.Configuracoes"
     xmlns:categorias="clr-namespace:ComoEstamos.Pages.Categorias"
     xmlns:contas="clr-namespace:ComoEstamos.Pages.Contas"
     xmlns:credores="clr-namespace:ComoEstamos.Pages.Credores"
@@ -74,6 +75,10 @@
 
     <FlyoutItem Title="Investimentos" Icon="investimento_icon.png">
         <ShellContent ContentTemplate="{DataTemplate investimentos:ListarInvestimentosPage}" Route="investimentos" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Configurações" Icon="configuracoes_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate configuracoes:ConfiguracoesPage}" Route="configuracoes" />
     </FlyoutItem>
 
 </Shell>

@@ -245,6 +245,44 @@ Decisão de 13/10/2026: toda mudança de saldo feita pelo usuário fica registra
   (`dm_ativo = false`, na mesma unidade de trabalho) todos os históricos ativos da conta
   (`HistoricoSaldoRepository.DesativarPorContaAsync`). Exclusão recusada não mexe no histórico.
 
+### Backup e restore (`UseCases/Backup/`)
+
+Decisão e implementação de 14/10/2026. Chamados pelo `IBackupService` (tela Configurações → Backup, ver
+[05-Telas.md](05-Telas.md#configurações)). Só **manual**: não há backup automático local nem agendado.
+
+**Arquivo de backup:** um `.zip` (não uma extensão própria: o seletor de arquivos do Android não a reconhece
+bem), com o nome `como-estamos-backup-AAAA-MM-DD-HHmm.zip`, contendo:
+
+| Entrada | Conteúdo |
+|---|---|
+| `comoestamos.db3` | Cópia **consistente** do banco SQLite |
+| `manifest.json` | `formato` (versão do formato do backup, começa em 1), `versaoApp`, `ultimaMigration` (Id da última migration aplicada), `dataHora` e `contagens` (registros **ativos** por tabela: contas, dívidas, receitas, parcelas, categorias, credores, carteiras, investimentos) |
+
+- O arquivo vai **sem senha** por enquanto (proteção com senha está em [06-Pendencias.md](06-Pendencias.md)).
+- O backup leva o banco inteiro (todos os usuários e os registros inativos). Hoje só há o usuário local.
+
+| Caso de uso | Assinatura | Regras |
+|---|---|---|
+| `GerarBackupUseCase` | `ExecutarAsync(string pastaDestino, string versaoApp)` → caminho do `.zip` | Copia o banco com `VACUUM INTO` (ou `SqliteConnection.BackupDatabase`), **nunca** copiando o arquivo `.db3` direto: o SQLite pode ter gravações pendentes no `-wal` e a cópia sairia incompleta. Monta o `manifest.json` e compacta. Os arquivos temporários são apagados |
+| `ValidarBackupUseCase` | `ExecutarAsync(string caminhoZip)` → `ResumoBackup` | Não muda nada. Recusa (`RegraDeNegocioException`, mensagem para o usuário) se: não é `.zip` válido; falta o `manifest.json` ou o `comoestamos.db3`; `formato` desconhecido; `PRAGMA integrity_check` diferente de `ok`; `ultimaMigration` **não existe nesta versão do app** (backup de versão mais nova: "Atualize o app para restaurar este backup"). Devolve `ResumoBackup`: data/hora, versão do app e contagens **do manifesto** (contar no banco do backup dependeria do esquema daquela versão) |
+| `RestaurarBackupUseCase` | `ExecutarAsync(string caminhoZip, string versaoApp)` | Valida de novo (como o `ValidarBackupUseCase`). Antes de trocar, grava um **backup de segurança** do banco atual na pasta do app (`backup-antes-do-restore.zip`, só o último, substituído a cada restore). Fecha as conexões (`SqliteConnection.ClearAllPools()`), **substitui o banco inteiro** (não mistura com os dados atuais) e roda as migrations (`Database.Migrate()`), o que atualiza um backup de versão anterior. Apaga o `-wal`/`-shm` do banco antigo (seriam aplicados ao novo). Se a troca ou a migration falhar, volta o banco de antes e lança o erro |
+
+Os casos de uso de backup **não** usam a unidade de trabalho: recebem o `IArquivoBanco` (`ComoEstamos.Data/ArquivoBanco.cs`),
+que faz a cópia (`VACUUM INTO`), o `integrity_check`, lê as migrations aplicadas/conhecidas, conta os registros ativos
+(`ContagemRegistros`) e troca o arquivo. O formato do zip e a validação comum ficam em `PacoteBackup` (interno do Core):
+só as duas entradas conhecidas são lidas, pelo nome (nada é extraído com o caminho que vem no zip). Os arquivos
+avulsos (cópias de backup) são abertos **sem pool** de conexões, para poderem ser apagados logo depois.
+
+**Onde fica cada parte** ([01-Arquitetura.md](01-Arquitetura.md)): `IBackupService` e os casos de uso no Core; o que é
+específico do SQLite no ComoEstamos.Data (`IArquivoBanco`, registrado por `AddComoEstamosData` com o caminho do
+banco); compartilhar (`Share.Default`), escolher o arquivo (`FilePicker`) e a versão do app (`AppInfo`) na página.
+
+**Testes** (`UseCaseTests/BackupUseCaseTests.cs`, ver [04-Testes.md](04-Testes.md)): com SQLite em **arquivo
+temporário** (não InMemory), gerar (zip, manifesto, contagens só de ativos), validar (resumo; recusa não-zip, zip sem
+manifesto, `formato` desconhecido, banco corrompido e migration desconhecida) e restaurar (substitui tudo e grava o
+backup de segurança; recusado não muda nada; backup de migration anterior é migrado). A volta do banco quando a troca
+falha não tem teste (precisaria simular a falha).
+
 ---
 
 ## Catálogo — candidatos futuros

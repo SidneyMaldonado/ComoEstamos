@@ -2,6 +2,7 @@ using ComoEstamos.Core;
 using ComoEstamos.Data;
 using ComoEstamos.Pages.Carteiras;
 using ComoEstamos.Pages.Categorias;
+using ComoEstamos.Pages.Configuracoes;
 using ComoEstamos.Pages.Contas;
 using ComoEstamos.Pages.Credores;
 using ComoEstamos.Pages.Dividas;
@@ -78,6 +79,8 @@ namespace ComoEstamos
             builder.Services.AddTransient<VisualizarParcelaPage>();
             builder.Services.AddTransient<IncluirParcelaPage>();
             builder.Services.AddTransient<AlterarParcelaPage>();
+
+            builder.Services.AddTransient<ConfiguracoesPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();
