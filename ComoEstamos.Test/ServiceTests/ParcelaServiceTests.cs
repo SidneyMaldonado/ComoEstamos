@@ -75,7 +75,8 @@ namespace ComoEstamos.Test.ServiceTests
             Assert.AreEqual(new DateTime(2026, 10, 8), (await _service.BuscarPorIdAsync(parcelas[0].Id))?.DataPagamento);
             Assert.IsNull(await _service.BuscarPorIdAsync(parcelas[2].Id));
             await using var db = CriarContexto();
-            Assert.AreEqual(900m, (await db.Contas.SingleAsync()).Saldo);
+            // Pagar não mexe no saldo da conta.
+            Assert.AreEqual(1000m, (await db.Contas.SingleAsync()).Saldo);
         }
     }
 }

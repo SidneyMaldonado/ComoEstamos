@@ -4,7 +4,10 @@ namespace ComoEstamos.Core.UseCases.Contas
 {
     public interface IExcluirContaUseCase
     {
-        /// <summary>Desativa a conta. Recusa se houver dívidas ou parcelas ativas nela.</summary>
+        /// <summary>
+        /// Desativa a conta e o histórico de saldo dela. Recusa se houver dívidas ou parcelas ativas nela
+        /// (o histórico não impede).
+        /// </summary>
         Task ExecutarAsync(int id, int idUsuario);
     }
 
@@ -21,6 +24,7 @@ namespace ComoEstamos.Core.UseCases.Contas
                 throw new RegraDeNegocioException("Não é possível excluir: existem parcelas ativas nesta conta.");
 
             await uow.Contas.DesativarAsync(id);
+            await uow.HistoricosSaldo.DesativarPorContaAsync(id);
             await uow.ConfirmarAsync();
         }
     }

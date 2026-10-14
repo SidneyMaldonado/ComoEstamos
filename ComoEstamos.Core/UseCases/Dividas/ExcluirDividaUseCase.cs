@@ -5,8 +5,7 @@ namespace ComoEstamos.Core.UseCases.Dividas
     public interface IExcluirDividaUseCase
     {
         /// <summary>
-        /// Desativa a dívida e todas as parcelas dela, pagas ou não. O saldo das contas não muda:
-        /// o que já foi pago continua descontado.
+        /// Desativa a dívida e todas as parcelas dela, pagas ou não. O saldo das contas não muda.
         /// </summary>
         Task ExecutarAsync(int id, int idUsuario);
     }
