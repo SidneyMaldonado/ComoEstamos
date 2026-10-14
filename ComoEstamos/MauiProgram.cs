@@ -5,6 +5,7 @@ using ComoEstamos.Pages.Categorias;
 using ComoEstamos.Pages.Contas;
 using ComoEstamos.Pages.Credores;
 using ComoEstamos.Pages.Dividas;
+using ComoEstamos.Pages.Parcelas;
 using ComoEstamos.Pages.Investimentos;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
@@ -63,6 +64,9 @@ namespace ComoEstamos
             builder.Services.AddTransient<VisualizarDividaPage>();
             builder.Services.AddTransient<IncluirDividaPage>();
             builder.Services.AddTransient<AlterarDividaPage>();
+            builder.Services.AddTransient<VisualizarParcelaPage>();
+            builder.Services.AddTransient<IncluirParcelaPage>();
+            builder.Services.AddTransient<AlterarParcelaPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

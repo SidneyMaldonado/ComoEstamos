@@ -2,12 +2,14 @@ using ComoEstamos.Controls;
 using ComoEstamos.Core.Formatacao;
 using ComoEstamos.Core.Services;
 using ComoEstamos.Data.Model;
+using ComoEstamos.Pages.Parcelas;
 
 namespace ComoEstamos.Pages.Dividas
 {
     /// <summary>
     /// Visualização da dívida, só de leitura: os dados em cima e a lista das parcelas embaixo.
     /// O lápis abre a alteração; a lixeira pede confirmação e exclui a dívida e as parcelas.
+    /// Tocar numa parcela abre a Visualizar Parcela; o + da seção Parcelas abre a Incluir Parcela.
     /// </summary>
     public partial class VisualizarDividaPage : ContentPage, IQueryAttributable
     {
@@ -85,6 +87,15 @@ namespace ComoEstamos.Pages.Dividas
                 pergunta += " Os pagamentos já feitos continuam descontados do saldo da conta.";
             await Formulario.ConfirmarEExcluirAsync(this, "Excluir dívida", pergunta, () => dividaService.ExcluirAsync(id));
         }
+
+        private async void IncluirParcela_Tapped(object? sender, TappedEventArgs e)
+        {
+            if (divida is not null)
+                await Shell.Current.GoToAsync($"{IncluirParcelaPage.Rota}?id={divida.Id}");
+        }
+
+        private async void TabelaParcelas_LinhaTocada(object? sender, LinhaTabela linha) =>
+            await Shell.Current.GoToAsync($"{VisualizarParcelaPage.Rota}?id={linha.Id}");
 
         private async void Voltar_Clicked(object? sender, EventArgs e) => await Formulario.VoltarAsync();
     }

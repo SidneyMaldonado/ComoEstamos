@@ -146,11 +146,13 @@ Alterar; excluir é a lixeira da Visualizar. Regras de alterar e excluir em
 cartão com os dados em duas colunas (Nome da Dívida; Credor e Conta; Categoria e Valor Total; Parcelas
 `12x de R$ 100,00` e Situação `Paga` ou `3 de 12 pagas`; Dia de Vencimento e Primeiro Vencimento; Data de
 Cadastro e Última Alteração). Embaixo, a seção **Parcelas**: tabela com `n/total · vencimento`, a situação
-(`Paga em 05/10/2026`, `Vencida` ou `Em aberto`) e o valor; ela rola sozinha. Botão Voltar.
+(`Paga em 05/10/2026`, `Vencida` ou `Em aberto`) e o valor; ela rola sozinha. **Tocar numa parcela** abre a
+Visualizar Parcela ([Parcelas](#parcelas)). À direita do título "Parcelas", um **+** (círculo de 34 px, menor que
+o do topo) abre a Incluir Parcela. Botão Voltar.
 Parcelas: o valor mostrado é o da próxima parcela em aberto.
 
 - **Lápis**: abre a Alterar.
-- **Lixeira**: "Confirma a exclusão da dívida \"X\" e de todas as parcelas?" (Sim/Não). Se houver parcela paga,
+- **Lixeira**: "Confirma a exclusão da dívida "X" e de todas as parcelas?" (Sim/Não). Se houver parcela paga,
   acrescenta "Os pagamentos já feitos continuam descontados do saldo da conta." Sim exclui e volta para a lista.
 
 **Incluir** (`IncluirDividaPage`, rota `incluir-divida`). Grava pelo `CriarDividaUseCase` e gera as parcelas.
@@ -175,6 +177,41 @@ erro abaixo do Primeiro Vencimento. Grava pelo `AlterarDividaUseCase`. Se já ho
 - acima do formulário aparece o aviso "N de T parcelas já pagas (R$ X). Elas não mudam. Se mudar o valor, o número
   de parcelas ou o dia, só as parcelas em aberto são refeitas, com o que falta pagar. Conta e categoria novas valem
   só para as parcelas em aberto."
+
+## Parcelas
+
+Páginas em `Pages/Parcelas/`, com o `IParcelaService`. Não há lista própria: a parcela é aberta pela tabela da
+Visualizar Dívida, e incluída pelo **+** da seção Parcelas dela. Regras em [03-UseCases.md](03-UseCases.md#parcelas-usecasesparcelas).
+
+**Visualizar** (`VisualizarParcelaPage`, rota `visualizar-parcela?id=`). Com rolagem. Cartão em duas colunas: Dívida
+e Parcela (`2 de 12`); Valor e Vencimento; Situação (como na tabela da dívida) e Data do Pagamento (`—` em aberto);
+Conta e Categoria; Descrição; Data de Cadastro e Última Alteração. Botão Voltar.
+
+- **Parcela em aberto**: o cartão **Pagar** (Data do Pagamento, `DatePicker` que começa em hoje e não aceita data
+  futura, e o botão Pagar). Pagar pede confirmação ("Confirma o pagamento de R$ 100,00 em 14/10/2026? O valor será
+  descontado do saldo da conta \"Corrente\"." — no crédito, "somado ao"); Sim paga e a página recarrega, mostrando a
+  parcela paga.
+- **Lápis**: abre a Alterar Parcela.
+- **Lixeira**: "Confirma a exclusão da parcela \"Notebook 3/12\" (R$ 100,00)? A dívida fica com uma parcela a menos e
+  o valor total diminui." (Sim/Não). Sim exclui e volta para a Visualizar Dívida. A exclusão da única parcela é recusada
+  com a mensagem num alerta.
+- **Parcela paga**: lápis e lixeira apagados (opacidade 0,35) e sem efeito; sem o cartão Pagar.
+
+**Incluir** (`IncluirParcelaPage`, rota `incluir-parcela?id=`, com o Id da **dívida**). O mesmo formulário da Alterar,
+preenchido com o valor da última parcela, o vencimento do mês seguinte a ela (no dia de vencimento da dívida, ou no
+último dia do mês) e a conta e a categoria da dívida. Acima, o aviso "Nova parcela de \"X\". Ela entra na ordem do
+vencimento, e o valor total da dívida passa a ser a soma das parcelas.". Grava pelo `IncluirParcelaUseCase` e volta.
+
+**Alterar** (`AlterarParcelaPage`, rota `alterar-parcela?id=`). Acima do formulário, a descrição da parcela e o
+aviso "O valor total da dívida passa a ser a soma das parcelas.". Grava pelo `AlterarParcelaUseCase`. Se a parcela
+estiver paga ao abrir, avisa e volta.
+
+| Campo | Título | Regra |
+|---|---|---|
+| `nr_valor` | Valor (R$) | Mesmos campos na Incluir. Obrigatório, até 2 casas, de 0,01 a 99.999.999,99; o total da dívida também não pode passar disso |
+| `dt_vencimento` | Vencimento | `DatePicker`; livre (pode mudar a ordem das parcelas) |
+| `id_conta` | Conta | Obrigatória (`Picker` com as contas ativas) |
+| `id_categoria` | Categoria | Obrigatória (`Picker` com as categorias ativas) |
 
 ## Compartilhar saldos
 

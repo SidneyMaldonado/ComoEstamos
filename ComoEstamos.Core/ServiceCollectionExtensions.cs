@@ -6,6 +6,7 @@ using ComoEstamos.Core.UseCases.Contas;
 using ComoEstamos.Core.UseCases.Credores;
 using ComoEstamos.Core.UseCases.Dividas;
 using ComoEstamos.Core.UseCases.Investimentos;
+using ComoEstamos.Core.UseCases.Parcelas;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ComoEstamos.Core
@@ -15,7 +16,6 @@ namespace ComoEstamos.Core
         /// <summary>Registra os casos de uso, os services e o usuário atual. Requer <c>AddComoEstamosData</c>.</summary>
         public static IServiceCollection AddComoEstamosCore(this IServiceCollection services)
         {
-            services.AddSingleton<IPagarParcelaUseCase, PagarParcelaUseCase>();
             services.AddSingleton<IRegistrarOperacaoUseCase, RegistrarOperacaoUseCase>();
 
             services.AddSingleton<IUsuarioAtual, UsuarioAtual>();
@@ -64,6 +64,13 @@ namespace ComoEstamos.Core
             services.AddSingleton<IAlterarDividaUseCase, AlterarDividaUseCase>();
             services.AddSingleton<IExcluirDividaUseCase, ExcluirDividaUseCase>();
             services.AddSingleton<IDividaService, DividaService>();
+
+            services.AddSingleton<IBuscarParcelaPorIdUseCase, BuscarParcelaPorIdUseCase>();
+            services.AddSingleton<IIncluirParcelaUseCase, IncluirParcelaUseCase>();
+            services.AddSingleton<IAlterarParcelaUseCase, AlterarParcelaUseCase>();
+            services.AddSingleton<IExcluirParcelaUseCase, ExcluirParcelaUseCase>();
+            services.AddSingleton<IPagarParcelaUseCase, PagarParcelaUseCase>();
+            services.AddSingleton<IParcelaService, ParcelaService>();
 
             return services;
         }
