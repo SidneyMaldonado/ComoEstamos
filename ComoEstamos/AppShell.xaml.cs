@@ -3,6 +3,7 @@ using ComoEstamos.Pages.Categorias;
 using ComoEstamos.Pages.Contas;
 using ComoEstamos.Pages.Credores;
 using ComoEstamos.Pages.Dividas;
+using ComoEstamos.Pages.Parcelas;
 using ComoEstamos.Pages.Investimentos;
 
 namespace ComoEstamos
@@ -38,6 +39,10 @@ namespace ComoEstamos
             Routing.RegisterRoute(IncluirDividaPage.Rota, typeof(IncluirDividaPage));
             Routing.RegisterRoute(AlterarDividaPage.Rota, typeof(AlterarDividaPage));
             Routing.RegisterRoute(VisualizarDividaPage.Rota, typeof(VisualizarDividaPage));
+
+            Routing.RegisterRoute(VisualizarParcelaPage.Rota, typeof(VisualizarParcelaPage));
+            Routing.RegisterRoute(IncluirParcelaPage.Rota, typeof(IncluirParcelaPage));
+            Routing.RegisterRoute(AlterarParcelaPage.Rota, typeof(AlterarParcelaPage));
         }
     }
 }

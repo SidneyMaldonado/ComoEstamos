@@ -129,14 +129,46 @@ Assinatura: `ExecutarAsync(FiltroDividas filtro, int idUsuario)` → `List<Resum
 Dívida da tela Visualizar, com `Credor`, `Conta`, `Categoria` e as **parcelas ativas** por vencimento.
 `null` se não existe, é de outro usuário ou está inativa (mesma regra do BuscarPorId do CRUD).
 
-### PagarParcelaUseCase
+### Parcelas (`UseCases/Parcelas/`)
+
+Decisão de 14/10/2026. Chamados pelo `IParcelaService` (tela Visualizar Parcela, ver [05-Telas.md](05-Telas.md#parcelas)).
+A parcela não tem `id_usuario`: o dono é conferido **pela dívida** (`Divida.IdUsuario`). Regras comuns em
+`ParcelaValidador`:
+
+- Inexistente ou de outro usuário → `KeyNotFoundException`. Parcela ou dívida excluída → `RegraDeNegocioException`.
+- **Parcela paga não muda**: não pode ser alterada nem excluída.
+- Depois de incluir, alterar ou excluir, a dívida é **recalculada** a partir das parcelas ativas: valor total = soma delas,
+  número de parcelas = quantidade, primeiro vencimento = o da primeira, e as descrições refeitas na ordem de
+  vencimento (`<Nome> <n>/<total>`; no empate de vencimento, a recém-incluída fica por último). O dia de vencimento
+não muda.
+
+| Caso de uso | Assinatura | Regras |
+|---|---|---|
+| `BuscarParcelaPorIdUseCase` | `ExecutarAsync(id, idUsuario)` → `Parcela?` | Com `Conta`, `Categoria` e `Divida` (com as parcelas ativas dela, por vencimento, para a tela saber o número). `null` se não existe, é de outro usuário ou se a parcela ou a dívida foi excluída |
+| `IncluirParcelaUseCase` | `ExecutarAsync(Parcela, idUsuario)` → `Parcela` | Na dívida `IdDivida` (ativa e do usuário: senão `KeyNotFoundException`/`RegraDeNegocioException`). Grava só valor, vencimento (só a data), conta e categoria: nasce ativa e **em aberto**. Recusa passar de 360 parcelas. Recalcula a dívida. O saldo não muda |
+| `AlterarParcelaUseCase` | `ExecutarAsync(Parcela, idUsuario)` | Só parcela em aberto. Grava valor, vencimento (só a data), conta e categoria e recalcula a dívida |
+| `ExcluirParcelaUseCase` | `ExecutarAsync(id, idUsuario)` | Só parcela em aberto; desativa (não apaga) e recalcula a dívida. **A única parcela ativa não pode ser excluída** (exclua a dívida). O saldo não muda |
+| `PagarParcelaUseCase` | `ExecutarAsync(id, dataPagamento, idUsuario)` | Ver abaixo |
+
+**Validação do `IncluirParcelaUseCase` e do `AlterarParcelaUseCase`** (`ParcelaValidador.ValidarCamposAsync`) (`ValidacaoException`, um erro por campo; nada gravado):
+
+| Campo | Regra |
+|---|---|
+| `Valor` | De 0,01 a 99.999.999,99, até 2 casas. O novo total da dívida (soma das parcelas) também não pode passar de 99.999.999,99 |
+| `IdConta`, `IdCategoria` | Obrigatórias, ativas e do mesmo usuário |
+| `DataVencimento` | Livre. Pode mudar a ordem das parcelas: a numeração das descrições acompanha |
+
+Se depois a **dívida** for alterada num campo financeiro, o `AlterarDividaUseCase` refaz as parcelas em aberto
+pela regra da inclusão, e os ajustes feitos à mão nelas se perdem.
+
+#### PagarParcelaUseCase
 
 Registra o pagamento (ou recebimento) de uma parcela e ajusta o saldo da conta dela.
 
 **Repositórios:** Parcelas, Dividas, Contas
 
-**Validações:** a parcela deve existir (`KeyNotFoundException`), estar ativa e ainda não
-estar paga; a dívida e a conta devem estar ativas.
+**Validações:** parcela do usuário (pela dívida), ativa e ainda não paga; a dívida e a conta devem estar ativas;
+a data do pagamento não pode ser futura (`ValidacaoException`, campo `DataPagamento`).
 
 **Efeito:**
 
@@ -145,7 +177,7 @@ estar paga; a dívida e a conta devem estar ativas.
 | `true` (dívida) | `Saldo -= Parcela.Valor` |
 | `false` (crédito) | `Saldo += Parcela.Valor` |
 
-- `Parcela.DataPagamento = dataPagamento`.
+- `Parcela.DataPagamento = dataPagamento` (só a data).
 - Saldo negativo é permitido.
 
 ### RegistrarOperacaoUseCase
@@ -189,7 +221,7 @@ Decisão de 13/10/2026: toda mudança de saldo feita pelo usuário fica registra
 | `AlterarContaUseCase` (CRUD de Conta) | Se o saldo mudou |
 
 - A inclusão de conta **não** grava histórico.
-- `PagarParcelaUseCase` ainda **não** grava histórico (decidir junto com as telas de Parcela).
+- `PagarParcelaUseCase` ainda **não** grava histórico (pendência em [06-Pendencias.md](06-Pendencias.md)).
 - O histórico não impede excluir a conta. Ao excluir, ele deve ser desativado junto (pendência em
   [06-Pendencias.md](06-Pendencias.md)).
 

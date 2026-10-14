@@ -75,13 +75,27 @@
                 </Grid>
             </Border>
 
-            <Label Grid.Row="3" Text="Parcelas" Style="{StaticResource TituloSecao}" />
+            <!-- Título da seção e, à direita, o + que inclui uma parcela (círculo menor que o do topo) -->
+            <Grid Grid.Row="3" ColumnDefinitions="*,Auto">
+                <Label Text="Parcelas" Style="{StaticResource TituloSecao}" VerticalOptions="Center" />
+                <Border Grid.Column="1"
+                        Style="{StaticResource BotaoCirculo}"
+                        WidthRequest="34"
+                        HeightRequest="34"
+                        SemanticProperties.Description="Incluir parcela">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="IncluirParcela_Tapped" />
+                    </Border.GestureRecognizers>
+                    <Label Style="{StaticResource SinalMais}" FontSize="22" Margin="0,-2,0,0" />
+                </Border>
+            </Grid>
 
             <controls:TabelaRegistros x:Name="TabelaParcelas"
                                    Grid.Row="4"
                                    TituloTexto="Vencimento"
                                    TituloValor="Valor"
-                                   MensagemVazia="Nenhuma parcela." />
+                                   MensagemVazia="Nenhuma parcela."
+                                   LinhaTocada="TabelaParcelas_LinhaTocada" />
 
             <Button Grid.Row="5"
                     Text="Voltar"

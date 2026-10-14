@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ComoEstamos.Pages.Parcelas.IncluirParcelaPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource ConteudoFormulario}">
+
+                <Label Text="Incluir Parcela" Style="{StaticResource TituloPagina}" />
+
+                <BoxView Style="{StaticResource LinhaTitulo}" />
+
+                <Label x:Name="Aviso"
+                       FontSize="14"
+                       TextColor="{StaticResource TextoClaro}" />
+
+                <Border Style="{StaticResource Cartao}">
+                    <VerticalStackLayout Spacing="8">
+
+                        <Label Text="Valor (R$)" Style="{StaticResource TituloCampo}" />
+                        <Entry x:Name="CampoValor"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 300,00"
+                               Keyboard="Numeric"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroValor" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Vencimento" Style="{StaticResource TituloCampoSeguinte}" />
+                        <DatePicker x:Name="CampoVencimento" Style="{StaticResource CampoData}" />
+                        <Label x:Name="ErroVencimento" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Conta" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Picker x:Name="CampoConta"
+                                Style="{StaticResource CampoEscolha}"
+                                Title="Escolha a conta" />
+                        <Label x:Name="ErroConta" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Categoria" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Picker x:Name="CampoCategoria"
+                                Style="{StaticResource CampoEscolha}"
+                                Title="Escolha a categoria" />
+                        <Label x:Name="ErroCategoria" Style="{StaticResource MensagemErro}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Text="Cancelar"
+                            Style="{StaticResource BotaoSecundario}"
+                            Clicked="Cancelar_Clicked" />
+                    <Button x:Name="BotaoSalvar"
+                            Grid.Column="1"
+                            Text="Salvar"
+                            Style="{StaticResource BotaoPrincipal}"
+                            Clicked="Salvar_Clicked" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>
