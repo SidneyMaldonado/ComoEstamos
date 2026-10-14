@@ -78,8 +78,6 @@ namespace ComoEstamos.Pages.Dividas
 
             var id = divida.Id;
             var pergunta = $"Confirma a exclusão da dívida \"{divida.Nome}\" e de todas as parcelas?";
-            if (divida.Parcelas.Any(p => p.DataPagamento is not null))
-                pergunta += " Os pagamentos já feitos continuam descontados do saldo da conta.";
             await Formulario.ConfirmarEExcluirAsync(this, "Excluir dívida", pergunta, () => dividaService.ExcluirAsync(id));
         }
 

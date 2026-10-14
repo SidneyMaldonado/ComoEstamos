@@ -70,6 +70,26 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
+        public async Task DesativarPorContaAsync_DesativaSoOsAtivosDaConta()
+        {
+            var outra = new Conta { IdUsuario = _usuario.Id, Nome = "Inter" };
+            await SemearAsync(outra);
+            var inativo = NovoHistorico(new DateTime(2026, 10, 3));
+            inativo.Ativo = false;
+            await SemearAsync(
+                NovoHistorico(new DateTime(2026, 10, 1)),
+                NovoHistorico(new DateTime(2026, 10, 2)),
+                inativo,
+                NovoHistorico(new DateTime(2026, 10, 2), outra.Id));
+
+            Assert.AreEqual(2, await _repository.DesativarPorContaAsync(_conta.Id));
+
+            Assert.IsEmpty(await _repository.ListarPorContaAsync(_conta.Id));
+            Assert.HasCount(3, await _repository.ListarPorContaAsync(_conta.Id, incluirInativos: true));
+            Assert.HasCount(1, await _repository.ListarPorContaAsync(outra.Id));
+        }
+
+        [TestMethod]
         public async Task ListarPorContaAsync_IgnoraInativosPorPadraoEIncluiQuandoSolicitado()
         {
             var inativo = NovoHistorico(new DateTime(2026, 10, 2));

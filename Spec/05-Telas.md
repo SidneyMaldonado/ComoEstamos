@@ -94,8 +94,7 @@ O Salvar chama `IContaService.AtualizarSaldosAsync` (`AtualizarSaldosUseCase`):
   abaixo da conta (campo `Saldo:<id>` no `ErroValidacao`);
 - grava só as contas cujo saldo mudou e, para cada uma, uma linha em `tb_historico_saldo` (todas com a
   mesma data/hora), numa única unidade de trabalho;
-- o histórico **não** impede a exclusão da conta (desativar o histórico junto com a conta está em
-  [06-Pendencias.md](06-Pendencias.md)).
+- o histórico **não** impede a exclusão da conta; ao excluir a conta, o histórico dela é desativado junto.
 
 A alteração pelo CRUD de Conta (`AlterarContaUseCase`) também grava uma linha em `tb_historico_saldo`
 quando o saldo muda. A inclusão da conta não grava histórico.
@@ -162,8 +161,7 @@ o do topo) abre a Incluir Parcela. Botão Voltar.
 Parcelas: o valor mostrado é o da próxima parcela em aberto.
 
 - **Lápis**: abre a Alterar.
-- **Lixeira**: "Confirma a exclusão da dívida "X" e de todas as parcelas?" (Sim/Não). Se houver parcela paga,
-  acrescenta "Os pagamentos já feitos continuam descontados do saldo da conta." Sim exclui e volta para a lista.
+- **Lixeira**: "Confirma a exclusão da dívida "X" e de todas as parcelas?" (Sim/Não). Sim exclui e volta para a lista.
 
 **Incluir** (`IncluirDividaPage`, rota `incluir-divida`). Grava pelo `CriarDividaUseCase` e gera as parcelas.
 
@@ -201,7 +199,6 @@ ficam em `Pages/Receitas/` (`ListarReceitasPage`, `VisualizarReceitaPage`, `Incl
 | Consulta | `FiltroDividas(..., EhDivida: true)` | `FiltroDividas(..., EhDivida: false)` |
 | `id_credor` | Título "Credor" | Título **"Pagador"** (opcional), com a mesma lista de Credores |
 | Situação | "Paga", "3 de 12 pagas", filtro "Ocultar dívidas pagas" | "Recebida", "3 de 12 recebidas", "Ocultar receitas recebidas" |
-| Exclusão com parcela paga | "Os pagamentos já feitos continuam descontados do saldo da conta." | "Os recebimentos já feitos continuam somados ao saldo da conta." |
 | Aviso da Alterar | "...parcelas já pagas... com o que falta pagar" | "...parcelas já recebidas... com o que falta receber" |
 
 `dm_divida` é sempre `false` na Incluir Receita. As parcelas usam as mesmas páginas de [Parcelas](#parcelas).
@@ -211,17 +208,15 @@ ficam em `Pages/Receitas/` (`ListarReceitasPage`, `VisualizarReceitaPage`, `Incl
 Páginas em `Pages/Parcelas/`, com o `IParcelaService`. Não há lista própria: a parcela é aberta pela tabela da
 Visualizar Dívida (ou Receita), e incluída pelo **+** da seção Parcelas dela. Na parcela de **receita** os textos mudam
 (`Pages/Parcelas/TextosParcela.cs`): título "Receita" no lugar de "Dívida", "Data do Recebimento", botão **Receber**,
-"Recebida em 05/10/2026", confirmação "Receber parcela" / "Confirma o recebimento de ... O valor será somado ao saldo
-da conta", e "A receita fica com uma parcela a menos..." na exclusão. Regras em [03-UseCases.md](03-UseCases.md#parcelas-usecasesparcelas).
+"Recebida em 05/10/2026", confirmação "Receber parcela" / "Confirma o recebimento de ...", e "A receita fica com uma parcela a menos..." na exclusão. Regras em [03-UseCases.md](03-UseCases.md#parcelas-usecasesparcelas).
 
 **Visualizar** (`VisualizarParcelaPage`, rota `visualizar-parcela?id=`). Com rolagem. Cartão em duas colunas: Dívida
 e Parcela (`2 de 12`); Valor e Vencimento; Situação (como na tabela da dívida) e Data do Pagamento (`—` em aberto);
 Conta e Categoria; Descrição; Data de Cadastro e Última Alteração. Botão Voltar.
 
 - **Parcela em aberto**: o cartão **Pagar** (Data do Pagamento, `DatePicker` que começa em hoje e não aceita data
-  futura, e o botão Pagar). Pagar pede confirmação ("Confirma o pagamento de R$ 100,00 em 14/10/2026? O valor será
-  descontado do saldo da conta \"Corrente\"." — no crédito, "somado ao"); Sim paga e a página recarrega, mostrando a
-  parcela paga.
+  futura, e o botão Pagar). Pagar pede confirmação ("Confirma o pagamento de R$ 100,00 em 14/10/2026?"); Sim paga e a página
+  recarrega, mostrando a parcela paga. **O saldo da conta não muda** (é atualizado em "Atualizar Saldos").
 - **Lápis**: abre a Alterar Parcela.
 - **Lixeira**: "Confirma a exclusão da parcela \"Notebook 3/12\" (R$ 100,00)? A dívida fica com uma parcela a menos e
   o valor total diminui." (Sim/Não). Sim exclui e volta para a Visualizar Dívida. A exclusão da única parcela é recusada

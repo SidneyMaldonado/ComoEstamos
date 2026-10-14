@@ -248,6 +248,37 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
+        public async Task Excluir_DesativaOHistoricoDeSaldoSoDaConta()
+        {
+            var conta = await SemearContaAsync("Nubank");
+            var outra = await SemearContaAsync("Inter");
+            await SemearAsync(
+                new HistoricoSaldo { IdConta = conta.Id, Saldo = 100m },
+                new HistoricoSaldo { IdConta = conta.Id, Saldo = 200m },
+                new HistoricoSaldo { IdConta = outra.Id, Saldo = 300m });
+
+            await new ExcluirContaUseCase(_uow).ExecutarAsync(conta.Id, _usuario.Id);
+
+            await using var db = CriarContexto();
+            var historicos = await db.HistoricosSaldo.AsNoTracking().ToListAsync();
+            Assert.IsTrue(historicos.Where(h => h.IdConta == conta.Id).All(h => !h.Ativo));
+            Assert.IsTrue(historicos.Single(h => h.IdConta == outra.Id).Ativo);
+        }
+
+        [TestMethod]
+        public async Task Excluir_RecusadaNaoDesativaOHistorico()
+        {
+            var conta = await SemearContaAsync("Nubank");
+            await SemearAsync(NovaDivida(conta.Id), new HistoricoSaldo { IdConta = conta.Id, Saldo = 100m });
+
+            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(
+                () => new ExcluirContaUseCase(_uow).ExecutarAsync(conta.Id, _usuario.Id));
+
+            await using var db = CriarContexto();
+            Assert.IsTrue((await db.HistoricosSaldo.AsNoTracking().SingleAsync()).Ativo);
+        }
+
+        [TestMethod]
         public async Task Excluir_RecusaComDividaAtivaSemDesativar()
         {
             var conta = await SemearContaAsync("Nubank");

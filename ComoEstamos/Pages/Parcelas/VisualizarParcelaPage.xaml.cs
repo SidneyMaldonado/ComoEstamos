@@ -99,11 +99,8 @@ namespace ComoEstamos.Pages.Parcelas
 
             Formulario.LimparErros(ErroDataPagamento);
             var data = CampoDataPagamento.Date ?? DateTime.Today;
-            var (titulo, acao, efeito) = EhDivida
-                ? ("Pagar parcela", "o pagamento", "descontado do")
-                : ("Receber parcela", "o recebimento", "somado ao");
-            var pergunta = $"Confirma {acao} de {FormatoBr.Moeda(parcela!.Valor)} em {FormatoBr.Data(data)}? " +
-                $"O valor será {efeito} saldo da conta \"{parcela.Conta?.Nome}\".";
+            var (titulo, acao) = EhDivida ? ("Pagar parcela", "o pagamento") : ("Receber parcela", "o recebimento");
+            var pergunta = $"Confirma {acao} de {FormatoBr.Moeda(parcela!.Valor)} em {FormatoBr.Data(data)}?";
             if (!await DisplayAlertAsync(titulo, pergunta, "Sim", "Não"))
                 return;
 

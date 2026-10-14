@@ -102,7 +102,7 @@ Decisão de 13/10/2026 (opção "excluir tudo sem mexer no saldo"). Chamado por 
 
 - Inexistente ou de outro usuário → `KeyNotFoundException`; já excluída → `RegraDeNegocioException`.
 - Desativa a dívida e **todas** as parcelas ativas dela, pagas ou não. Nada é apagado do banco.
-- **O saldo das contas não muda**: o que já foi pago continua descontado.
+- **O saldo das contas não muda.**
 - Depois disso, a dívida e as parcelas não impedem mais a exclusão da conta, da categoria ou do credor.
 
 ### BuscarDividasUseCase
@@ -183,22 +183,17 @@ pela regra da inclusão, e os ajustes feitos à mão nelas se perdem.
 
 #### PagarParcelaUseCase
 
-Registra o pagamento (ou recebimento) de uma parcela e ajusta o saldo da conta dela.
+Registra o pagamento (ou recebimento) de uma parcela.
 
-**Repositórios:** Parcelas, Dividas, Contas
+**Repositórios:** Parcelas, Dividas
 
-**Validações:** parcela do usuário (pela dívida), ativa e ainda não paga; a dívida e a conta devem estar ativas;
+**Validações:** parcela do usuário (pela dívida), ativa e ainda não paga; a dívida deve estar ativa;
 a data do pagamento não pode ser futura (`ValidacaoException`, campo `DataPagamento`).
 
-**Efeito:**
+**Efeito:** `Parcela.DataPagamento = dataPagamento` (só a data).
 
-| `Divida.EhDivida` | Saldo da conta da parcela |
-|---|---|
-| `true` (dívida) | `Saldo -= Parcela.Valor` |
-| `false` (crédito) | `Saldo += Parcela.Valor` |
-
-- `Parcela.DataPagamento = dataPagamento` (só a data).
-- Saldo negativo é permitido.
+**O saldo da conta não muda** (decisão de 14/10/2026; até então, a dívida debitava e a receita creditava a conta).
+O saldo é atualizado pelo usuário em "Atualizar Saldos". Por isso o pagamento também não grava `tb_historico_saldo`.
 
 ### RegistrarOperacaoUseCase
 
@@ -245,9 +240,10 @@ Decisão de 13/10/2026: toda mudança de saldo feita pelo usuário fica registra
 | `AlterarContaUseCase` (CRUD de Conta) | Se o saldo mudou |
 
 - A inclusão de conta **não** grava histórico.
-- `PagarParcelaUseCase` ainda **não** grava histórico (pendência em [06-Pendencias.md](06-Pendencias.md)).
-- O histórico não impede excluir a conta. Ao excluir, ele deve ser desativado junto (pendência em
-  [06-Pendencias.md](06-Pendencias.md)).
+- `PagarParcelaUseCase` **não** grava histórico: ele não mexe no saldo.
+- O histórico não impede excluir a conta. Decisão de 14/10/2026: o `ExcluirContaUseCase` desativa junto
+  (`dm_ativo = false`, na mesma unidade de trabalho) todos os históricos ativos da conta
+  (`HistoricoSaldoRepository.DesativarPorContaAsync`). Exclusão recusada não mexe no histórico.
 
 ---
 
@@ -257,7 +253,7 @@ Operações já identificadas que envolvem mais de um repositório. Especifique 
 
 | Caso de uso | Envolve | Decisões em aberto |
 |---|---|---|
-| `EstornarPagamentoParcelaUseCase` | Parcelas, Dividas, Contas | Precisa de um método no repositório para limpar `DataPagamento`; reverte o saldo com o sinal inverso de `PagarParcela` |
+| `EstornarPagamentoParcelaUseCase` | Parcelas, Dividas | Precisa de um método no repositório para limpar `DataPagamento`; o saldo não muda (como no `PagarParcela`) |
 | `TransferirEntreContasUseCase` | Contas | Uma só tabela, mas duas contas precisam mudar juntas |
 | `RegistrarHistoricoUseCase` | Investimentos, Historicos | Retrato da carteira inteira ou de um investimento; periodicidade (manual ou mensal) |
 | `DesativarOperacaoUseCase` | Operacoes, Investimentos | Reverter a quantidade do investimento; impedir se a quantidade ficar negativa |

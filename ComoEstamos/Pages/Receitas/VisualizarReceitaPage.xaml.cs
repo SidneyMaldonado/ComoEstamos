@@ -78,8 +78,6 @@ namespace ComoEstamos.Pages.Receitas
 
             var id = divida.Id;
             var pergunta = $"Confirma a exclusão da receita \"{divida.Nome}\" e de todas as parcelas?";
-            if (divida.Parcelas.Any(p => p.DataPagamento is not null))
-                pergunta += " Os recebimentos já feitos continuam somados ao saldo da conta.";
             await Formulario.ConfirmarEExcluirAsync(this, "Excluir receita", pergunta, () => dividaService.ExcluirAsync(id));
         }
 

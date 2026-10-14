@@ -50,27 +50,17 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
-        public async Task ExecutarAsync_DividaRegistraPagamentoEDebitaConta()
+        [DataRow(true, DisplayName = "Dívida")]
+        [DataRow(false, DisplayName = "Receita")]
+        public async Task ExecutarAsync_RegistraOPagamentoSemMexerNoSaldo(bool ehDivida)
         {
-            var parcela = await CriarParcelaAsync(ehDivida: true, valor: 250m);
+            var parcela = await CriarParcelaAsync(ehDivida, valor: 250m);
 
             await _useCase.ExecutarAsync(parcela.Id, new DateTime(2026, 10, 8), _usuario.Id);
 
             var (paga, conta) = await LerDoBancoAsync(parcela.Id);
             Assert.AreEqual(new DateTime(2026, 10, 8), paga.DataPagamento);
-            Assert.AreEqual(750m, conta.Saldo);
-        }
-
-        [TestMethod]
-        public async Task ExecutarAsync_CreditoRegistraRecebimentoECreditaConta()
-        {
-            var parcela = await CriarParcelaAsync(ehDivida: false, valor: 250m);
-
-            await _useCase.ExecutarAsync(parcela.Id, new DateTime(2026, 10, 8), _usuario.Id);
-
-            var (paga, conta) = await LerDoBancoAsync(parcela.Id);
-            Assert.AreEqual(new DateTime(2026, 10, 8), paga.DataPagamento);
-            Assert.AreEqual(1250m, conta.Saldo);
+            Assert.AreEqual(1000m, conta.Saldo);
         }
 
         [TestMethod]
@@ -84,18 +74,7 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
-        public async Task ExecutarAsync_PermiteSaldoNegativo()
-        {
-            var parcela = await CriarParcelaAsync(valor: 1500m);
-
-            await _useCase.ExecutarAsync(parcela.Id, DateTime.Today, _usuario.Id);
-
-            var (_, conta) = await LerDoBancoAsync(parcela.Id);
-            Assert.AreEqual(-500m, conta.Saldo);
-        }
-
-        [TestMethod]
-        public async Task ExecutarAsync_RecusaParcelaJaPagaSemAlterarSaldo()
+        public async Task ExecutarAsync_RecusaParcelaJaPaga()
         {
             var parcela = await CriarParcelaAsync();
             await _useCase.ExecutarAsync(parcela.Id, new DateTime(2026, 10, 8), _usuario.Id);
@@ -105,7 +84,7 @@ namespace ComoEstamos.Test.UseCaseTests
 
             var (paga, conta) = await LerDoBancoAsync(parcela.Id);
             Assert.AreEqual(new DateTime(2026, 10, 8), paga.DataPagamento);
-            Assert.AreEqual(750m, conta.Saldo);
+            Assert.AreEqual(1000m, conta.Saldo);
         }
 
         [TestMethod]
@@ -135,22 +114,6 @@ namespace ComoEstamos.Test.UseCaseTests
             var (naoPaga, conta) = await LerDoBancoAsync(parcela.Id);
             Assert.IsNull(naoPaga.DataPagamento);
             Assert.AreEqual(1000m, conta.Saldo);
-        }
-
-        [TestMethod]
-        public async Task ExecutarAsync_RecusaContaDesativada()
-        {
-            var parcela = await CriarParcelaAsync();
-            await using (var db = CriarContexto())
-            {
-                (await db.Contas.SingleAsync()).Ativo = false;
-                await db.SaveChangesAsync();
-            }
-
-            await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(parcela.Id, DateTime.Today, _usuario.Id));
-
-            var (naoPaga, _) = await LerDoBancoAsync(parcela.Id);
-            Assert.IsNull(naoPaga.DataPagamento);
         }
 
         [TestMethod]

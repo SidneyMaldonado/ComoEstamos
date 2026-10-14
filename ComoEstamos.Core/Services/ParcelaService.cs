@@ -18,7 +18,7 @@ namespace ComoEstamos.Core.Services
         /// <summary>Exclui uma parcela em aberto; a dívida fica com uma parcela a menos.</summary>
         Task ExcluirAsync(int id);
 
-        /// <summary>Registra o pagamento e ajusta o saldo da conta da parcela.</summary>
+        /// <summary>Registra o pagamento (ou recebimento); o saldo da conta não muda.</summary>
         Task PagarAsync(int id, DateTime dataPagamento);
     }
 

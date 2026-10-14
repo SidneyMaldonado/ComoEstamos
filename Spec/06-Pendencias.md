@@ -12,19 +12,9 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 - [ ] **Quantidade do investimento.** Hoje a quantidade é editável no CRUD de Investimento, porque ainda
   não há tela de Operação. Quando houver, decidir se a quantidade passa a mudar só pelas operações
   (`RegistrarOperacaoUseCase`) e fica só de leitura no formulário.
-- [ ] **Histórico de saldo no pagamento.** O `PagarParcelaUseCase` muda o saldo da conta, mas não grava
-  `tb_historico_saldo` (a regra de [03-UseCases.md](03-UseCases.md#histórico-de-saldo-tb_historico_saldo) fala em
-  "toda mudança de saldo feita pelo usuário"). Decidir se o pagamento também grava.
 - [ ] **Casos de uso candidatos** em [03-UseCases.md](03-UseCases.md#catálogo--candidatos-futuros): estornar
   pagamento, transferir entre contas, registrar histórico, desativar operação.
   Cada um tem decisões em aberto. O CRUD de Operação depende deles.
-
-## Regras a implementar
-
-- [ ] **Excluir conta desativa o histórico de saldo.** Ao excluir uma conta (exclusão lógica no
-  `ExcluirContaUseCase`), os registros dela em `tb_historico_saldo` também passam a `dm_ativo = false`,
-  na mesma unidade de trabalho. O histórico continua **sem impedir** a exclusão da conta. Precisa de um
-  método no `HistoricoSaldoRepository` (ex.: `DesativarPorContaAsync`) e dos testes correspondentes.
 
 ## Telas
 
@@ -70,13 +60,13 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 - [ ] **Windows e Android — Parcelas (14/10/2026):** testar no app o + da seção Parcelas (tamanho e alinhamento com o
   título; a Incluir preenchida, erros, a nova parcela na ordem certa e o total recalculado), o toque na parcela da Visualizar Dívida, a
   Visualizar Parcela (em aberto, vencida e paga: lápis e lixeira apagados), o Pagar (Sim e Não, data de hoje e
-  anterior, saldo da conta descontado, página recarregada), a Alterar (valor, vencimento mudando a ordem, conta,
+  anterior, saldo da conta sem mudar, página recarregada), a Alterar (valor, vencimento mudando a ordem, conta,
   categoria, erros de formato e de domínio, total da dívida recalculado na volta) e a exclusão (Sim e Não, única
   parcela recusada, volta para a dívida com uma parcela a menos).
 - [ ] **Windows e Android — Receitas (14/10/2026):** testar no app o item "Receitas" do menu (ícone), a lista (só
   receitas; filtros; "Recebida"), a Incluir (Pagador opcional, receita criada não aparece em Dívidas), a Visualizar e a
   Alterar (aviso de recebidas), a exclusão, e as parcelas de receita (título "Receita", botão Receber, saldo da conta
-  somado, "Recebida em"). Conferir que uma receita não abre nas telas de dívida (e vice-versa) e que, no Resumo do
+  sem mudar, "Recebida em"). Conferir que uma receita não abre nas telas de dívida (e vice-versa) e que, no Resumo do
   Mês, a linha de receita abre a Visualizar Receita. No Android, os atalhos: arrastar para cima nas dívidas abre as
   receitas, e para baixo nas receitas volta para as dívidas (sem atrapalhar a rolagem da tabela).
 - [ ] **Android:** aviso `CS8602` em `Platforms/Android/MainActivity.cs` (linha 27), anterior a 13/10/2026.
