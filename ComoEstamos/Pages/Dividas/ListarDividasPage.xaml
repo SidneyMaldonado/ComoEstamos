@@ -14,7 +14,7 @@
 
         <Grid RowDefinitions="Auto,Auto,Auto,*" Style="{StaticResource Conteudo}">
 
-            <!-- Atalho: arrastar o dedo para baixo volta para a tela inicial (o contrário do atalho da MainPage).
+            <!-- Atalho: arrastar o dedo para baixo volta para o resumo do mês (o contrário do atalho do resumo).
                  As linhas da tabela continuam rolando. -->
             <Grid.GestureRecognizers>
                 <SwipeGestureRecognizer Direction="Down" Swiped="ArrastarParaBaixo_Swiped" />

@@ -10,6 +10,9 @@ namespace ComoEstamos.Core.Services
         Task<List<ResumoDivida>> BuscarAsync(FiltroDividas filtro);
         Task<Divida?> BuscarPorIdAsync(int id);
 
+        /// <summary>Dívidas e créditos com parcela vencendo no mês, com os totais e a diferença.</summary>
+        Task<ResumoMes> BuscarResumoMesAsync(DateTime mes);
+
         /// <summary>Grava a dívida e gera as parcelas.</summary>
         Task<Divida> IncluirAsync(Divida divida);
 
@@ -24,6 +27,7 @@ namespace ComoEstamos.Core.Services
         IUsuarioAtual usuarioAtual,
         IBuscarDividasUseCase buscar,
         IBuscarDividaPorIdUseCase buscarPorId,
+        IBuscarResumoMesUseCase buscarResumoMes,
         ICriarDividaUseCase criar,
         IAlterarDividaUseCase alterar,
         IExcluirDividaUseCase excluir) : IDividaService
@@ -33,6 +37,9 @@ namespace ComoEstamos.Core.Services
 
         public async Task<Divida?> BuscarPorIdAsync(int id) =>
             await buscarPorId.ExecutarAsync(id, await usuarioAtual.ObterIdAsync());
+
+        public async Task<ResumoMes> BuscarResumoMesAsync(DateTime mes) =>
+            await buscarResumoMes.ExecutarAsync(mes, await usuarioAtual.ObterIdAsync());
 
         public async Task<Divida> IncluirAsync(Divida divida) =>
             await criar.ExecutarAsync(divida, await usuarioAtual.ObterIdAsync());

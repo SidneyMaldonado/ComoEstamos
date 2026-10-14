@@ -124,6 +124,21 @@ Assinatura: `ExecutarAsync(FiltroDividas filtro, int idUsuario)` → `List<Resum
 
 **Ordem:** as em aberto pelo **próximo vencimento**; depois as pagas, pelo último vencimento. Empate: por nome.
 
+### BuscarResumoMesUseCase
+
+Decisão de 14/10/2026. Consulta da tela Resumo do Mês ([05-Telas.md](05-Telas.md#resumo-do-mês)). Fica em
+`UseCases/Dividas/` e é chamado por `IDividaService.BuscarResumoMesAsync`. Assinatura:
+`ExecutarAsync(DateTime mes, int idUsuario)` → `ResumoMes` (o dia de `mes` é ignorado).
+
+**Repositórios:** Dividas, Parcelas (leitura; uma consulta de cada, agrupadas em memória)
+
+- Dívidas e créditos **ativos** do usuário com alguma **parcela ativa** vencendo no mês. Sem parcela no mês, não
+  aparecem.
+- Um `ItemResumoMes` por dívida: nome, **soma das parcelas do mês** (em geral uma só), vencimento da primeira delas,
+  `Paga` (todas as do mês pagas) e a data do último pagamento delas.
+- `Despesas` = `EhDivida = true`; `Receitas` = `EhDivida = false`. Ordem: pelo vencimento; empate, por nome.
+- Totais: `TotalDespesas`, `TotalReceitas` e `Diferenca` = receitas − despesas (pagas e em aberto somam igual).
+
 ### BuscarDividaPorIdUseCase
 
 Dívida da tela Visualizar, com `Credor`, `Conta`, `Categoria` e as **parcelas ativas** por vencimento.

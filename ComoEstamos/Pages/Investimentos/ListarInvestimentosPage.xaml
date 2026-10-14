@@ -14,6 +14,12 @@
 
         <Grid RowDefinitions="Auto,Auto,*" Style="{StaticResource Conteudo}">
 
+            <!-- Atalho: arrastar o dedo para cima volta para a tela inicial (o contrário do atalho da MainPage).
+                 As linhas da tabela continuam rolando. -->
+            <Grid.GestureRecognizers>
+                <SwipeGestureRecognizer Direction="Up" Swiped="ArrastarParaCima_Swiped" />
+            </Grid.GestureRecognizers>
+
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                 <ImageButton Style="{StaticResource BotaoMenu}" Clicked="Menu_Clicked" />
                 <Label Grid.Column="1"

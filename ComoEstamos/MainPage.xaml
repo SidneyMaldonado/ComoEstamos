@@ -16,9 +16,11 @@
               Padding="20,50,20,20"
               RowSpacing="16">
 
-            <!-- Atalho: arrastar o dedo para cima abre as dívidas. As linhas da tabela continuam rolando. -->
+            <!-- Atalhos: arrastar o dedo para cima abre o resumo do mês; para baixo, os investimentos.
+                 As linhas da tabela continuam rolando. -->
             <Grid.GestureRecognizers>
                 <SwipeGestureRecognizer Direction="Up" Swiped="ArrastarParaCima_Swiped" />
+                <SwipeGestureRecognizer Direction="Down" Swiped="ArrastarParaBaixo_Swiped" />
             </Grid.GestureRecognizers>
 
             <!-- Título -->
@@ -55,16 +57,16 @@
                     Style="{StaticResource BotaoPrincipal}"
                     Clicked="AtualizarSaldos_Clicked" />
 
-            <!-- Dica do atalho; tocar também abre as dívidas (no Windows, o arrasto com o mouse não dispara o gesto). -->
+            <!-- Dica do atalho; tocar também abre o resumo (no Windows, o arrasto com o mouse não dispara o gesto). -->
             <Label Grid.Row="4"
-                   Text="︿  Arraste para cima para ver as dívidas"
+                   Text="︿  Arraste para cima para ver o resumo do mês"
                    FontSize="12"
                    TextColor="{StaticResource Dourado}"
                    Opacity="0.8"
                    HorizontalTextAlignment="Center"
                    Margin="0,-8,0,0">
                 <Label.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="Dividas_Tapped" />
+                    <TapGestureRecognizer Tapped="Resumo_Tapped" />
                 </Label.GestureRecognizers>
             </Label>
         </Grid>

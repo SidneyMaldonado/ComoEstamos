@@ -92,9 +92,9 @@ namespace ComoEstamos.Pages.Dividas
 
         private void Menu_Clicked(object? sender, EventArgs e) => Shell.Current.FlyoutIsPresented = true;
 
-        /// <summary>Volta para a tela inicial, como o item "Início" do menu.</summary>
+        /// <summary>Volta para o resumo do mês, como o item "Resumo do Mês" do menu.</summary>
         private async void ArrastarParaBaixo_Swiped(object? sender, SwipedEventArgs e) =>
-            await Shell.Current.GoToAsync("//MainPage");
+            await Shell.Current.GoToAsync("//resumo");
 
         private async void Incluir_Tapped(object? sender, TappedEventArgs e) =>
             await Shell.Current.GoToAsync(IncluirDividaPage.Rota);
