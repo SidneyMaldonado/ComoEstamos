@@ -18,6 +18,12 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 
 ## Telas
 
+- [ ] **Senha no backup** (decidido: depois). Proteger o `.zip` com senha (AES; precisa de uma biblioteca de zip com
+  criptografia). Até lá, a tela avisa ao compartilhar que o arquivo não tem senha.
+- [ ] **Backup automático do sistema:** o `AndroidManifest` está com `android:allowBackup="true"`, então o Android
+  (Auto Backup) já pode copiar os dados do app, inclusive o banco, para o Google Drive do usuário; o iOS faz o mesmo
+  no iCloud. Decidir se mantém ou desliga (não substitui o backup manual). Se mantiver, conferir no aparelho se o
+  banco volta inteiro numa reinstalação.
 - [ ] **Telas das entidades fora do CRUD padrão**, na estrutura de [07-Crud.md](07-Crud.md)
   (página → service → caso de uso → repositório):
 
@@ -69,6 +75,11 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
   sem mudar, "Recebida em"). Conferir que uma receita não abre nas telas de dívida (e vice-versa) e que, no Resumo do
   Mês, a linha de receita abre a Visualizar Receita. No Android, os atalhos: arrastar para cima nas dívidas abre as
   receitas, e para baixo nas receitas volta para as dívidas (sem atrapalhar a rolagem da tabela).
+- [ ] **Windows e Android — Configurações/Backup (14/10/2026):** testar no app o item do menu (ícone), o aviso de
+  "sem senha" (Sim e Não), o backup compartilhado (Drive, e-mail, WhatsApp; nome do arquivo; "Último backup"
+  atualizado), o restore de um backup do Drive e de Downloads (seletor de arquivos, resumo, Sim e Não, dados trocados,
+  volta para o Início com os novos saldos), os arquivos recusados (um `.zip` qualquer, um arquivo que não é zip) e o
+  `backup-antes-do-restore.zip` na pasta do app.
 - [ ] **Android:** aviso `CS8602` em `Platforms/Android/MainActivity.cs` (linha 27), anterior a 13/10/2026.
 
 ## Limpeza

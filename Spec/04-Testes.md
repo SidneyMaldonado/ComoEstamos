@@ -35,3 +35,8 @@ constraints (`dia_vencimento`, `nr_valor`), e não tem transações. Por isso:
 
 Se for preciso testar comportamento específico do SQLite, a alternativa é o SQLite em memória
 (`Data Source=:memory:` com a conexão aberta durante o teste). Essa mudança deve ser registrada aqui.
+
+**Exceção — backup (14/10/2026):** `BackupUseCaseTests` não herda `RepositoryTestBase`: usa SQLite em **arquivo**, numa
+pasta temporária por teste (`Path.GetTempPath()`), apagada no `[TestCleanup]` depois de
+`SqliteConnection.ClearAllPools()`. O backup copia e troca o arquivo do banco, o que nem o InMemory nem o
+`:memory:` têm. No Windows, o pool do SQLite mantém o arquivo aberto: limpe o pool antes de ler o arquivo do banco direto.
