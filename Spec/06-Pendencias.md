@@ -2,12 +2,6 @@
 
 Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decisão no documento correspondente.
 
-## Git
-
-- [ ] **`feature/operacao-valor-total`** (commit `8cb32e0`, renomeia `Operacao.Valor` → `ValorTotal`):
-  commitada, mas sem push e sem PR. Foi criada antes do PR #3; fazer rebase sobre o `master`, conferir a
-  migration e o snapshot do EF e abrir o PR.
-
 ## Decisões em aberto
 
 - [ ] **Login.** Hoje todas as telas usam o usuário local padrão (`IUsuarioAtual`, ver [05-Telas.md](05-Telas.md)).

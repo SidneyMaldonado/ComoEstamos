@@ -18,7 +18,7 @@ namespace ComoEstamos.Core.UseCases
         {
             if (operacao.Quantidade <= 0)
                 throw new RegraDeNegocioException("A quantidade deve ser maior que zero.");
-            if (operacao.Valor < 0)
+            if (operacao.ValorTotal < 0)
                 throw new RegraDeNegocioException("O valor não pode ser negativo.");
 
             await using var uow = await unitOfWorkFactory.IniciarAsync();

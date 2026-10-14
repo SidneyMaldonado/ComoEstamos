@@ -29,7 +29,7 @@ namespace ComoEstamos.Test.UseCaseTests
             IdInvestimento = _investimento.Id,
             EhCompra = ehCompra,
             Quantidade = quantidade,
-            Valor = quantidade * 32m,
+            ValorTotal = quantidade * 32m,
             DataOperacao = new DateTime(2026, 9, 30)
         };
 
@@ -105,7 +105,7 @@ namespace ComoEstamos.Test.UseCaseTests
         public async Task ExecutarAsync_RecusaValorNegativo()
         {
             var operacao = NovaOperacao(ehCompra: true, quantidade: 10m);
-            operacao.Valor = -1m;
+            operacao.ValorTotal = -1m;
 
             await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(() => _useCase.ExecutarAsync(operacao));
 

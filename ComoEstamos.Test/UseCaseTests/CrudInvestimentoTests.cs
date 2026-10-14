@@ -247,7 +247,7 @@ namespace ComoEstamos.Test.UseCaseTests
         public async Task Excluir_RecusaComOperacaoAtivaSemDesativar()
         {
             var investimento = await SemearInvestimentoAsync("PETR4");
-            await SemearAsync(new Operacao { IdInvestimento = investimento.Id, EhCompra = true, Quantidade = 1m, Valor = 32m });
+            await SemearAsync(new Operacao { IdInvestimento = investimento.Id, EhCompra = true, Quantidade = 1m, ValorTotal = 32m });
 
             var ex = await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(
                 () => new ExcluirInvestimentoUseCase(_uow).ExecutarAsync(investimento.Id, _usuario.Id));
@@ -273,7 +273,7 @@ namespace ComoEstamos.Test.UseCaseTests
         public async Task Excluir_DependenteInativoNaoImpede()
         {
             var investimento = await SemearInvestimentoAsync("PETR4");
-            await SemearAsync(new Operacao { IdInvestimento = investimento.Id, EhCompra = true, Quantidade = 1m, Valor = 32m, Ativo = false });
+            await SemearAsync(new Operacao { IdInvestimento = investimento.Id, EhCompra = true, Quantidade = 1m, ValorTotal = 32m, Ativo = false });
 
             await new ExcluirInvestimentoUseCase(_uow).ExecutarAsync(investimento.Id, _usuario.Id);
 
