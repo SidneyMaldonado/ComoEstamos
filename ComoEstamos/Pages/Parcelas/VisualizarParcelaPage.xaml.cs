@@ -5,8 +5,8 @@ using ComoEstamos.Data.Model;
 namespace ComoEstamos.Pages.Parcelas
 {
     /// <summary>
-    /// Visualização da parcela, aberta ao tocar numa parcela da Visualizar Dívida. Na parcela em aberto:
-    /// Pagar (com a data), o lápis abre a alteração e a lixeira exclui. A parcela paga não muda.
+    /// Visualização da parcela, aberta ao tocar numa parcela da Visualizar Dívida (ou Receita). Na parcela em aberto:
+    /// Pagar (na receita, Receber) com a data, o lápis abre a alteração e a lixeira exclui. A parcela paga não muda.
     /// </summary>
     public partial class VisualizarParcelaPage : ContentPage, IQueryAttributable
     {
@@ -45,12 +45,16 @@ namespace ComoEstamos.Pages.Parcelas
             var parcelas = parcela.Divida?.Parcelas ?? [];
             var numero = parcelas.FindIndex(p => p.Id == parcela.Id) + 1;
             var paga = parcela.DataPagamento is not null;
+            var ehDivida = EhDivida;
 
+            TituloDivida.Text = ehDivida ? "Dívida" : "Receita";
+            TituloDataPagamento.Text = TituloCampoDataPagamento.Text = ehDivida ? "Data do Pagamento" : "Data do Recebimento";
+            BotaoPagar.Text = ehDivida ? "Pagar" : "Receber";
             ValorDivida.Text = parcela.Divida?.Nome ?? "—";
             ValorNumero.Text = numero > 0 ? $"{numero} de {parcelas.Count}" : "—";
             ValorValor.Text = FormatoBr.Moeda(parcela.Valor);
             ValorVencimento.Text = FormatoBr.Data(parcela.DataVencimento);
-            ValorSituacao.Text = Situacao(parcela);
+            ValorSituacao.Text = TextosParcela.Situacao(parcela, ehDivida);
             ValorDataPagamento.Text = parcela.DataPagamento is DateTime pagamento ? FormatoBr.Data(pagamento) : "—";
             ValorConta.Text = parcela.Conta?.Nome ?? "—";
             ValorCategoria.Text = parcela.Categoria?.Nome ?? "—";
@@ -66,11 +70,8 @@ namespace ComoEstamos.Pages.Parcelas
             Formulario.LimparErros(ErroDataPagamento);
         }
 
-        /// <summary>"Paga em 05/10/2026", "Vencida" ou "Em aberto" (como na tabela da Visualizar Dívida).</summary>
-        private static string Situacao(Parcela parcela) =>
-            parcela.DataPagamento is DateTime pagamento ? $"Paga em {FormatoBr.Data(pagamento)}"
-            : parcela.DataVencimento.Date < DateTime.Today ? "Vencida"
-            : "Em aberto";
+        /// <summary>A parcela é de dívida; <c>false</c> quando é de receita (crédito).</summary>
+        private bool EhDivida => parcela?.Divida?.EhDivida != false;
 
         private bool EmAberto => parcela is { DataPagamento: null };
 
@@ -87,7 +88,7 @@ namespace ComoEstamos.Pages.Parcelas
 
             var id = parcela!.Id;
             var pergunta = $"Confirma a exclusão da parcela \"{parcela.Descricao}\" ({FormatoBr.Moeda(parcela.Valor)})? " +
-                "A dívida fica com uma parcela a menos e o valor total diminui.";
+                $"A {TextosParcela.Tipo(EhDivida)} fica com uma parcela a menos e o valor total diminui.";
             await Formulario.ConfirmarEExcluirAsync(this, "Excluir parcela", pergunta, () => parcelaService.ExcluirAsync(id));
         }
 
@@ -98,10 +99,12 @@ namespace ComoEstamos.Pages.Parcelas
 
             Formulario.LimparErros(ErroDataPagamento);
             var data = CampoDataPagamento.Date ?? DateTime.Today;
-            var efeito = parcela!.Divida?.EhDivida == false ? "somado ao" : "descontado do";
-            var pergunta = $"Confirma o pagamento de {FormatoBr.Moeda(parcela.Valor)} em {FormatoBr.Data(data)}? " +
+            var (titulo, acao, efeito) = EhDivida
+                ? ("Pagar parcela", "o pagamento", "descontado do")
+                : ("Receber parcela", "o recebimento", "somado ao");
+            var pergunta = $"Confirma {acao} de {FormatoBr.Moeda(parcela!.Valor)} em {FormatoBr.Data(data)}? " +
                 $"O valor será {efeito} saldo da conta \"{parcela.Conta?.Nome}\".";
-            if (!await DisplayAlertAsync("Pagar parcela", pergunta, "Sim", "Não"))
+            if (!await DisplayAlertAsync(titulo, pergunta, "Sim", "Não"))
                 return;
 
             var id = parcela.Id;

@@ -76,7 +76,7 @@
                                            TituloTotal="Total"
                                            MensagemVazia="Nenhuma receita neste mês."
                                            RolaSozinha="False"
-                                           LinhaTocada="Tabela_LinhaTocada" />
+                                           LinhaTocada="TabelaReceitas_LinhaTocada" />
 
                     <!-- Receitas, Despesas e, no rodapé, a Diferença (vermelha quando negativa) -->
                     <controls:TabelaRegistros x:Name="TabelaResumo"

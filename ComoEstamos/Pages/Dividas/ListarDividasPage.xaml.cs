@@ -96,6 +96,10 @@ namespace ComoEstamos.Pages.Dividas
         private async void ArrastarParaBaixo_Swiped(object? sender, SwipedEventArgs e) =>
             await Shell.Current.GoToAsync("//resumo");
 
+        /// <summary>Abre as receitas, como o item "Receitas" do menu.</summary>
+        private async void ArrastarParaCima_Swiped(object? sender, SwipedEventArgs e) =>
+            await Shell.Current.GoToAsync("//receitas");
+
         private async void Incluir_Tapped(object? sender, TappedEventArgs e) =>
             await Shell.Current.GoToAsync(IncluirDividaPage.Rota);
 

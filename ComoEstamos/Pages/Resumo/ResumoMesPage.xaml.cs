@@ -3,12 +3,13 @@ using ComoEstamos.Core.Formatacao;
 using ComoEstamos.Core.Services;
 using ComoEstamos.Core.UseCases.Dividas;
 using ComoEstamos.Pages.Dividas;
+using ComoEstamos.Pages.Receitas;
 
 namespace ComoEstamos.Pages.Resumo
 {
     /// <summary>
     /// Resumo do mês: as dívidas e as receitas (créditos) com parcela vencendo no mês, com os totais e a
-    /// diferença. As setas mudam o mês; tocar numa linha abre a dívida. Aberta pelo menu e pelo arrastar
+    /// diferença. As setas mudam o mês; tocar numa linha abre a dívida ou a receita. Aberta pelo menu e pelo arrastar
     /// para cima da tela inicial; arrastar para cima de novo abre as dívidas, e para baixo volta ao início.
     /// </summary>
     public partial class ResumoMesPage : ContentPage
@@ -46,9 +47,9 @@ namespace ComoEstamos.Pages.Resumo
             if (consulta != consultaAtual)
                 return;
 
-            TabelaDespesas.Linhas = Linhas(resumo.Despesas);
+            TabelaDespesas.Linhas = Linhas(resumo.Despesas, "Paga");
             TabelaDespesas.Total = resumo.TotalDespesas;
-            TabelaReceitas.Linhas = Linhas(resumo.Receitas);
+            TabelaReceitas.Linhas = Linhas(resumo.Receitas, "Recebida");
             TabelaReceitas.Total = resumo.TotalReceitas;
             // Linhas com Id 0: não abrem nada ao serem tocadas.
             TabelaResumo.Linhas = LinhaTabela.Montar(
@@ -59,12 +60,13 @@ namespace ComoEstamos.Pages.Resumo
             TabelaResumo.Total = resumo.Diferenca;
         }
 
-        private static List<LinhaTabela> Linhas(IEnumerable<ItemResumoMes> itens) =>
-            LinhaTabela.Montar(itens, i => i.IdDivida, i => i.Nome, Detalhe, i => i.Valor, i => i.Paga);
+        /// <param name="paga">"Paga" nas dívidas; "Recebida" nas receitas.</param>
+        private static List<LinhaTabela> Linhas(IEnumerable<ItemResumoMes> itens, string paga) =>
+            LinhaTabela.Montar(itens, i => i.IdDivida, i => i.Nome, i => Detalhe(i, paga), i => i.Valor, i => i.Paga);
 
-        /// <summary>"Paga em 05/10", "Vencida em 10/10" ou "Vence em 10/10".</summary>
-        private static string Detalhe(ItemResumoMes item) =>
-            item.DataPagamento is DateTime pagamento ? $"Paga em {DiaMes(pagamento)}"
+        /// <summary>"Paga em 05/10" (ou "Recebida em"), "Vencida em 10/10" ou "Vence em 10/10".</summary>
+        private static string Detalhe(ItemResumoMes item, string paga) =>
+            item.DataPagamento is DateTime pagamento ? $"{paga} em {DiaMes(pagamento)}"
             : item.Vencimento.Date < DateTime.Today ? $"Vencida em {DiaMes(item.Vencimento)}"
             : $"Vence em {DiaMes(item.Vencimento)}";
 
@@ -94,6 +96,12 @@ namespace ComoEstamos.Pages.Resumo
         {
             if (linha.Id > 0)
                 await Shell.Current.GoToAsync($"{VisualizarDividaPage.Rota}?id={linha.Id}");
+        }
+
+        private async void TabelaReceitas_LinhaTocada(object? sender, LinhaTabela linha)
+        {
+            if (linha.Id > 0)
+                await Shell.Current.GoToAsync($"{VisualizarReceitaPage.Rota}?id={linha.Id}");
         }
 
         private void Menu_Clicked(object? sender, EventArgs e) => Shell.Current.FlyoutIsPresented = true;

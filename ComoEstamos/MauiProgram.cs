@@ -6,6 +6,7 @@ using ComoEstamos.Pages.Contas;
 using ComoEstamos.Pages.Credores;
 using ComoEstamos.Pages.Dividas;
 using ComoEstamos.Pages.Parcelas;
+using ComoEstamos.Pages.Receitas;
 using ComoEstamos.Pages.Investimentos;
 using ComoEstamos.Pages.Resumo;
 using Microsoft.Extensions.Logging;
@@ -67,6 +68,13 @@ namespace ComoEstamos
             builder.Services.AddTransient<VisualizarDividaPage>();
             builder.Services.AddTransient<IncluirDividaPage>();
             builder.Services.AddTransient<AlterarDividaPage>();
+
+            // Receitas (créditos): as mesmas páginas das dívidas; as parcelas usam as páginas de parcela.
+            builder.Services.AddTransient<ListarReceitasPage>();
+            builder.Services.AddTransient<VisualizarReceitaPage>();
+            builder.Services.AddTransient<IncluirReceitaPage>();
+            builder.Services.AddTransient<AlterarReceitaPage>();
+
             builder.Services.AddTransient<VisualizarParcelaPage>();
             builder.Services.AddTransient<IncluirParcelaPage>();
             builder.Services.AddTransient<AlterarParcelaPage>();

@@ -32,7 +32,8 @@ namespace ComoEstamos.Pages.Dividas
         {
             base.OnAppearing();
             divida = await dividaService.BuscarPorIdAsync(idDivida);
-            if (divida is null)
+            // Uma receita não abre aqui: ela tem a tela própria.
+            if (divida is not { EhDivida: true })
             {
                 await Formulario.AvisarNaoEncontradoAsync(this, "Dívida não encontrada", "A dívida não existe mais ou foi excluída.");
                 return;
@@ -60,15 +61,9 @@ namespace ComoEstamos.Pages.Dividas
                 numeradas,
                 n => n.parcela.Id,
                 n => $"{n.numero}/{parcelas.Count} · {FormatoBr.Data(n.parcela.DataVencimento)}",
-                n => Situacao(n.parcela),
+                n => TextosParcela.Situacao(n.parcela, ehDivida: true),
                 n => n.parcela.Valor);
         }
-
-        /// <summary>"Paga em 05/10/2026", "Vencida" ou "Em aberto".</summary>
-        private static string Situacao(Parcela parcela) =>
-            parcela.DataPagamento is DateTime pagamento ? $"Paga em {FormatoBr.Data(pagamento)}"
-            : parcela.DataVencimento.Date < DateTime.Today ? "Vencida"
-            : "Em aberto";
 
         private async void Alterar_Tapped(object? sender, TappedEventArgs e)
         {

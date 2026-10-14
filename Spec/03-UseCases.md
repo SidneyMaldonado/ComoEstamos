@@ -71,7 +71,10 @@ Assinatura: `ExecutarAsync(Divida divida, int idUsuario)`.
 **Repositórios:** Contas, Categorias, Credores (leitura) · Dividas, Parcelas (escrita)
 
 - Inexistente ou de outro usuário → `KeyNotFoundException`; excluída → `RegraDeNegocioException`.
-- Valida os campos como a inclusão (`DividaValidador`). `EhDivida` não muda.
+- Valida os campos como a inclusão (`DividaValidador`). `EhDivida` não muda: vale o gravado, mesmo que a edição
+  traga outro valor.
+- Mensagens conforme o tipo: "o nome da receita", "parcelas recebidas", "já foram recebidos" e "O pagador escolhido"
+  na receita (`DividaValidador.Tipo`/`Pagas`). O `PagarParcelaUseCase` também: "A data do recebimento não pode ser futura."
 - **As parcelas pagas nunca mudam** de valor, vencimento, conta ou categoria (só a descrição, abaixo).
 
 **Campos simples** (nome, credor, conta, categoria), sem mudar nenhum campo financeiro: as parcelas continuam
@@ -109,7 +112,8 @@ Assinatura: `ExecutarAsync(FiltroDividas filtro, int idUsuario)` → `List<Resum
 
 **Repositórios:** Dividas, Parcelas (leitura; uma consulta de cada, agrupadas em memória)
 
-- Só **dívidas** (`EhDivida = true`) ativas do usuário; créditos ficam para uma tela própria.
+- Só **dívidas** (`EhDivida = true`) ativas do usuário, ou só **receitas** com `FiltroDividas.EhDivida = false`
+  (tela de Receitas). Nunca as duas juntas.
 - Considera só as parcelas **ativas**. A dívida está **paga** quando tem parcelas e todas têm `DataPagamento`
   (não há coluna de situação na dívida).
 - `ResumoDivida`: nome, dia de vencimento, número de parcelas, valor total, valor da parcela
@@ -121,6 +125,7 @@ Assinatura: `ExecutarAsync(FiltroDividas filtro, int idUsuario)` → `List<Resum
 | `Nome` | Parte do nome, sem diferenciar maiúsculas nem acentos ("cartao" acha "Cartão"); espaços nas pontas ignorados; vazio não filtra |
 | `MesVencimento` | Dívidas com **alguma parcela** vencendo no mês/ano (o dia é ignorado); nulo não filtra |
 | `OcultarPagas` | Remove as pagas |
+| `EhDivida` | `true` (padrão): dívidas; `false`: receitas |
 
 **Ordem:** as em aberto pelo **próximo vencimento**; depois as pagas, pelo último vencimento. Empate: por nome.
 

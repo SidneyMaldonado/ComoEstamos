@@ -157,6 +157,17 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
+        public async Task ExecutarAsync_ReceitaSemNomeFalaEmReceita()
+        {
+            var receita = NovaDivida();
+            receita.EhDivida = false;
+            receita.Nome = " ";
+
+            var ex = await Assert.ThrowsExactlyAsync<ValidacaoException>(() => ExecutarAsync(receita));
+            StringAssert.Contains(ex.Erros.Single(e => e.Campo == nameof(Divida.Nome)).Mensagem, "receita");
+        }
+
+        [TestMethod]
         public async Task ExecutarAsync_GeraParcelasTambemParaCredito()
         {
             var credito = NovaDivida(500m, 2);

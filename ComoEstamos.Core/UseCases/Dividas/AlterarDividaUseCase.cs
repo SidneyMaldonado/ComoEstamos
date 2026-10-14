@@ -21,12 +21,15 @@ namespace ComoEstamos.Core.UseCases.Dividas
             await using var uow = await unitOfWorkFactory.IniciarAsync();
 
             var gravada = await DividaValidador.ObterAtivaDoUsuarioAsync(uow, divida.Id, idUsuario);
+            // O tipo (dívida ou receita) não muda; vale o gravado, também para as mensagens.
+            divida.EhDivida = gravada.EhDivida;
             var validador = await DividaValidador.ValidarCamposAsync(uow, divida, idUsuario);
 
             var parcelas = await DividaValidador.ObterParcelasAtivasAsync(uow, gravada.Id);
             var pagas = parcelas.Where(p => p.DataPagamento is not null).OrderBy(p => p.DataVencimento).ToList();
             var emAberto = parcelas.Where(p => p.DataPagamento is null).ToList();
             var valorPago = pagas.Sum(p => p.Valor);
+            var termoPagas = DividaValidador.Pagas(gravada);
 
             var financeiroMudou = divida.Valor != gravada.Valor
                 || divida.NumeroParcelas != gravada.NumeroParcelas
@@ -37,11 +40,11 @@ namespace ComoEstamos.Core.UseCases.Dividas
             {
                 if (divida.DataPrimeiroVencimento.Date != gravada.DataPrimeiroVencimento.Date)
                     validador.Adicionar(nameof(Divida.DataPrimeiroVencimento),
-                        "O primeiro vencimento não pode mudar: já há parcelas pagas.");
+                        $"O primeiro vencimento não pode mudar: já há parcelas {termoPagas}.");
 
                 if (!validador.TemErro(nameof(Divida.NumeroParcelas)) && divida.NumeroParcelas < pagas.Count)
                     validador.Adicionar(nameof(Divida.NumeroParcelas),
-                        $"Já há {pagas.Count} parcelas pagas: o número de parcelas deve ser pelo menos {pagas.Count}.");
+                        $"Já há {pagas.Count} parcelas {termoPagas}: o número de parcelas deve ser pelo menos {pagas.Count}.");
 
                 if (!validador.TemErro(nameof(Divida.Valor)) && !validador.TemErro(nameof(Divida.NumeroParcelas)))
                 {
@@ -49,11 +52,11 @@ namespace ComoEstamos.Core.UseCases.Dividas
                     var valorRestante = divida.Valor - valorPago;
                     if (restantes == 0 && valorRestante != 0)
                         validador.Adicionar(nameof(Divida.Valor),
-                            $"Todas as parcelas já estão pagas: o valor total deve ser {FormatoBr.Moeda(valorPago)}.");
+                            $"Todas as parcelas já estão {termoPagas}: o valor total deve ser {FormatoBr.Moeda(valorPago)}.");
                     else if (restantes > 0 && valorRestante < 0.01m * restantes)
                         validador.Adicionar(nameof(Divida.Valor),
                             $"O valor total deve ser pelo menos {FormatoBr.Moeda(valorPago + 0.01m * restantes)} " +
-                            $"(já foram pagos {FormatoBr.Moeda(valorPago)}).");
+                            $"(já foram {(gravada.EhDivida ? "pagos" : "recebidos")} {FormatoBr.Moeda(valorPago)}).");
                 }
             }
 

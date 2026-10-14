@@ -6,7 +6,7 @@ namespace ComoEstamos.Core.Services
     /// <summary>Operações de dívida usadas pelas telas, sempre do usuário atual.</summary>
     public interface IDividaService
     {
-        /// <summary>Consulta das dívidas (sem os créditos), filtrada e ordenada pelo vencimento.</summary>
+        /// <summary>Consulta das dívidas ou, com <see cref="FiltroDividas.EhDivida"/> false, das receitas; filtrada e ordenada pelo vencimento.</summary>
         Task<List<ResumoDivida>> BuscarAsync(FiltroDividas filtro);
         Task<Divida?> BuscarPorIdAsync(int id);
 

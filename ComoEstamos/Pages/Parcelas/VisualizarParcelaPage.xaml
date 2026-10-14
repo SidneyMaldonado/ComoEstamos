@@ -44,7 +44,7 @@
                           RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                           ColumnSpacing="12">
 
-                        <Label Text="Dívida" Style="{StaticResource TituloCampo}" />
+                        <Label x:Name="TituloDivida" Text="Dívida" Style="{StaticResource TituloCampo}" />
                         <Label x:Name="ValorDivida" Grid.Row="1" Style="{StaticResource ValorCampo}" />
                         <Label Grid.Column="1" Text="Parcela" Style="{StaticResource TituloCampo}" />
                         <Label x:Name="ValorNumero" Grid.Row="1" Grid.Column="1" Style="{StaticResource ValorCampo}" />
@@ -56,7 +56,7 @@
 
                         <Label Grid.Row="4" Text="Situação" Style="{StaticResource TituloCampoSeguinte}" />
                         <Label x:Name="ValorSituacao" Grid.Row="5" Style="{StaticResource ValorCampo}" />
-                        <Label Grid.Row="4" Grid.Column="1" Text="Data do Pagamento" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Label x:Name="TituloDataPagamento" Grid.Row="4" Grid.Column="1" Text="Data do Pagamento" Style="{StaticResource TituloCampoSeguinte}" />
                         <Label x:Name="ValorDataPagamento" Grid.Row="5" Grid.Column="1" Style="{StaticResource ValorCampo}" />
 
                         <Label Grid.Row="6" Text="Conta" Style="{StaticResource TituloCampoSeguinte}" />
@@ -75,10 +75,10 @@
                     </Grid>
                 </Border>
 
-                <!-- Pagamento: só aparece na parcela em aberto -->
+                <!-- Pagamento (na receita, recebimento): só aparece na parcela em aberto -->
                 <Border x:Name="CartaoPagar" Style="{StaticResource Cartao}" IsVisible="False">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Data do Pagamento" Style="{StaticResource TituloCampo}" />
+                        <Label x:Name="TituloCampoDataPagamento" Text="Data do Pagamento" Style="{StaticResource TituloCampo}" />
                         <DatePicker x:Name="CampoDataPagamento" Style="{StaticResource CampoData}" />
                         <Label x:Name="ErroDataPagamento" Style="{StaticResource MensagemErro}" />
                         <Button x:Name="BotaoPagar"
