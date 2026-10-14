@@ -26,7 +26,7 @@ só o `UsuarioAtual` muda.
 
 ## Navegação
 
-- `AppShell` tem um **menu lateral (flyout)**: Início, Resumo do Mês, Contas, Dívidas, Categorias, Credores, Carteiras e Investimentos.
+- `AppShell` tem um **menu lateral (flyout)**: Início, Resumo do Mês, Contas, Dívidas, Receitas, Categorias, Credores, Carteiras e Investimentos.
   Cada item de CRUD abre a página Listar (rota no plural: `contas`, `carteiras`...).
 - As páginas escondem a barra de navegação (`Shell.NavBarIsVisible="False"`). As páginas do menu
   têm o ícone ☰ dourado no canto superior esquerdo, que abre o menu (`Shell.Current.FlyoutIsPresented = true`).
@@ -46,6 +46,9 @@ só o `UsuarioAtual` muda.
 - **Volta, na mesma ordem** (Dívidas ↓ Resumo ↓ Início): arrastar o dedo para baixo na `ListarDividasPage` abre
   `//resumo` (vale fora das linhas da tabela e do campo de busca); na `ResumoMesPage`, abre `//MainPage` (no título e
   na linha do mês). Sem dica na tela.
+- **Das dívidas para as receitas** (14/10/2026): arrastar o dedo para cima na `ListarDividasPage` abre `//receitas`;
+  na `ListarReceitasPage`, arrastar para baixo volta para `//dividas`. Valem fora das linhas da tabela e do campo de
+  busca. Sem dica na tela (no Windows, as receitas ficam no menu). Ordem completa: Início ↑ Resumo ↑ Dívidas ↑ Receitas.
 - **Da tela inicial para os investimentos**: arrastar o dedo para baixo na MainPage abre `//investimentos`; na
   `ListarInvestimentosPage`, arrastar para cima volta para `//MainPage`. Valem fora das linhas da tabela. Sem dica
   na tela (no Windows, os investimentos ficam no menu).
@@ -130,9 +133,9 @@ Lista: nome, carteira (abaixo, em letra menor) e valor (quantidade × cotação)
 ## Dívidas
 
 Fora do CRUD padrão ([07-Crud.md](07-Crud.md#entidades-fora-do-crud-padrão)): as páginas ficam em
-`Pages/Dividas/` e usam o `IDividaService`. Só dívidas
-(`EhDivida = true`); créditos terão tela própria. Por enquanto: Listar (consulta), Visualizar, Incluir e
-Alterar; excluir é a lixeira da Visualizar. Regras de alterar e excluir em
+`Pages/Dividas/` e usam o `IDividaService`. **Só dívidas** (`EhDivida = true`): as receitas têm tela própria
+([Receitas](#receitas)). A Visualizar e a Alterar Dívida tratam uma receita como "Dívida não encontrada" (e
+vice-versa nas páginas de receita). Listar (consulta), Visualizar, Incluir e Alterar; excluir é a lixeira da Visualizar. Regras de alterar e excluir em
 [03-UseCases.md](03-UseCases.md#alterardividausecase).
 
 **Listar** (`ListarDividasPage`, rota `dividas`, item "Dívidas" do menu). Regras da consulta em
@@ -185,10 +188,31 @@ erro abaixo do Primeiro Vencimento. Grava pelo `AlterarDividaUseCase`. Se já ho
   de parcelas ou o dia, só as parcelas em aberto são refeitas, com o que falta pagar. Conta e categoria novas valem
   só para as parcelas em aberto."
 
+## Receitas
+
+Decisão de 14/10/2026. Receita = registro de `tb_divida` com `EhDivida = false` (crédito, valor a receber). As páginas
+ficam em `Pages/Receitas/` (`ListarReceitasPage`, `VisualizarReceitaPage`, `IncluirReceitaPage`, `AlterarReceitaPage`),
+**cópias das de Dívidas** com o mesmo layout e o mesmo `IDividaService` e casos de uso. Diferenças:
+
+| Onde | Dívida | Receita |
+|---|---|---|
+| Rotas | `dividas`, `visualizar-divida`, `incluir-divida`, `alterar-divida` | `receitas`, `visualizar-receita`, `incluir-receita`, `alterar-receita` |
+| Menu | "Dívidas" (`divida_icon`) | "Receitas" (`receita_icon`, logo abaixo de Dívidas) |
+| Consulta | `FiltroDividas(..., EhDivida: true)` | `FiltroDividas(..., EhDivida: false)` |
+| `id_credor` | Título "Credor" | Título **"Pagador"** (opcional), com a mesma lista de Credores |
+| Situação | "Paga", "3 de 12 pagas", filtro "Ocultar dívidas pagas" | "Recebida", "3 de 12 recebidas", "Ocultar receitas recebidas" |
+| Exclusão com parcela paga | "Os pagamentos já feitos continuam descontados do saldo da conta." | "Os recebimentos já feitos continuam somados ao saldo da conta." |
+| Aviso da Alterar | "...parcelas já pagas... com o que falta pagar" | "...parcelas já recebidas... com o que falta receber" |
+
+`dm_divida` é sempre `false` na Incluir Receita. As parcelas usam as mesmas páginas de [Parcelas](#parcelas).
+
 ## Parcelas
 
 Páginas em `Pages/Parcelas/`, com o `IParcelaService`. Não há lista própria: a parcela é aberta pela tabela da
-Visualizar Dívida, e incluída pelo **+** da seção Parcelas dela. Regras em [03-UseCases.md](03-UseCases.md#parcelas-usecasesparcelas).
+Visualizar Dívida (ou Receita), e incluída pelo **+** da seção Parcelas dela. Na parcela de **receita** os textos mudam
+(`Pages/Parcelas/TextosParcela.cs`): título "Receita" no lugar de "Dívida", "Data do Recebimento", botão **Receber**,
+"Recebida em 05/10/2026", confirmação "Receber parcela" / "Confirma o recebimento de ... O valor será somado ao saldo
+da conta", e "A receita fica com uma parcela a menos..." na exclusão. Regras em [03-UseCases.md](03-UseCases.md#parcelas-usecasesparcelas).
 
 **Visualizar** (`VisualizarParcelaPage`, rota `visualizar-parcela?id=`). Com rolagem. Cartão em duas colunas: Dívida
 e Parcela (`2 de 12`); Valor e Vencimento; Situação (como na tabela da dívida) e Data do Pagamento (`—` em aberto);
@@ -234,11 +258,11 @@ receitas e a diferença. Usa o `IDividaService.BuscarResumoMesAsync` ([03-UseCas
   - **Dívidas**: uma linha por dívida (`EhDivida = true`) com parcela vencendo no mês, com o nome e, abaixo,
     "Paga em 05/10", "Vencida em 10/10" ou "Vence em 10/10"; à direita, a soma das parcelas do mês. O valor das
     pagas fica num tom mais fraco. Rodapé "Total". Vazia: "Nenhuma dívida vence neste mês.";
-  - **Receitas**: o mesmo para os créditos (`EhDivida = false`). Vazia: "Nenhuma receita neste mês.";
+  - **Receitas**: o mesmo para os créditos (`EhDivida = false`), com "Recebida em 05/10". Vazia: "Nenhuma receita neste mês.";
   - **Resumo**: linhas Receitas e Despesas e, no rodapé, a **Diferença** (receitas − despesas; vermelha quando
     negativa).
-- Tocar numa linha de Dívidas ou Receitas abre a Visualizar Dívida (de onde se paga a parcela). As linhas do Resumo
-  não abrem nada.
+- Tocar numa linha de Dívidas abre a Visualizar Dívida; de Receitas, a Visualizar Receita (de onde se paga ou recebe
+  a parcela). As linhas do Resumo não abrem nada.
 - Dívidas sem parcela no mês não aparecem (na planilha aparecem com "-").
 
 ## Compartilhar saldos

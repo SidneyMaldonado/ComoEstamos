@@ -21,7 +21,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
 
             var (parcela, divida) = await ParcelaValidador.ObterAtivaDoUsuarioAsync(uow, idParcela, idUsuario);
             if (parcela.DataPagamento is not null)
-                throw new RegraDeNegocioException("A parcela já está paga.");
+                throw new RegraDeNegocioException(divida.EhDivida ? "A parcela já está paga." : "A parcela já foi recebida.");
 
             var conta = await uow.Contas.ObterPorIdAsync(parcela.IdConta)
                 ?? throw new KeyNotFoundException($"Conta {parcela.IdConta} não encontrada.");
@@ -29,7 +29,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
                 throw new RegraDeNegocioException("A conta desta parcela está desativada.");
 
             if (dataPagamento.Date > DateTime.Today)
-                throw new ValidacaoException([new ErroValidacao(nameof(Parcela.DataPagamento), "A data do pagamento não pode ser futura.")]);
+                throw new ValidacaoException([new ErroValidacao(nameof(Parcela.DataPagamento), divida.EhDivida ? "A data do pagamento não pode ser futura." : "A data do recebimento não pode ser futura.")]);
 
             var novoSaldo = divida.EhDivida ? conta.Saldo - parcela.Valor : conta.Saldo + parcela.Valor;
 

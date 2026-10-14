@@ -5,7 +5,7 @@ using ComoEstamos.Data.Model;
 namespace ComoEstamos.Pages.Parcelas
 {
     /// <summary>
-    /// Inclusão de uma parcela na dívida do <c>id</c> recebido (aberta pelo + da Visualizar Dívida). Vem preenchida
+    /// Inclusão de uma parcela na dívida (ou receita) do <c>id</c> recebido (aberta pelo + da Visualizar Dívida ou Receita). Vem preenchida
     /// com o valor da última parcela, o vencimento do mês seguinte a ela, e a conta e a categoria da dívida.
     /// Salvar valida, grava e volta; o valor total da dívida passa a ser a soma das parcelas.
     /// </summary>
@@ -55,8 +55,8 @@ namespace ComoEstamos.Pages.Parcelas
             CampoConta.ItemsSource = contas.Select(c => c.Nome).ToList();
             CampoCategoria.ItemsSource = categorias.Select(c => c.Nome).ToList();
 
-            Aviso.Text = $"Nova parcela de \"{divida.Nome}\". Ela entra na ordem do vencimento, e o valor total da dívida " +
-                "passa a ser a soma das parcelas.";
+            Aviso.Text = $"Nova parcela de \"{divida.Nome}\". Ela entra na ordem do vencimento, e o valor total da " +
+                $"{TextosParcela.Tipo(divida.EhDivida)} passa a ser a soma das parcelas.";
             var ultima = divida.Parcelas.LastOrDefault();
             if (ultima is not null)
                 CampoValor.Text = FormatoBr.NumeroFixo(ultima.Valor, 2);

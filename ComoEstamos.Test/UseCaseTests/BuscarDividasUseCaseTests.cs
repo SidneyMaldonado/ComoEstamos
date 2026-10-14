@@ -111,6 +111,16 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
+        public async Task ExecutarAsync_ComEhDividaFalseRetornaSoAsReceitas()
+        {
+            await CriarDividaAsync("Dívida", Meses(2026, 10, 1));
+            await CriarDividaAsync("Salário", Meses(2026, 10, 1), ehDivida: false);
+            await CriarDividaAsync("Excluída", Meses(2026, 10, 1), ehDivida: false, ativa: false);
+
+            CollectionAssert.AreEqual(new[] { "Salário" }, Nomes(await BuscarAsync(new FiltroDividas(EhDivida: false))));
+        }
+
+        [TestMethod]
         public async Task ExecutarAsync_OrdenaPeloProximoVencimentoEmAbertoComAsPagasNoFim()
         {
             await CriarDividaAsync("Paga", Meses(2026, 1, 2), pagas: 2);

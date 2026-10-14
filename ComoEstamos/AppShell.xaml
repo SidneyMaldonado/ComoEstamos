@@ -10,6 +10,7 @@
     xmlns:credores="clr-namespace:ComoEstamos.Pages.Credores"
     xmlns:dividas="clr-namespace:ComoEstamos.Pages.Dividas"
     xmlns:investimentos="clr-namespace:ComoEstamos.Pages.Investimentos"
+    xmlns:receitas="clr-namespace:ComoEstamos.Pages.Receitas"
     xmlns:resumo="clr-namespace:ComoEstamos.Pages.Resumo"
     Shell.BackgroundColor="#1A2E6E"
     Shell.FlyoutBehavior="Flyout"
@@ -53,6 +54,10 @@
 
     <FlyoutItem Title="Dívidas" Icon="divida_icon.png">
         <ShellContent ContentTemplate="{DataTemplate dividas:ListarDividasPage}" Route="dividas" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Receitas" Icon="receita_icon.png">
+        <ShellContent ContentTemplate="{DataTemplate receitas:ListarReceitasPage}" Route="receitas" />
     </FlyoutItem>
 
     <FlyoutItem Title="Categorias" Icon="categoria_icon.png">

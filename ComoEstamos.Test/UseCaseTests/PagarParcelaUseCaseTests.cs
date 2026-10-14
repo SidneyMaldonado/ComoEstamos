@@ -74,6 +74,16 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
+        public async Task ExecutarAsync_CreditoComDataFuturaFalaEmRecebimento()
+        {
+            var parcela = await CriarParcelaAsync(ehDivida: false);
+
+            var ex = await Assert.ThrowsExactlyAsync<ValidacaoException>(
+                () => _useCase.ExecutarAsync(parcela.Id, DateTime.Today.AddDays(1), _usuario.Id));
+            StringAssert.Contains(ex.Erros.Single().Mensagem, "recebimento");
+        }
+
+        [TestMethod]
         public async Task ExecutarAsync_PermiteSaldoNegativo()
         {
             var parcela = await CriarParcelaAsync(valor: 1500m);

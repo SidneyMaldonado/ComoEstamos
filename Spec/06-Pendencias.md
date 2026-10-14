@@ -39,7 +39,7 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 
   | Entidade | Observação |
   |---|---|
-  | Dívida | Listar, Visualizar, Incluir, Alterar e Excluir feitos em 13/10/2026 ([05-Telas.md](05-Telas.md#dívidas)). Falta a tela de **créditos** (`EhDivida = false`): hoje eles só aparecem nas Receitas do Resumo do Mês e abrem na Visualizar Dívida |
+  | Dívida | Listar, Visualizar, Incluir, Alterar e Excluir feitos em 13/10/2026 ([05-Telas.md](05-Telas.md#dívidas)). Receitas (`EhDivida = false`) com tela própria em 14/10/2026 ([05-Telas.md](05-Telas.md#receitas)) |
   | Operação | Inclusão pelo `RegistrarOperacaoUseCase`; excluir depende de `DesativarOperacaoUseCase` |
   | Parcela | Visualizar (com Pagar), Incluir, Alterar e Excluir feitos em 14/10/2026 ([05-Telas.md](05-Telas.md#parcelas)). Falta o **estorno** do pagamento (`EstornarPagamentoParcelaUseCase`) |
   | Histórico | Só consulta; depende de `RegistrarHistoricoUseCase` |
@@ -79,6 +79,12 @@ Atualizado em 13/10/2026. Ao resolver um item, remova-o daqui e registre a decis
   anterior, saldo da conta descontado, página recarregada), a Alterar (valor, vencimento mudando a ordem, conta,
   categoria, erros de formato e de domínio, total da dívida recalculado na volta) e a exclusão (Sim e Não, única
   parcela recusada, volta para a dívida com uma parcela a menos).
+- [ ] **Windows e Android — Receitas (14/10/2026):** testar no app o item "Receitas" do menu (ícone), a lista (só
+  receitas; filtros; "Recebida"), a Incluir (Pagador opcional, receita criada não aparece em Dívidas), a Visualizar e a
+  Alterar (aviso de recebidas), a exclusão, e as parcelas de receita (título "Receita", botão Receber, saldo da conta
+  somado, "Recebida em"). Conferir que uma receita não abre nas telas de dívida (e vice-versa) e que, no Resumo do
+  Mês, a linha de receita abre a Visualizar Receita. No Android, os atalhos: arrastar para cima nas dívidas abre as
+  receitas, e para baixo nas receitas volta para as dívidas (sem atrapalhar a rolagem da tabela).
 - [ ] **Android:** aviso `CS8602` em `Platforms/Android/MainActivity.cs` (linha 27), anterior a 13/10/2026.
 
 ## Limpeza

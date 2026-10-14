@@ -19,7 +19,7 @@ namespace ComoEstamos.Core.UseCases.Dividas
             divida.Nome = ValidadorCampos.Normalizar(divida.Nome);
 
             var validador = new ValidadorCampos();
-            validador.Texto(nameof(Divida.Nome), "o nome da dívida", divida.Nome, TamanhoMaximoNome, obrigatorio: true);
+            validador.Texto(nameof(Divida.Nome), $"o nome da {Tipo(divida)}", divida.Nome, TamanhoMaximoNome, obrigatorio: true);
             validador.Numero(nameof(Divida.Valor), "o valor total", divida.Valor, 2, 0.01m, Limites.Decimal10x2);
 
             if (divida.NumeroParcelas is < 1 or > MaximoParcelas)
@@ -53,11 +53,18 @@ namespace ComoEstamos.Core.UseCases.Dividas
             {
                 var credor = await uow.Credores.ObterPorIdAsync(idCredor);
                 if (credor is not { Ativo: true } || credor.IdUsuario != idUsuario)
-                    validador.Adicionar(nameof(Divida.IdCredor), "O credor escolhido não existe mais.");
+                    validador.Adicionar(nameof(Divida.IdCredor),
+                        divida.EhDivida ? "O credor escolhido não existe mais." : "O pagador escolhido não existe mais.");
             }
 
             return validador;
         }
+
+        /// <summary>"dívida" ou "receita" (crédito), para as mensagens.</summary>
+        public static string Tipo(Divida divida) => divida.EhDivida ? "dívida" : "receita";
+
+        /// <summary>"pagas" ou "recebidas" (crédito), para as mensagens sobre as parcelas.</summary>
+        public static string Pagas(Divida divida) => divida.EhDivida ? "pagas" : "recebidas";
 
         /// <summary>
         /// Dívida rastreada pela unidade de trabalho, para alterar ou excluir.

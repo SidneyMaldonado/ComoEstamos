@@ -6,7 +6,7 @@ namespace ComoEstamos.Pages.Parcelas
 {
     /// <summary>
     /// Alteração de uma parcela em aberto: valor, vencimento, conta e categoria. Salvar valida, grava e volta;
-    /// o valor total da dívida passa a ser a soma das parcelas.
+    /// o valor total da dívida (ou receita) passa a ser a soma das parcelas.
     /// </summary>
     public partial class AlterarParcelaPage : ContentPage, IQueryAttributable
     {
@@ -44,9 +44,11 @@ namespace ComoEstamos.Pages.Parcelas
                 await Formulario.AvisarNaoEncontradoAsync(this, "Parcela não encontrada", "A parcela não existe mais ou foi excluída.");
                 return;
             }
+            var ehDivida = parcela.Divida?.EhDivida != false;
             if (parcela.DataPagamento is not null)
             {
-                await Formulario.AvisarNaoEncontradoAsync(this, "Parcela paga", "A parcela já está paga e não pode ser alterada.");
+                await Formulario.AvisarNaoEncontradoAsync(this, ehDivida ? "Parcela paga" : "Parcela recebida",
+                    ehDivida ? "A parcela já está paga e não pode ser alterada." : "A parcela já foi recebida e não pode ser alterada.");
                 return;
             }
 
@@ -55,7 +57,7 @@ namespace ComoEstamos.Pages.Parcelas
             CampoConta.ItemsSource = contas.Select(c => c.Nome).ToList();
             CampoCategoria.ItemsSource = categorias.Select(c => c.Nome).ToList();
 
-            Aviso.Text = $"{parcela.Descricao}. O valor total da dívida passa a ser a soma das parcelas.";
+            Aviso.Text = $"{parcela.Descricao}. O valor total da {TextosParcela.Tipo(ehDivida)} passa a ser a soma das parcelas.";
             CampoValor.Text = FormatoBr.NumeroFixo(parcela.Valor, 2);
             CampoVencimento.Date = parcela.DataVencimento;
             CampoConta.SelectedIndex = contas.FindIndex(c => c.Id == parcela.IdConta);

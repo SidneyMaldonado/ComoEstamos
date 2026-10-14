@@ -45,7 +45,8 @@ namespace ComoEstamos.Pages.Dividas
             carregada = true;
 
             var divida = await dividaService.BuscarPorIdAsync(idDivida);
-            if (divida is null)
+            // Uma receita não abre aqui: ela tem a tela própria.
+            if (divida is not { EhDivida: true })
             {
                 await Formulario.AvisarNaoEncontradoAsync(this, "Dívida não encontrada", "A dívida não existe mais ou foi excluída.");
                 return;

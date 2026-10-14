@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
+             x:Class="ComoEstamos.Pages.Receitas.VisualizarReceitaPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <!-- Sem ScrollView: os dados ficam em cima e a tabela de parcelas rola sozinha embaixo. -->
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" Style="{StaticResource Conteudo}">
+
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                <Label Text="Receita" Style="{StaticResource TituloPagina}" />
+                <!-- Alterar: lápis dourado sobre um círculo -->
+                <Border Grid.Column="1"
+                        Style="{StaticResource BotaoCirculo}"
+                        SemanticProperties.Description="Alterar receita">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Alterar_Tapped" />
+                    </Border.GestureRecognizers>
+                    <Image Source="editar_icon.png" Style="{StaticResource IconeCirculo}" />
+                </Border>
+                <!-- Excluir: lixeira dourada sobre um círculo; pede confirmação -->
+                <Border Grid.Column="2"
+                        Style="{StaticResource BotaoCirculo}"
+                        SemanticProperties.Description="Excluir receita">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="Excluir_Tapped" />
+                    </Border.GestureRecognizers>
+                    <Image Source="lixeira_icon.png" Style="{StaticResource IconeCirculo}" />
+                </Border>
+            </Grid>
+
+            <BoxView Grid.Row="1" Style="{StaticResource LinhaTitulo}" />
+
+            <Border Grid.Row="2" Style="{StaticResource Cartao}" Padding="16,14">
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                      ColumnSpacing="12">
+
+                    <Label Grid.ColumnSpan="2" Text="Nome da Receita" Style="{StaticResource TituloCampo}" />
+                    <Label x:Name="ValorNome" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource ValorCampo}" />
+
+                    <Label Grid.Row="2" Text="Pagador" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorCredor" Grid.Row="3" Style="{StaticResource ValorCampo}" />
+                    <Label Grid.Row="2" Grid.Column="1" Text="Conta" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorConta" Grid.Row="3" Grid.Column="1" Style="{StaticResource ValorCampo}" />
+
+                    <Label Grid.Row="4" Text="Categoria" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorCategoria" Grid.Row="5" Style="{StaticResource ValorCampo}" />
+                    <Label Grid.Row="4" Grid.Column="1" Text="Valor Total" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorTotal" Grid.Row="5" Grid.Column="1" Style="{StaticResource ValorCampo}" />
+
+                    <Label Grid.Row="6" Text="Parcelas" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorParcelas" Grid.Row="7" Style="{StaticResource ValorCampo}" />
+                    <Label Grid.Row="6" Grid.Column="1" Text="Situação" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorSituacao" Grid.Row="7" Grid.Column="1" Style="{StaticResource ValorCampo}" />
+
+                    <Label Grid.Row="8" Text="Dia de Vencimento" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorDiaVencimento" Grid.Row="9" Style="{StaticResource ValorCampo}" />
+                    <Label Grid.Row="8" Grid.Column="1" Text="Primeiro Vencimento" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorPrimeiroVencimento" Grid.Row="9" Grid.Column="1" Style="{StaticResource ValorCampo}" />
+
+                    <Label Grid.Row="10" Text="Data de Cadastro" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorDataCriacao" Grid.Row="11" Style="{StaticResource ValorCampo}" />
+                    <Label Grid.Row="10" Grid.Column="1" Text="Última Alteração" Style="{StaticResource TituloCampoSeguinte}" />
+                    <Label x:Name="ValorDataAlteracao" Grid.Row="11" Grid.Column="1" Style="{StaticResource ValorCampo}" />
+
+                </Grid>
+            </Border>
+
+            <!-- Título da seção e, à direita, o + que inclui uma parcela (círculo menor que o do topo) -->
+            <Grid Grid.Row="3" ColumnDefinitions="*,Auto">
+                <Label Text="Parcelas" Style="{StaticResource TituloSecao}" VerticalOptions="Center" />
+                <Border Grid.Column="1"
+                        Style="{StaticResource BotaoCirculo}"
+                        WidthRequest="34"
+                        HeightRequest="34"
+                        SemanticProperties.Description="Incluir parcela">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="IncluirParcela_Tapped" />
+                    </Border.GestureRecognizers>
+                    <Label Style="{StaticResource SinalMais}" FontSize="22" Margin="0,-2,0,0" />
+                </Border>
+            </Grid>
+
+            <controls:TabelaRegistros x:Name="TabelaParcelas"
+                                   Grid.Row="4"
+                                   TituloTexto="Vencimento"
+                                   TituloValor="Valor"
+                                   MensagemVazia="Nenhuma parcela."
+                                   LinhaTocada="TabelaParcelas_LinhaTocada" />
+
+            <Button Grid.Row="5"
+                    Text="Voltar"
+                    Style="{StaticResource BotaoSecundario}"
+                    Clicked="Voltar_Clicked" />
+        </Grid>
+    </Grid>
+
+</ContentPage>

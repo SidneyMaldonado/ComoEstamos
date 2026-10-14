@@ -4,6 +4,7 @@ using ComoEstamos.Pages.Contas;
 using ComoEstamos.Pages.Credores;
 using ComoEstamos.Pages.Dividas;
 using ComoEstamos.Pages.Parcelas;
+using ComoEstamos.Pages.Receitas;
 using ComoEstamos.Pages.Investimentos;
 
 namespace ComoEstamos
@@ -39,6 +40,10 @@ namespace ComoEstamos
             Routing.RegisterRoute(IncluirDividaPage.Rota, typeof(IncluirDividaPage));
             Routing.RegisterRoute(AlterarDividaPage.Rota, typeof(AlterarDividaPage));
             Routing.RegisterRoute(VisualizarDividaPage.Rota, typeof(VisualizarDividaPage));
+
+            Routing.RegisterRoute(IncluirReceitaPage.Rota, typeof(IncluirReceitaPage));
+            Routing.RegisterRoute(AlterarReceitaPage.Rota, typeof(AlterarReceitaPage));
+            Routing.RegisterRoute(VisualizarReceitaPage.Rota, typeof(VisualizarReceitaPage));
 
             Routing.RegisterRoute(VisualizarParcelaPage.Rota, typeof(VisualizarParcelaPage));
             Routing.RegisterRoute(IncluirParcelaPage.Rota, typeof(IncluirParcelaPage));

@@ -8,9 +8,10 @@ namespace ComoEstamos.Core.UseCases.Dividas
     /// <summary>
     /// Filtros da consulta de dívidas. <paramref name="Nome"/>: parte do nome, sem diferenciar
     /// maiúsculas nem acentos (vazio não filtra). <paramref name="MesVencimento"/>: só as dívidas com
-    /// alguma parcela vencendo nesse mês (o dia é ignorado; nulo não filtra).
+    /// alguma parcela vencendo nesse mês (o dia é ignorado; nulo não filtra). <paramref name="EhDivida"/>: true
+    /// lista só as dívidas; false, só as receitas (créditos).
     /// </summary>
-    public record FiltroDividas(string? Nome = null, DateTime? MesVencimento = null, bool OcultarPagas = false);
+    public record FiltroDividas(string? Nome = null, DateTime? MesVencimento = null, bool OcultarPagas = false, bool EhDivida = true);
 
     /// <summary>Uma linha da consulta de dívidas.</summary>
     /// <param name="ValorParcela">Valor da próxima parcela em aberto (sem parcela em aberto: da primeira; sem parcelas: total ÷ número de parcelas).</param>
@@ -30,7 +31,7 @@ namespace ComoEstamos.Core.UseCases.Dividas
     public interface IBuscarDividasUseCase
     {
         /// <summary>
-        /// Dívidas ativas do usuário (não inclui créditos), filtradas. Ordem: as em aberto pelo próximo
+        /// Dívidas (ou só as receitas, com <see cref="FiltroDividas.EhDivida"/> false) ativas do usuário, filtradas. Ordem: as em aberto pelo próximo
         /// vencimento; depois as pagas, pelo último vencimento. Empate: por nome.
         /// </summary>
         Task<List<ResumoDivida>> ExecutarAsync(FiltroDividas filtro, int idUsuario);
@@ -47,7 +48,7 @@ namespace ComoEstamos.Core.UseCases.Dividas
             var nome = filtro.Nome?.Trim();
             var linhas =
                 from divida in dividas
-                where divida.EhDivida
+                where divida.EhDivida == filtro.EhDivida
                 where string.IsNullOrEmpty(nome) || ContemNome(divida.Nome, nome)
                 let parcelasDaDivida = parcelas[divida.Id].ToList()
                 where filtro.MesVencimento is not DateTime mes || parcelasDaDivida.Any(p => MesmoMes(p.DataVencimento, mes))

@@ -36,10 +36,11 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         /// <summary>Cria pela inclusão (R$ 1.200 em 12x, dia 10, a partir de 10/10/2026) e paga as <paramref name="pagas"/> primeiras.</summary>
-        private async Task<Divida> CriarAsync(int pagas = 0, decimal valor = 1200m, int parcelas = 12)
+        private async Task<Divida> CriarAsync(int pagas = 0, decimal valor = 1200m, int parcelas = 12, bool ehDivida = true)
         {
             var divida = await _criar.ExecutarAsync(new Divida
             {
+                EhDivida = ehDivida,
                 IdConta = _conta.Id,
                 IdCategoria = _categoria.Id,
                 Nome = "Notebook",
@@ -240,6 +241,28 @@ namespace ComoEstamos.Test.UseCaseTests
             edicao.DataPrimeiroVencimento = new DateTime(2026, 11, 10);
 
             await AssertRecusaCampoAsync(edicao, nameof(Divida.DataPrimeiroVencimento));
+        }
+
+        [TestMethod]
+        public async Task ExecutarAsync_ReceitaContinuaReceita()
+        {
+            // A edição vem com EhDivida = true (o padrão); o tipo gravado não muda.
+            var edicao = Edicao(await CriarAsync(ehDivida: false));
+            edicao.Nome = "Salário";
+
+            await ExecutarAsync(edicao);
+
+            Assert.IsFalse((await DividaGravadaAsync()).EhDivida);
+        }
+
+        [TestMethod]
+        public async Task ExecutarAsync_ReceitaFalaEmParcelasRecebidas()
+        {
+            var edicao = Edicao(await CriarAsync(pagas: 1, ehDivida: false));
+            edicao.DataPrimeiroVencimento = new DateTime(2026, 11, 10);
+
+            var ex = await Assert.ThrowsExactlyAsync<ValidacaoException>(() => ExecutarAsync(edicao));
+            StringAssert.Contains(ex.Erros.Single(e => e.Campo == nameof(Divida.DataPrimeiroVencimento)).Mensagem, "recebidas");
         }
 
         [TestMethod]
