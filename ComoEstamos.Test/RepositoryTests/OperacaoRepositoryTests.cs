@@ -27,7 +27,7 @@ namespace ComoEstamos.Test.RepositoryTests
             EhCompra = ehCompra,
             DataOperacao = data,
             Quantidade = 10m,
-            Valor = 325m
+            ValorTotal = 325m
         };
 
         [TestMethod]
@@ -40,7 +40,7 @@ namespace ComoEstamos.Test.RepositoryTests
             Assert.IsTrue(obtida.EhCompra);
             Assert.AreEqual(new DateTime(2026, 9, 1), obtida.DataOperacao);
             Assert.AreEqual(10m, obtida.Quantidade);
-            Assert.AreEqual(325m, obtida.Valor);
+            Assert.AreEqual(325m, obtida.ValorTotal);
         }
 
         [TestMethod]
@@ -109,18 +109,18 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
-        public async Task AtualizarAsync_AlteraQuantidadeEValor()
+        public async Task AtualizarAsync_AlteraQuantidadeEValorTotal()
         {
             var operacao = await _repository.InserirAsync(NovaOperacao(new DateTime(2026, 9, 1)));
 
             operacao.Quantidade = 20m;
-            operacao.Valor = 650m;
+            operacao.ValorTotal = 650m;
             await _repository.AtualizarAsync(operacao);
 
             var obtida = await _repository.ObterPorIdAsync(operacao.Id);
             Assert.IsNotNull(obtida);
             Assert.AreEqual(20m, obtida.Quantidade);
-            Assert.AreEqual(650m, obtida.Valor);
+            Assert.AreEqual(650m, obtida.ValorTotal);
         }
 
         [TestMethod]

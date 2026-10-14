@@ -25,9 +25,10 @@ namespace ComoEstamos.Data.Model
         [Precision(18, 6)]
         public decimal Quantidade { get; set; }
 
+        /// <summary>Valor total da operação (quantidade × preço unitário), não o preço unitário.</summary>
         [Column("vl_operacao")]
         [Precision(10, 2)]
-        public decimal Valor { get; set; }
+        public decimal ValorTotal { get; set; }
 
         [ForeignKey(nameof(IdInvestimento))]
         public Investimento? Investimento { get; set; }

@@ -206,11 +206,15 @@ Registra a compra ou venda de um investimento e atualiza a quantidade em carteir
 
 **Repositórios:** Investimentos, Operacoes
 
-**Validações:** `Quantidade` > 0; `Valor` ≥ 0; o investimento deve existir
+**Validações:** `Quantidade` > 0; `ValorTotal` ≥ 0; o investimento deve existir
 (`KeyNotFoundException`) e estar ativo; na venda, `Quantidade` ≤ quantidade disponível.
 
 **Efeito:** compra → `Investimento.Quantidade += Quantidade`; venda → `-=`. A operação é gravada.
 A cotação do investimento **não** é alterada.
+
+`Operacao.ValorTotal` é o **valor total** da operação (quantidade × preço unitário), não o
+preço unitário. Quando for preciso o preço unitário (preço médio, rentabilidade), calcule
+`ValorTotal / Quantidade`.
 
 ### AtualizarSaldosUseCase
 
@@ -257,8 +261,3 @@ Operações já identificadas que envolvem mais de um repositório. Especifique 
 | `TransferirEntreContasUseCase` | Contas | Uma só tabela, mas duas contas precisam mudar juntas |
 | `RegistrarHistoricoUseCase` | Investimentos, Historicos | Retrato da carteira inteira ou de um investimento; periodicidade (manual ou mensal) |
 | `DesativarOperacaoUseCase` | Operacoes, Investimentos | Reverter a quantidade do investimento; impedir se a quantidade ficar negativa |
-
-## Decisões em aberto
-
-- **`Operacao.Valor`**: é o valor total da operação ou o preço unitário? Hoje nenhum caso de
-  uso faz conta com ele; defina antes de calcular preço médio ou rentabilidade.

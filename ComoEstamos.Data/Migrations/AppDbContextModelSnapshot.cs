@@ -443,7 +443,7 @@ namespace ComoEstamos.Data.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("nr_quantidade");
 
-                    b.Property<decimal>("Valor")
+                    b.Property<decimal>("ValorTotal")
                         .HasPrecision(10, 2)
                         .HasColumnType("TEXT")
                         .HasColumnName("vl_operacao");
