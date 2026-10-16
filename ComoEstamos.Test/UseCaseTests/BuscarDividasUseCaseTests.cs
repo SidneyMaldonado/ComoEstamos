@@ -28,12 +28,11 @@ namespace ComoEstamos.Test.UseCaseTests
         /// as <paramref name="pagas"/> primeiras ficam pagas.
         /// </summary>
         private async Task<Divida> CriarDividaAsync(string nome, DateTime[] vencimentos, int pagas = 0,
-            bool ehDivida = true, bool ativa = true, int? idUsuario = null, int diaVencimento = 10)
+            bool ehDivida = true, bool ativa = true, int? idConta = null, int diaVencimento = 10)
         {
             var divida = new Divida
             {
-                IdUsuario = idUsuario ?? _usuario.Id,
-                IdConta = _conta.Id,
+                IdConta = idConta ?? _conta.Id,
                 IdCategoria = _categoria.Id,
                 Nome = nome,
                 DiaVencimento = diaVencimento,
@@ -87,7 +86,7 @@ namespace ComoEstamos.Test.UseCaseTests
         {
             await SemearAsync(new Divida
             {
-                IdUsuario = _usuario.Id,
+                IdConta = _conta.Id,
                 Nome = "Curso",
                 Valor = 100m,
                 NumeroParcelas = 3,
@@ -100,11 +99,11 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_NaoRetornaCreditosInativasNemDeOutroUsuario()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
+            var contaDeOutro = await CriarContaDeOutroUsuarioAsync();
             await CriarDividaAsync("Dívida", Meses(2026, 10, 1));
             await CriarDividaAsync("Crédito", Meses(2026, 10, 1), ehDivida: false);
             await CriarDividaAsync("Excluída", Meses(2026, 10, 1), ativa: false);
-            await CriarDividaAsync("De outro", Meses(2026, 10, 1), idUsuario: outro.Id);
+            await CriarDividaAsync("De outro", Meses(2026, 10, 1), idConta: contaDeOutro.Id);
 
             CollectionAssert.AreEqual(new[] { "Dívida" }, Nomes(await BuscarAsync()));
         }

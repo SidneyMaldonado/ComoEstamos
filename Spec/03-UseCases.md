@@ -36,8 +36,11 @@ A validação dos campos fica em `DividaValidador` e o cálculo das parcelas (va
 
 **Repositórios:** Usuarios, Contas, Categorias, Credores (leitura) · Dividas, Parcelas (escrita)
 
-**Dono:** como no CRUD ([07-Crud.md](07-Crud.md#dono-do-registro)), sobrescreve `IdUsuario` com o usuário
-recebido, zera o `Id` e grava ativa. Usuário inexistente ou desativado → `RegraDeNegocioException`.
+**Dono:** a dívida **não tem `id_usuario`** (saiu de `tb_divida` na migration `RemoverUsuarioDivida`, decisão de
+16/10/2026): o dono é o **da conta dela** (`Divida.Conta.IdUsuario`). Por isso a conta é obrigatória e precisa ser do
+usuário recebido (validação abaixo). Consultas e checagens de dono usam
+`DividaValidador.EhDoUsuarioAsync` (casos de uso) ou `Divida.Conta.IdUsuario` (repositórios). Zera o `Id` e grava
+ativa. Usuário inexistente ou desativado → `RegraDeNegocioException`.
 
 **Validações** (todas juntas numa `ValidacaoException`, um erro por campo; nada gravado):
 
@@ -154,7 +157,7 @@ Dívida da tela Visualizar, com `Credor`, `Conta`, `Categoria` e as **parcelas a
 ### Parcelas (`UseCases/Parcelas/`)
 
 Decisão de 14/10/2026. Chamados pelo `IParcelaService` (tela Visualizar Parcela, ver [05-Telas.md](05-Telas.md#parcelas)).
-A parcela não tem `id_usuario`: o dono é conferido **pela dívida** (`Divida.IdUsuario`). Regras comuns em
+A parcela não tem `id_usuario`: o dono é conferido **pela conta da dívida** (`Divida.Conta.IdUsuario`). Regras comuns em
 `ParcelaValidador`:
 
 - Inexistente ou de outro usuário → `KeyNotFoundException`. Parcela ou dívida excluída → `RegraDeNegocioException`.

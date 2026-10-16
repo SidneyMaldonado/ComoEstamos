@@ -28,7 +28,6 @@ namespace ComoEstamos.Test.UseCaseTests
 
         private Divida NovaDivida(decimal valor = 1200m, int parcelas = 12) => new()
         {
-            IdUsuario = _usuario.Id,
             IdConta = _conta.Id,
             IdCategoria = _categoria.Id,
             Nome = "Notebook",
@@ -207,16 +206,13 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
-        public async Task ExecutarAsync_GravaParaOUsuarioRecebidoERemoveEspacosDoNome()
+        public async Task ExecutarAsync_GravaAtivaERemoveEspacosDoNome()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
             var divida = NovaDivida();
-            divida.IdUsuario = outro.Id;
             divida.Nome = "  Notebook  ";
 
             var gravada = await ExecutarAsync(divida);
 
-            Assert.AreEqual(_usuario.Id, gravada.IdUsuario);
             Assert.AreEqual("Notebook", gravada.Nome);
             Assert.IsTrue(gravada.Ativo);
         }

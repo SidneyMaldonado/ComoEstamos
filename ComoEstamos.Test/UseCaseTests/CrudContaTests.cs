@@ -345,7 +345,6 @@ namespace ComoEstamos.Test.UseCaseTests
 
         private Divida NovaDivida(int idConta) => new()
         {
-            IdUsuario = _usuario.Id,
             IdConta = idConta,
             Nome = "Financiamento",
             DataPrimeiroVencimento = new DateTime(2026, 10, 10),

@@ -10,7 +10,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
     internal static class ParcelaValidador
     {
         /// <summary>
-        /// Parcela e dívida rastreadas pela unidade de trabalho. O dono é conferido pela dívida.
+        /// Parcela e dívida rastreadas pela unidade de trabalho. O dono é conferido pela conta da dívida.
         /// Inexistente ou de outro usuário: <see cref="KeyNotFoundException"/>.
         /// Parcela ou dívida excluída: <see cref="RegraDeNegocioException"/>.
         /// </summary>
@@ -18,7 +18,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
         {
             var parcela = await uow.Parcelas.ObterPorIdAsync(id);
             var divida = parcela is null ? null : await uow.Dividas.ObterPorIdAsync(parcela.IdDivida);
-            if (parcela is null || divida is null || divida.IdUsuario != idUsuario)
+            if (parcela is null || divida is null || !await DividaValidador.EhDoUsuarioAsync(uow, divida, idUsuario))
                 throw new KeyNotFoundException("A parcela não foi encontrada.");
             if (!parcela.Ativo)
                 throw new RegraDeNegocioException("A parcela foi excluída.");

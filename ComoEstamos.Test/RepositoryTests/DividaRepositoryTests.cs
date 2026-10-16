@@ -1,4 +1,4 @@
-using ComoEstamos.Data.Model;
+﻿using ComoEstamos.Data.Model;
 using ComoEstamos.Data.Repository;
 
 namespace ComoEstamos.Test.RepositoryTests
@@ -11,20 +11,28 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestInitialize]
         public void Inicializar() => _repository = new DividaRepository(ContextFactory);
 
-        private static Divida NovaDivida(int idUsuario, string nome = "Financiamento") => new()
+        private static Divida NovaDivida(int? idConta = null, string nome = "Financiamento") => new()
         {
-            IdUsuario = idUsuario,
+            IdConta = idConta,
             Nome = nome,
             DataPrimeiroVencimento = new DateTime(2026, 10, 10),
             NumeroParcelas = 12,
             Valor = 1200m
         };
 
+        /// <summary>Usuário com uma conta: a dívida não tem id_usuario, o dono é o da conta dela.</summary>
+        private async Task<Conta> CriarContaAsync(string email = "usuario@teste.com")
+        {
+            var usuario = await CriarUsuarioAsync(email);
+            var conta = new Conta { IdUsuario = usuario.Id, Nome = "Corrente" };
+            await SemearAsync(conta);
+            return conta;
+        }
+
         [TestMethod]
         public async Task InserirAsync_PersisteDividaComTodosOsCampos()
         {
-            var usuario = await CriarUsuarioAsync();
-            var divida = NovaDivida(usuario.Id);
+            var divida = NovaDivida();
             divida.DiaVencimento = 15;
 
             await _repository.InserirAsync(divida);
@@ -52,8 +60,7 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task InserirAsync_PersisteCredito()
         {
-            var usuario = await CriarUsuarioAsync();
-            var credito = NovaDivida(usuario.Id, "Empréstimo a amigo");
+            var credito = NovaDivida(nome: "Empréstimo a amigo");
             credito.EhDivida = false;
 
             await _repository.InserirAsync(credito);
@@ -71,9 +78,8 @@ namespace ComoEstamos.Test.RepositoryTests
             var conta = new Conta { IdUsuario = usuario.Id, Nome = "Corrente" };
             var categoria = new Categoria { IdUsuario = usuario.Id, Nome = "Moradia" };
             await SemearAsync(credor, conta, categoria);
-            var divida = NovaDivida(usuario.Id);
+            var divida = NovaDivida(conta.Id);
             divida.IdCredor = credor.Id;
-            divida.IdConta = conta.Id;
             divida.IdCategoria = categoria.Id;
             await SemearAsync(divida);
 
@@ -86,30 +92,30 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
-        public async Task ListarPorUsuarioAsync_AceitaRelacionamentosOpcionaisNulos()
+        public async Task ListarPorUsuarioAsync_AceitaCredorECategoriaNulos()
         {
-            var usuario = await CriarUsuarioAsync();
-            await SemearAsync(NovaDivida(usuario.Id));
+            var conta = await CriarContaAsync();
+            await SemearAsync(NovaDivida(conta.Id));
 
-            var lista = await _repository.ListarPorUsuarioAsync(usuario.Id);
+            var lista = await _repository.ListarPorUsuarioAsync(conta.IdUsuario);
 
             Assert.HasCount(1, lista);
             Assert.IsNull(lista[0].Credor);
-            Assert.IsNull(lista[0].Conta);
+            Assert.AreEqual("Corrente", lista[0].Conta?.Nome);
             Assert.IsNull(lista[0].Categoria);
         }
 
         [TestMethod]
         public async Task ListarPorUsuarioAsync_RetornaSomenteDividasDoUsuarioOrdenadasPorNome()
         {
-            var usuario = await CriarUsuarioAsync("a@teste.com");
-            var outro = await CriarUsuarioAsync("b@teste.com");
+            var conta = await CriarContaAsync("a@teste.com");
+            var contaDeOutro = await CriarContaAsync("b@teste.com");
             await SemearAsync(
-                NovaDivida(usuario.Id, "Financiamento"),
-                NovaDivida(usuario.Id, "Cartão"),
-                NovaDivida(outro.Id, "De outro"));
+                NovaDivida(conta.Id, "Financiamento"),
+                NovaDivida(conta.Id, "Cartão"),
+                NovaDivida(contaDeOutro.Id, "De outro"));
 
-            var lista = await _repository.ListarPorUsuarioAsync(usuario.Id);
+            var lista = await _repository.ListarPorUsuarioAsync(conta.IdUsuario);
 
             CollectionAssert.AreEqual(new[] { "Cartão", "Financiamento" }, lista.Select(d => d.Nome).ToArray());
         }
@@ -117,12 +123,12 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task ListarPorUsuarioAsync_RetornaDividasECreditos()
         {
-            var usuario = await CriarUsuarioAsync();
-            var credito = NovaDivida(usuario.Id, "A receber");
+            var conta = await CriarContaAsync();
+            var credito = NovaDivida(conta.Id, "A receber");
             credito.EhDivida = false;
-            await SemearAsync(NovaDivida(usuario.Id, "A pagar"), credito);
+            await SemearAsync(NovaDivida(conta.Id, "A pagar"), credito);
 
-            var lista = await _repository.ListarPorUsuarioAsync(usuario.Id);
+            var lista = await _repository.ListarPorUsuarioAsync(conta.IdUsuario);
 
             Assert.HasCount(2, lista);
             Assert.AreEqual(1, lista.Count(d => d.EhDivida));
@@ -132,12 +138,12 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task ListarPorUsuarioAsync_IgnoraInativosPorPadrao()
         {
-            var usuario = await CriarUsuarioAsync();
-            var inativa = NovaDivida(usuario.Id, "Quitada");
+            var conta = await CriarContaAsync();
+            var inativa = NovaDivida(conta.Id, "Quitada");
             inativa.Ativo = false;
-            await SemearAsync(NovaDivida(usuario.Id, "Em aberto"), inativa);
+            await SemearAsync(NovaDivida(conta.Id, "Em aberto"), inativa);
 
-            var lista = await _repository.ListarPorUsuarioAsync(usuario.Id);
+            var lista = await _repository.ListarPorUsuarioAsync(conta.IdUsuario);
 
             Assert.HasCount(1, lista);
             Assert.AreEqual("Em aberto", lista[0].Nome);
@@ -146,12 +152,12 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task ListarPorUsuarioAsync_IncluiInativosQuandoSolicitado()
         {
-            var usuario = await CriarUsuarioAsync();
-            var inativa = NovaDivida(usuario.Id, "Quitada");
+            var conta = await CriarContaAsync();
+            var inativa = NovaDivida(conta.Id, "Quitada");
             inativa.Ativo = false;
-            await SemearAsync(NovaDivida(usuario.Id, "Em aberto"), inativa);
+            await SemearAsync(NovaDivida(conta.Id, "Em aberto"), inativa);
 
-            var lista = await _repository.ListarPorUsuarioAsync(usuario.Id, incluirInativos: true);
+            var lista = await _repository.ListarPorUsuarioAsync(conta.IdUsuario, incluirInativos: true);
 
             Assert.HasCount(2, lista);
         }
@@ -159,8 +165,7 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task AtualizarAsync_AlteraValorETipo()
         {
-            var usuario = await CriarUsuarioAsync();
-            var divida = await _repository.InserirAsync(NovaDivida(usuario.Id));
+            var divida = await _repository.InserirAsync(NovaDivida());
 
             divida.Valor = 900m;
             divida.EhDivida = false;
@@ -175,12 +180,12 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task DesativarAsync_RemoveDaListagemDoUsuario()
         {
-            var usuario = await CriarUsuarioAsync();
-            var divida = await _repository.InserirAsync(NovaDivida(usuario.Id));
+            var conta = await CriarContaAsync();
+            var divida = await _repository.InserirAsync(NovaDivida(conta.Id));
 
             await _repository.DesativarAsync(divida.Id);
 
-            Assert.IsEmpty(await _repository.ListarPorUsuarioAsync(usuario.Id));
+            Assert.IsEmpty(await _repository.ListarPorUsuarioAsync(conta.IdUsuario));
         }
 
         [TestMethod]
@@ -192,12 +197,10 @@ namespace ComoEstamos.Test.RepositoryTests
             var categoria = new Categoria { IdUsuario = usuario.Id, Nome = "Moradia" };
             var credor = new Credor { IdUsuario = usuario.Id, Nome = "Banco" };
             await SemearAsync(conta, outraConta, categoria, credor);
-            var ativa = NovaDivida(usuario.Id);
-            ativa.IdConta = conta.Id;
+            var ativa = NovaDivida(conta.Id);
             ativa.IdCategoria = categoria.Id;
             ativa.IdCredor = credor.Id;
-            var inativa = NovaDivida(usuario.Id);
-            inativa.IdConta = outraConta.Id;
+            var inativa = NovaDivida(outraConta.Id);
             inativa.Ativo = false;
             await SemearAsync(ativa, inativa);
 

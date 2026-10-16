@@ -58,7 +58,7 @@ namespace ComoEstamos.Test.UseCaseTests
         private Conta NovaConta(string nome, bool ativa = true) => new() { IdUsuario = _usuario.Id, Nome = nome, Ativo = ativa };
 
         private Divida NovaDivida(string nome, bool ehDivida) =>
-            new() { IdUsuario = _usuario.Id, Nome = nome, Valor = 100m, EhDivida = ehDivida, DataPrimeiroVencimento = new DateTime(2026, 10, 10) };
+            new() { Nome = nome, Valor = 100m, EhDivida = ehDivida, DataPrimeiroVencimento = new DateTime(2026, 10, 10) };
 
         private async Task<string[]> NomesDasContasAsync()
         {

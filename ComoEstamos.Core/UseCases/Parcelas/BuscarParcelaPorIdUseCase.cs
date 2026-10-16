@@ -1,3 +1,4 @@
+using ComoEstamos.Core.UseCases.Dividas;
 using ComoEstamos.Data;
 using ComoEstamos.Data.Model;
 
@@ -22,7 +23,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
             if (parcela is not { Ativo: true })
                 return null;
             var divida = await uow.Dividas.ObterPorIdAsync(parcela.IdDivida);
-            if (divida is not { Ativo: true } || divida.IdUsuario != idUsuario)
+            if (divida is not { Ativo: true } || !await DividaValidador.EhDoUsuarioAsync(uow, divida, idUsuario))
                 return null;
 
             var conta = await uow.Contas.ObterPorIdAsync(parcela.IdConta);

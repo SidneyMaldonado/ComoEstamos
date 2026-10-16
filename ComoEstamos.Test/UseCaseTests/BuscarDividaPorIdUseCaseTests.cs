@@ -25,12 +25,11 @@ namespace ComoEstamos.Test.UseCaseTests
             await SemearAsync(_conta, _categoria, _credor);
         }
 
-        private async Task<Divida> CriarDividaAsync(bool ativa = true, int? idUsuario = null)
+        private async Task<Divida> CriarDividaAsync(bool ativa = true, int? idConta = null)
         {
             var divida = new Divida
             {
-                IdUsuario = idUsuario ?? _usuario.Id,
-                IdConta = _conta.Id,
+                IdConta = idConta ?? _conta.Id,
                 IdCategoria = _categoria.Id,
                 IdCredor = _credor.Id,
                 Nome = "Notebook",
@@ -94,9 +93,9 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_RetornaNuloParaInexistenteInativaOuDeOutroUsuario()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
+            var contaDeOutro = await CriarContaDeOutroUsuarioAsync();
             var inativa = await CriarDividaAsync(ativa: false);
-            var deOutro = await CriarDividaAsync(idUsuario: outro.Id);
+            var deOutro = await CriarDividaAsync(idConta: contaDeOutro.Id);
 
             Assert.IsNull(await _useCase.ExecutarAsync(999, _usuario.Id));
             Assert.IsNull(await _useCase.ExecutarAsync(inativa.Id, _usuario.Id));

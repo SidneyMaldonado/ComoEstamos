@@ -194,7 +194,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var categoria = await SemearCategoriaAsync("Moradia");
             await SemearAsync(new Divida
             {
-                IdUsuario = _usuario.Id, IdCategoria = categoria.Id, Nome = "Financiamento",
+                IdCategoria = categoria.Id, Nome = "Financiamento",
                 DataPrimeiroVencimento = new DateTime(2026, 10, 10), Valor = 100m, Ativo = true
             });
 
@@ -211,7 +211,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var categoria = await SemearCategoriaAsync("Moradia");
             await SemearAsync(new Divida
             {
-                IdUsuario = _usuario.Id, IdCategoria = categoria.Id, Nome = "Financiamento",
+                IdCategoria = categoria.Id, Nome = "Financiamento",
                 DataPrimeiroVencimento = new DateTime(2026, 10, 10), Valor = 100m, Ativo = false
             });
 

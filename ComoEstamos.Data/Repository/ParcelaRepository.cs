@@ -28,11 +28,11 @@ namespace ComoEstamos.Data.Repository
             ListarAsync(p => p.IdDivida == idDivida, incluirInativos, q => q.OrderBy(p => p.DataVencimento));
 
         public Task<List<Parcela>> ListarPorUsuarioAsync(int idUsuario) =>
-            ListarAsync(p => p.Divida!.IdUsuario == idUsuario, montarConsulta: q => q.OrderBy(p => p.DataVencimento));
+            ListarAsync(p => p.Divida!.Conta!.IdUsuario == idUsuario, montarConsulta: q => q.OrderBy(p => p.DataVencimento));
 
         public Task<List<Parcela>> ListarPendentesAsync(int idUsuario, DateTime vencimentoAte) =>
             ListarAsync(
-                p => p.Divida!.IdUsuario == idUsuario
+                p => p.Divida!.Conta!.IdUsuario == idUsuario
                      && p.Divida.Ativo
                      && p.DataPagamento == null
                      && p.DataVencimento <= vencimentoAte,

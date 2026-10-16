@@ -225,10 +225,6 @@ namespace ComoEstamos.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("id_credor");
 
-                    b.Property<int>("IdUsuario")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("id_usuario");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -251,8 +247,6 @@ namespace ComoEstamos.Data.Migrations
                     b.HasIndex("IdConta");
 
                     b.HasIndex("IdCredor");
-
-                    b.HasIndex("IdUsuario");
 
                     b.ToTable("tb_divida", t =>
                         {
@@ -620,19 +614,11 @@ namespace ComoEstamos.Data.Migrations
                         .HasForeignKey("IdCredor")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("ComoEstamos.Data.Model.Usuario", "Usuario")
-                        .WithMany("Dividas")
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Categoria");
 
                     b.Navigation("Conta");
 
                     b.Navigation("Credor");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("ComoEstamos.Data.Model.Historico", b =>
@@ -724,8 +710,6 @@ namespace ComoEstamos.Data.Migrations
                     b.Navigation("Contas");
 
                     b.Navigation("Credores");
-
-                    b.Navigation("Dividas");
                 });
 #pragma warning restore 612, 618
         }

@@ -11,9 +11,6 @@ namespace ComoEstamos.Data.Model
         [Column("id_divida")]
         public int Id { get; set; }
 
-        [Column("id_usuario")]
-        public int IdUsuario { get; set; }
-
         [Column("id_credor")]
         public int? IdCredor { get; set; }
 
@@ -44,9 +41,6 @@ namespace ComoEstamos.Data.Model
         /// <summary>true = dívida (valor a pagar); false = crédito (valor a receber).</summary>
         [Column("dm_divida")]
         public bool EhDivida { get; set; } = true;
-
-        [ForeignKey(nameof(IdUsuario))]
-        public Usuario? Usuario { get; set; }
 
         [ForeignKey(nameof(IdCredor))]
         public Credor? Credor { get; set; }

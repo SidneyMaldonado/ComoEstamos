@@ -1,5 +1,6 @@
 using ComoEstamos.Core.Services;
 using ComoEstamos.Core.UseCases.Dividas;
+using ComoEstamos.Core.Validacao;
 using ComoEstamos.Data;
 using ComoEstamos.Data.Model;
 using ComoEstamos.Data.Repository;
@@ -50,23 +51,22 @@ namespace ComoEstamos.Test.ServiceTests
         }
 
         [TestMethod]
-        public async Task IncluirAsync_GravaParaOUsuarioAtual()
+        public async Task IncluirAsync_RecusaContaDeOutroUsuario()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
             var divida = await NovaDividaAsync();
-            divida.IdUsuario = outro.Id;
+            divida.IdConta = (await CriarContaDeOutroUsuarioAsync()).Id;
 
-            await _service.IncluirAsync(divida);
+            await Assert.ThrowsExactlyAsync<ValidacaoException>(() => _service.IncluirAsync(divida));
 
             await using var db = CriarContexto();
-            Assert.AreEqual(await _usuarioAtual.ObterIdAsync(), (await db.Dividas.SingleAsync()).IdUsuario);
+            Assert.IsFalse(await db.Dividas.AnyAsync());
         }
 
         [TestMethod]
         public async Task BuscarEBuscarPorId_UsamOUsuarioAtual()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
-            var deOutro = new Divida { IdUsuario = outro.Id, Nome = "De outro", DataPrimeiroVencimento = new DateTime(2026, 10, 10) };
+            var contaDeOutro = await CriarContaDeOutroUsuarioAsync();
+            var deOutro = new Divida { IdConta = contaDeOutro.Id, Nome = "De outro", DataPrimeiroVencimento = new DateTime(2026, 10, 10) };
             await SemearAsync(deOutro);
             var divida = await _service.IncluirAsync(await NovaDividaAsync());
 
@@ -80,8 +80,8 @@ namespace ComoEstamos.Test.ServiceTests
         [TestMethod]
         public async Task BuscarResumoMes_UsaOUsuarioAtual()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
-            var deOutro = new Divida { IdUsuario = outro.Id, Nome = "De outro", DataPrimeiroVencimento = new DateTime(2026, 10, 10) };
+            var contaDeOutro = await CriarContaDeOutroUsuarioAsync();
+            var deOutro = new Divida { IdConta = contaDeOutro.Id, Nome = "De outro", DataPrimeiroVencimento = new DateTime(2026, 10, 10) };
             deOutro.Parcelas.Add(new Parcela { Divida = deOutro, Descricao = "De outro 1/1", Valor = 50m, DataVencimento = new DateTime(2026, 10, 10) });
             await SemearAsync(deOutro);
             await _service.IncluirAsync(await NovaDividaAsync());

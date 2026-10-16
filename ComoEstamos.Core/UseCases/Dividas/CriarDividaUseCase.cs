@@ -18,7 +18,6 @@ namespace ComoEstamos.Core.UseCases.Dividas
         public async Task<Divida> ExecutarAsync(Divida divida, int idUsuario)
         {
             divida.Id = 0;
-            divida.IdUsuario = idUsuario;
             divida.Ativo = true;
 
             await using var uow = await unitOfWorkFactory.IniciarAsync();

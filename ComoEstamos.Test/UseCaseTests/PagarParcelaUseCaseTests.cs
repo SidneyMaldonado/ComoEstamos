@@ -26,7 +26,7 @@ namespace ComoEstamos.Test.UseCaseTests
 
         private async Task<Parcela> CriarParcelaAsync(bool ehDivida = true, decimal valor = 250m, bool dividaAtiva = true)
         {
-            var divida = new Divida { IdUsuario = _usuario.Id, Nome = "Aluguel", Valor = valor, EhDivida = ehDivida, Ativo = dividaAtiva };
+            var divida = new Divida { IdConta = _conta.Id, Nome = "Aluguel", Valor = valor, EhDivida = ehDivida, Ativo = dividaAtiva };
             await SemearAsync(divida);
             var parcela = new Parcela
             {

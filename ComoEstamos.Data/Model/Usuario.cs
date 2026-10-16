@@ -32,6 +32,5 @@ namespace ComoEstamos.Data.Model
         public List<Categoria> Categorias { get; set; } = [];
         public List<Conta> Contas { get; set; } = [];
         public List<Credor> Credores { get; set; } = [];
-        public List<Divida> Dividas { get; set; } = [];
     }
 }
