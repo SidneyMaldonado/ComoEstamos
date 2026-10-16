@@ -204,7 +204,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var credor = await SemearCredorAsync("Banco");
             await SemearAsync(new Divida
             {
-                IdUsuario = _usuario.Id, IdCredor = credor.Id, Nome = "Financiamento",
+                IdCredor = credor.Id, Nome = "Financiamento",
                 DataPrimeiroVencimento = new DateTime(2026, 10, 10), Valor = 100m, Ativo = true
             });
 
@@ -221,7 +221,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var credor = await SemearCredorAsync("Banco");
             await SemearAsync(new Divida
             {
-                IdUsuario = _usuario.Id, IdCredor = credor.Id, Nome = "Financiamento",
+                IdCredor = credor.Id, Nome = "Financiamento",
                 DataPrimeiroVencimento = new DateTime(2026, 10, 10), Valor = 100m, Ativo = false
             });
 

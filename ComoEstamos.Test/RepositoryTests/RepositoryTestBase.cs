@@ -38,5 +38,14 @@ namespace ComoEstamos.Test.RepositoryTests
             await SemearAsync(usuario);
             return usuario;
         }
+
+        /// <summary>Conta de um outro usuário. A dívida não tem id_usuario: o dono é o da conta dela.</summary>
+        protected async Task<Conta> CriarContaDeOutroUsuarioAsync(string email = "outro@teste.com")
+        {
+            var outro = await CriarUsuarioAsync(email);
+            var conta = new Conta { IdUsuario = outro.Id, Nome = "Do outro" };
+            await SemearAsync(conta);
+            return conta;
+        }
     }
 }

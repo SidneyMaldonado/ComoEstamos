@@ -9,7 +9,6 @@ namespace ComoEstamos.Test.RepositoryTests
         private ParcelaRepository _repository = null!;
         private Usuario _usuario = null!;
         private Conta _conta = null!;
-        private Categoria _categoria = null!;
         private Divida _divida = null!;
 
         [TestInitialize]
@@ -18,16 +17,15 @@ namespace ComoEstamos.Test.RepositoryTests
             _repository = new ParcelaRepository(ContextFactory);
             _usuario = await CriarUsuarioAsync();
             _conta = new Conta { IdUsuario = _usuario.Id, Nome = "Corrente" };
-            _categoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Moradia" };
-            await SemearAsync(_conta, _categoria);
-            _divida = await CriarDividaAsync(_usuario.Id);
+            await SemearAsync(_conta);
+            _divida = await CriarDividaAsync(_conta.Id);
         }
 
-        private async Task<Divida> CriarDividaAsync(int idUsuario, bool ativa = true)
+        private async Task<Divida> CriarDividaAsync(int idConta, bool ativa = true)
         {
             var divida = new Divida
             {
-                IdUsuario = idUsuario,
+                IdConta = idConta,
                 Nome = "Financiamento",
                 DataPrimeiroVencimento = new DateTime(2026, 10, 10),
                 Valor = 300m,
@@ -41,7 +39,6 @@ namespace ComoEstamos.Test.RepositoryTests
         {
             IdDivida = idDivida ?? _divida.Id,
             IdConta = _conta.Id,
-            IdCategoria = _categoria.Id,
             Descricao = descricao,
             Valor = 100m,
             DataVencimento = vencimento
@@ -63,7 +60,7 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task ListarPorDividaAsync_RetornaSomenteParcelasDaDividaOrdenadasPorVencimento()
         {
-            var outraDivida = await CriarDividaAsync(_usuario.Id);
+            var outraDivida = await CriarDividaAsync(_conta.Id);
             await SemearAsync(
                 NovaParcela(new DateTime(2026, 12, 10), descricao: "3/3"),
                 NovaParcela(new DateTime(2026, 10, 10), descricao: "1/3"),
@@ -78,9 +75,8 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task ListarPorUsuarioAsync_RetornaParcelasAtivasDasDividasDoUsuarioPorVencimento()
         {
-            var outroUsuario = await CriarUsuarioAsync("outro@teste.com");
-            var dividaDeOutro = await CriarDividaAsync(outroUsuario.Id);
-            var outraDivida = await CriarDividaAsync(_usuario.Id);
+            var dividaDeOutro = await CriarDividaAsync((await CriarContaDeOutroUsuarioAsync()).Id);
+            var outraDivida = await CriarDividaAsync(_conta.Id);
             var inativa = NovaParcela(new DateTime(2026, 9, 1), descricao: "Inativa");
             inativa.Ativo = false;
             await SemearAsync(
@@ -136,7 +132,7 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
-        public async Task ListarPendentesAsync_CarregaDividaContaECategoria()
+        public async Task ListarPendentesAsync_CarregaDividaEConta()
         {
             await SemearAsync(NovaParcela(new DateTime(2026, 10, 10)));
 
@@ -145,14 +141,12 @@ namespace ComoEstamos.Test.RepositoryTests
             Assert.HasCount(1, lista);
             Assert.AreEqual("Financiamento", lista[0].Divida?.Nome);
             Assert.AreEqual("Corrente", lista[0].Conta?.Nome);
-            Assert.AreEqual("Moradia", lista[0].Categoria?.Nome);
         }
 
         [TestMethod]
         public async Task ListarPendentesAsync_IgnoraParcelasDeOutroUsuario()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
-            var dividaDeOutro = await CriarDividaAsync(outro.Id);
+            var dividaDeOutro = await CriarDividaAsync((await CriarContaDeOutroUsuarioAsync()).Id);
             await SemearAsync(NovaParcela(new DateTime(2026, 10, 10), dividaDeOutro.Id));
 
             var lista = await _repository.ListarPendentesAsync(_usuario.Id, new DateTime(2026, 10, 31));
@@ -163,7 +157,7 @@ namespace ComoEstamos.Test.RepositoryTests
         [TestMethod]
         public async Task ListarPendentesAsync_IgnoraParcelasDeDividaInativa()
         {
-            var dividaInativa = await CriarDividaAsync(_usuario.Id, ativa: false);
+            var dividaInativa = await CriarDividaAsync(_conta.Id, ativa: false);
             await SemearAsync(NovaParcela(new DateTime(2026, 10, 10), dividaInativa.Id));
 
             var lista = await _repository.ListarPendentesAsync(_usuario.Id, new DateTime(2026, 10, 31));
@@ -215,21 +209,17 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
-        public async Task ExisteAtivaPorContaECategoria_ConsideramSoParcelasAtivas()
+        public async Task ExisteAtivaPorConta_ConsideraSoParcelasAtivas()
         {
             var outraConta = new Conta { IdUsuario = _usuario.Id, Nome = "Poupança" };
-            var outraCategoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Lazer" };
-            await SemearAsync(outraConta, outraCategoria);
+            await SemearAsync(outraConta);
             var inativa = NovaParcela(new DateTime(2026, 10, 10));
             inativa.IdConta = outraConta.Id;
-            inativa.IdCategoria = outraCategoria.Id;
             inativa.Ativo = false;
             await SemearAsync(NovaParcela(new DateTime(2026, 10, 10)), inativa);
 
             Assert.IsTrue(await _repository.ExisteAtivaPorContaAsync(_conta.Id));
-            Assert.IsTrue(await _repository.ExisteAtivaPorCategoriaAsync(_categoria.Id));
             Assert.IsFalse(await _repository.ExisteAtivaPorContaAsync(outraConta.Id));
-            Assert.IsFalse(await _repository.ExisteAtivaPorCategoriaAsync(outraCategoria.Id));
         }
     }
 }

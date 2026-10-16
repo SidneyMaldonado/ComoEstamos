@@ -27,12 +27,11 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         /// <summary>Dívida com 3 parcelas, a primeira paga.</summary>
-        private async Task<Divida> CriarDividaAsync(int? idUsuario = null, bool ativa = true)
+        private async Task<Divida> CriarDividaAsync(int? idConta = null, bool ativa = true)
         {
             var divida = new Divida
             {
-                IdUsuario = idUsuario ?? _usuario.Id,
-                IdConta = _conta.Id,
+                IdConta = idConta ?? _conta.Id,
                 IdCategoria = _categoria.Id,
                 Nome = "Notebook",
                 NumeroParcelas = 3,
@@ -44,7 +43,6 @@ namespace ComoEstamos.Test.UseCaseTests
             {
                 Divida = divida,
                 IdConta = _conta.Id,
-                IdCategoria = _categoria.Id,
                 Descricao = $"Notebook {i + 1}/3",
                 Valor = 100m,
                 DataVencimento = new DateTime(2026, 10 + i, 10),
@@ -83,8 +81,8 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_InexistenteOuDeOutroUsuarioLancaKeyNotFoundSemDesativar()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
-            var deOutro = await CriarDividaAsync(outro.Id);
+            var contaDeOutro = await CriarContaDeOutroUsuarioAsync();
+            var deOutro = await CriarDividaAsync(contaDeOutro.Id);
 
             await Assert.ThrowsExactlyAsync<KeyNotFoundException>(() => _useCase.ExecutarAsync(999, _usuario.Id));
             await Assert.ThrowsExactlyAsync<KeyNotFoundException>(() => _useCase.ExecutarAsync(deOutro.Id, _usuario.Id));

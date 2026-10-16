@@ -5,7 +5,7 @@ namespace ComoEstamos.Data.Repository
 {
     public interface IDividaRepository : IRepository<Divida>
     {
-        /// <summary>Lista as dívidas do usuário com Credor, Conta e Categoria carregados.</summary>
+        /// <summary>Lista as dívidas do usuário (dono da conta delas) com Credor, Conta e Categoria carregados.</summary>
         Task<List<Divida>> ListarPorUsuarioAsync(int idUsuario, bool incluirInativos = false);
 
         Task<bool> ExisteAtivaPorContaAsync(int idConta);
@@ -20,7 +20,7 @@ namespace ComoEstamos.Data.Repository
         internal DividaRepository(AppDbContext contexto) : base(contexto) { }
 
         public Task<List<Divida>> ListarPorUsuarioAsync(int idUsuario, bool incluirInativos = false) =>
-            ListarAsync(d => d.IdUsuario == idUsuario, incluirInativos, q => q
+            ListarAsync(d => d.Conta!.IdUsuario == idUsuario, incluirInativos, q => q
                 .Include(d => d.Credor)
                 .Include(d => d.Conta)
                 .Include(d => d.Categoria)

@@ -44,7 +44,7 @@ namespace ComoEstamos.Core.UseCases.Dividas
         /// <summary>
         /// Gera as parcelas de número <paramref name="primeiroNumero"/> até <see cref="Divida.NumeroParcelas"/>,
         /// dividindo <paramref name="valor"/> igualmente entre elas, com os centavos que sobrarem na última.
-        /// Conta e categoria são as da dívida. Na inclusão, gera todas (a partir da 1ª) com o valor total.
+        /// A conta é a da dívida. Na inclusão, gera todas (a partir da 1ª) com o valor total.
         /// </summary>
         public static List<Parcela> Gerar(Divida divida, int primeiroNumero, decimal valor)
         {
@@ -59,7 +59,6 @@ namespace ComoEstamos.Core.UseCases.Dividas
                 {
                     Divida = divida,
                     IdConta = divida.IdConta!.Value,
-                    IdCategoria = divida.IdCategoria!.Value,
                     Descricao = Descricao(divida.Nome, numero, total),
                     Valor = numero == total ? valor - valorParcela * (quantidade - 1) : valorParcela,
                     DataVencimento = Vencimento(divida, numero - 1)

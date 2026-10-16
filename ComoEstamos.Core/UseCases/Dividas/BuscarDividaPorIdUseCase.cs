@@ -18,7 +18,7 @@ namespace ComoEstamos.Core.UseCases.Dividas
         {
             await using var uow = await unitOfWorkFactory.IniciarAsync();
             var divida = await uow.Dividas.ObterPorIdAsync(id);
-            if (divida is not { Ativo: true } || divida.IdUsuario != idUsuario)
+            if (divida is not { Ativo: true } || !await DividaValidador.EhDoUsuarioAsync(uow, divida, idUsuario))
                 return null;
 
             if (divida.IdCredor is int idCredor)

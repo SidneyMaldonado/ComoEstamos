@@ -10,7 +10,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
     internal static class ParcelaValidador
     {
         /// <summary>
-        /// Parcela e dívida rastreadas pela unidade de trabalho. O dono é conferido pela dívida.
+        /// Parcela e dívida rastreadas pela unidade de trabalho. O dono é conferido pela conta da dívida.
         /// Inexistente ou de outro usuário: <see cref="KeyNotFoundException"/>.
         /// Parcela ou dívida excluída: <see cref="RegraDeNegocioException"/>.
         /// </summary>
@@ -18,7 +18,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
         {
             var parcela = await uow.Parcelas.ObterPorIdAsync(id);
             var divida = parcela is null ? null : await uow.Dividas.ObterPorIdAsync(parcela.IdDivida);
-            if (parcela is null || divida is null || divida.IdUsuario != idUsuario)
+            if (parcela is null || divida is null || !await DividaValidador.EhDoUsuarioAsync(uow, divida, idUsuario))
                 throw new KeyNotFoundException("A parcela não foi encontrada.");
             if (!parcela.Ativo)
                 throw new RegraDeNegocioException("A parcela foi excluída.");
@@ -28,7 +28,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
         }
 
         /// <summary>
-        /// Valida o domínio dos campos editáveis (valor, conta e categoria). O total da dívida —
+        /// Valida o domínio dos campos editáveis (valor e conta). O total da dívida —
         /// <paramref name="somaDasOutras"/> mais o valor desta parcela — também não pode passar do limite.
         /// Devolve o validador, para quem chama acrescentar as regras próprias.
         /// </summary>
@@ -43,10 +43,6 @@ namespace ComoEstamos.Core.UseCases.Parcelas
             var conta = await uow.Contas.ObterPorIdAsync(parcela.IdConta);
             if (conta is not { Ativo: true } || conta.IdUsuario != idUsuario)
                 validador.Adicionar(nameof(Parcela.IdConta), parcela.IdConta == 0 ? "Escolha a conta." : "A conta escolhida não existe mais.");
-
-            var categoria = await uow.Categorias.ObterPorIdAsync(parcela.IdCategoria);
-            if (categoria is not { Ativo: true } || categoria.IdUsuario != idUsuario)
-                validador.Adicionar(nameof(Parcela.IdCategoria), parcela.IdCategoria == 0 ? "Escolha a categoria." : "A categoria escolhida não existe mais.");
 
             return validador;
         }

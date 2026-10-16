@@ -298,11 +298,9 @@ namespace ComoEstamos.Test.UseCaseTests
             var outra = await SemearContaAsync("Inter");
             var divida = NovaDivida(outra.Id);
             await SemearAsync(divida);
-            var categoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Moradia" };
-            await SemearAsync(categoria);
             await SemearAsync(new Parcela
             {
-                IdDivida = divida.Id, IdConta = conta.Id, IdCategoria = categoria.Id,
+                IdDivida = divida.Id, IdConta = conta.Id,
                 Descricao = "1/1", Valor = 10m, DataVencimento = new DateTime(2026, 10, 10)
             });
 
@@ -347,7 +345,6 @@ namespace ComoEstamos.Test.UseCaseTests
 
         private Divida NovaDivida(int idConta) => new()
         {
-            IdUsuario = _usuario.Id,
             IdConta = idConta,
             Nome = "Financiamento",
             DataPrimeiroVencimento = new DateTime(2026, 10, 10),

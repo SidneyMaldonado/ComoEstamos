@@ -18,7 +18,6 @@ namespace ComoEstamos.Test.UseCaseTests
         private Conta _conta = null!;
         private Conta _outraConta = null!;
         private Categoria _categoria = null!;
-        private Categoria _outraCategoria = null!;
 
         [TestInitialize]
         public async Task Inicializar()
@@ -30,8 +29,7 @@ namespace ComoEstamos.Test.UseCaseTests
             _conta = new Conta { IdUsuario = _usuario.Id, Nome = "Corrente", Saldo = 1000m };
             _outraConta = new Conta { IdUsuario = _usuario.Id, Nome = "Poupança" };
             _categoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Compras" };
-            _outraCategoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Eletrônicos" };
-            await SemearAsync(_conta, _outraConta, _categoria, _outraCategoria);
+            await SemearAsync(_conta, _outraConta, _categoria);
         }
 
         /// <summary>Cria pela inclusão (R$ 300 em 3x, dia 10, a partir de 10/10/2026) e paga as <paramref name="pagas"/> primeiras.</summary>
@@ -74,8 +72,7 @@ namespace ComoEstamos.Test.UseCaseTests
             Id = parcela.Id,
             Valor = parcela.Valor,
             DataVencimento = parcela.DataVencimento,
-            IdConta = parcela.IdConta,
-            IdCategoria = parcela.IdCategoria
+            IdConta = parcela.IdConta
         };
 
         [TestMethod]
@@ -87,7 +84,6 @@ namespace ComoEstamos.Test.UseCaseTests
             edicao.Valor = 150m;
             edicao.DataVencimento = new DateTime(2026, 11, 15, 9, 0, 0);
             edicao.IdConta = _outraConta.Id;
-            edicao.IdCategoria = _outraCategoria.Id;
 
             await _useCase.ExecutarAsync(edicao, _usuario.Id);
 
@@ -96,7 +92,6 @@ namespace ComoEstamos.Test.UseCaseTests
             Assert.AreEqual(150m, alterada.Valor);
             Assert.AreEqual(new DateTime(2026, 11, 15), alterada.DataVencimento, "Só a data, sem hora.");
             Assert.AreEqual(_outraConta.Id, alterada.IdConta);
-            Assert.AreEqual(_outraCategoria.Id, alterada.IdCategoria);
             Assert.IsTrue(parcelas.Where(p => p.Id != segunda.Id).All(p => p.Valor == 100m && p.IdConta == _conta.Id));
 
             var divida = await DividaGravadaAsync();
@@ -146,33 +141,32 @@ namespace ComoEstamos.Test.UseCaseTests
             var edicao = Edicao((await ParcelasAsync())[1]);
             edicao.Valor = 10.555m;
             edicao.IdConta = contaDeOutro.Id;
-            edicao.IdCategoria = 0;
 
             var ex = await Assert.ThrowsExactlyAsync<ValidacaoException>(() => _useCase.ExecutarAsync(edicao, _usuario.Id));
 
             CollectionAssert.AreEquivalent(
-                new[] { nameof(Parcela.Valor), nameof(Parcela.IdConta), nameof(Parcela.IdCategoria) },
+                new[] { nameof(Parcela.Valor), nameof(Parcela.IdConta) },
                 ex.Erros.Select(e => e.Campo).ToList());
             Assert.IsTrue((await ParcelasAsync()).All(p => p.Valor == 100m && p.IdConta == _conta.Id));
         }
 
         [TestMethod]
-        public async Task ExecutarAsync_RecusaValorZeroECategoriaInativa()
+        public async Task ExecutarAsync_RecusaValorZeroEContaInativa()
         {
             await CriarAsync();
             await using (var db = CriarContexto())
             {
-                (await db.Categorias.SingleAsync(c => c.Id == _outraCategoria.Id)).Ativo = false;
+                (await db.Contas.SingleAsync(c => c.Id == _outraConta.Id)).Ativo = false;
                 await db.SaveChangesAsync();
             }
             var edicao = Edicao((await ParcelasAsync())[1]);
             edicao.Valor = 0m;
-            edicao.IdCategoria = _outraCategoria.Id;
+            edicao.IdConta = _outraConta.Id;
 
             var ex = await Assert.ThrowsExactlyAsync<ValidacaoException>(() => _useCase.ExecutarAsync(edicao, _usuario.Id));
 
             CollectionAssert.AreEquivalent(
-                new[] { nameof(Parcela.Valor), nameof(Parcela.IdCategoria) },
+                new[] { nameof(Parcela.Valor), nameof(Parcela.IdConta) },
                 ex.Erros.Select(e => e.Campo).ToList());
         }
 

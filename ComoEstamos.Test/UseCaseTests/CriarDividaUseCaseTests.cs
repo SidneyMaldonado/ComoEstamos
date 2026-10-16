@@ -28,7 +28,6 @@ namespace ComoEstamos.Test.UseCaseTests
 
         private Divida NovaDivida(decimal valor = 1200m, int parcelas = 12) => new()
         {
-            IdUsuario = _usuario.Id,
             IdConta = _conta.Id,
             IdCategoria = _categoria.Id,
             Nome = "Notebook",
@@ -70,7 +69,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var parcelas = await ParcelasGravadasAsync();
             Assert.HasCount(12, parcelas);
             Assert.IsTrue(parcelas.All(p => p.IdDivida == divida.Id));
-            Assert.IsTrue(parcelas.All(p => p.IdConta == _conta.Id && p.IdCategoria == _categoria.Id));
+            Assert.IsTrue(parcelas.All(p => p.IdConta == _conta.Id));
             Assert.IsTrue(parcelas.All(p => p.Valor == 100m && p.DataPagamento is null && p.Ativo));
             Assert.AreEqual(new DateTime(2026, 10, 10), parcelas[0].DataVencimento);
             Assert.AreEqual(new DateTime(2027, 9, 10), parcelas[11].DataVencimento);
@@ -207,16 +206,13 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
-        public async Task ExecutarAsync_GravaParaOUsuarioRecebidoERemoveEspacosDoNome()
+        public async Task ExecutarAsync_GravaAtivaERemoveEspacosDoNome()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
             var divida = NovaDivida();
-            divida.IdUsuario = outro.Id;
             divida.Nome = "  Notebook  ";
 
             var gravada = await ExecutarAsync(divida);
 
-            Assert.AreEqual(_usuario.Id, gravada.IdUsuario);
             Assert.AreEqual("Notebook", gravada.Nome);
             Assert.IsTrue(gravada.Ativo);
         }

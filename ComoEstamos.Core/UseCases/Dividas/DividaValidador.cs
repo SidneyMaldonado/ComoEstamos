@@ -73,12 +73,16 @@ namespace ComoEstamos.Core.UseCases.Dividas
         public static async Task<Divida> ObterAtivaDoUsuarioAsync(IUnitOfWork uow, int id, int idUsuario)
         {
             var divida = await uow.Dividas.ObterPorIdAsync(id);
-            if (divida is null || divida.IdUsuario != idUsuario)
+            if (divida is null || !await EhDoUsuarioAsync(uow, divida, idUsuario))
                 throw new KeyNotFoundException("A dívida não foi encontrada.");
             if (!divida.Ativo)
                 throw new RegraDeNegocioException("A dívida foi excluída.");
             return divida;
         }
+
+        /// <summary>A dívida não tem <c>id_usuario</c>: o dono é o da conta dela (a conta é obrigatória).</summary>
+        public static async Task<bool> EhDoUsuarioAsync(IUnitOfWork uow, Divida divida, int idUsuario) =>
+            divida.IdConta is int idConta && (await uow.Contas.ObterPorIdAsync(idConta))?.IdUsuario == idUsuario;
 
         /// <summary>
         /// Parcelas ativas da dívida, por vencimento, <b>rastreadas</b> pela unidade de trabalho

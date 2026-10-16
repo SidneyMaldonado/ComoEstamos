@@ -225,10 +225,6 @@ namespace ComoEstamos.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("id_credor");
 
-                    b.Property<int>("IdUsuario")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("id_usuario");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -251,8 +247,6 @@ namespace ComoEstamos.Data.Migrations
                     b.HasIndex("IdConta");
 
                     b.HasIndex("IdCredor");
-
-                    b.HasIndex("IdUsuario");
 
                     b.ToTable("tb_divida", t =>
                         {
@@ -488,10 +482,6 @@ namespace ComoEstamos.Data.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("ds_parcela");
 
-                    b.Property<int>("IdCategoria")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("id_categoria");
-
                     b.Property<int>("IdConta")
                         .HasColumnType("INTEGER")
                         .HasColumnName("id_conta");
@@ -506,8 +496,6 @@ namespace ComoEstamos.Data.Migrations
                         .HasColumnName("nr_valor");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdCategoria");
 
                     b.HasIndex("IdConta");
 
@@ -626,19 +614,11 @@ namespace ComoEstamos.Data.Migrations
                         .HasForeignKey("IdCredor")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("ComoEstamos.Data.Model.Usuario", "Usuario")
-                        .WithMany("Dividas")
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Categoria");
 
                     b.Navigation("Conta");
 
                     b.Navigation("Credor");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("ComoEstamos.Data.Model.Historico", b =>
@@ -687,12 +667,6 @@ namespace ComoEstamos.Data.Migrations
 
             modelBuilder.Entity("ComoEstamos.Data.Model.Parcela", b =>
                 {
-                    b.HasOne("ComoEstamos.Data.Model.Categoria", "Categoria")
-                        .WithMany()
-                        .HasForeignKey("IdCategoria")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("ComoEstamos.Data.Model.Conta", "Conta")
                         .WithMany()
                         .HasForeignKey("IdConta")
@@ -704,8 +678,6 @@ namespace ComoEstamos.Data.Migrations
                         .HasForeignKey("IdDivida")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Categoria");
 
                     b.Navigation("Conta");
 
@@ -738,8 +710,6 @@ namespace ComoEstamos.Data.Migrations
                     b.Navigation("Contas");
 
                     b.Navigation("Credores");
-
-                    b.Navigation("Dividas");
                 });
 #pragma warning restore 612, 618
         }

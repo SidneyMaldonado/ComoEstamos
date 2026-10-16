@@ -84,7 +84,7 @@ Hoje o banco fica em `FileSystem.AppDataDirectory`, que o sistema preserva nas a
   título; a Incluir preenchida, erros, a nova parcela na ordem certa e o total recalculado), o toque na parcela da Visualizar Dívida, a
   Visualizar Parcela (em aberto, vencida e paga: lápis e lixeira apagados), o Pagar (Sim e Não, data de hoje e
   anterior, saldo da conta sem mudar, página recarregada), a Alterar (valor, vencimento mudando a ordem, conta,
-  categoria, erros de formato e de domínio, total da dívida recalculado na volta) e a exclusão (Sim e Não, única
+  sem campo de categoria, erros de formato e de domínio, total da dívida recalculado na volta) e a exclusão (Sim e Não, única
   parcela recusada, volta para a dívida com uma parcela a menos).
 - [ ] **Windows e Android — Receitas (14/10/2026):** testar no app o item "Receitas" do menu (ícone), a lista (só
   receitas; filtros; "Recebida"), a Incluir (Pagador opcional, receita criada não aparece em Dívidas), a Visualizar e a
@@ -97,6 +97,10 @@ Hoje o banco fica em `FileSystem.AppDataDirectory`, que o sistema preserva nas a
   atualizado), o restore de um backup do Drive e de Downloads (seletor de arquivos, resumo, Sim e Não, dados trocados,
   volta para o Início com os novos saldos), os arquivos recusados (um `.zip` qualquer, um arquivo que não é zip) e o
   `backup-antes-do-restore.zip` na pasta do app.
+- [ ] **Windows e Android — dono da dívida pela conta (16/10/2026):** num banco com dados, abrir o app (migrations
+  `RemoverCategoriaParcela` e `RemoverUsuarioDivida`) e conferir que as dívidas, as receitas e as parcelas continuam
+  na lista, no Resumo do Mês e na Visualizar; incluir e alterar dívida e parcela; restaurar um backup anterior a
+  essas migrations.
 - [ ] **Android:** aviso `CS8602` em `Platforms/Android/MainActivity.cs` (linha 27), anterior a 13/10/2026.
 
 ## Limpeza

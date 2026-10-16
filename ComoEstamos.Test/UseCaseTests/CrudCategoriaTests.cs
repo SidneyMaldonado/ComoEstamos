@@ -194,7 +194,7 @@ namespace ComoEstamos.Test.UseCaseTests
             var categoria = await SemearCategoriaAsync("Moradia");
             await SemearAsync(new Divida
             {
-                IdUsuario = _usuario.Id, IdCategoria = categoria.Id, Nome = "Financiamento",
+                IdCategoria = categoria.Id, Nome = "Financiamento",
                 DataPrimeiroVencimento = new DateTime(2026, 10, 10), Valor = 100m, Ativo = true
             });
 
@@ -206,37 +206,12 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
-        public async Task Excluir_RecusaComParcelaAtivaSemDesativar()
-        {
-            var categoria = await SemearCategoriaAsync("Moradia");
-            var conta = new Conta { IdUsuario = _usuario.Id, Nome = "Corrente" };
-            await SemearAsync(conta);
-            var divida = new Divida
-            {
-                IdUsuario = _usuario.Id, Nome = "Financiamento",
-                DataPrimeiroVencimento = new DateTime(2026, 10, 10), Valor = 100m
-            };
-            await SemearAsync(divida);
-            await SemearAsync(new Parcela
-            {
-                IdDivida = divida.Id, IdConta = conta.Id, IdCategoria = categoria.Id,
-                Descricao = "1/1", Valor = 10m, DataVencimento = new DateTime(2026, 10, 10)
-            });
-
-            var ex = await Assert.ThrowsExactlyAsync<RegraDeNegocioException>(
-                () => new ExcluirCategoriaUseCase(_uow).ExecutarAsync(categoria.Id, _usuario.Id));
-
-            Assert.AreEqual("Não é possível excluir: existem parcelas ativas nesta categoria.", ex.Message);
-            Assert.IsTrue((await GravadasAsync()).Single().Ativo);
-        }
-
-        [TestMethod]
         public async Task Excluir_DependenteInativoNaoImpede()
         {
             var categoria = await SemearCategoriaAsync("Moradia");
             await SemearAsync(new Divida
             {
-                IdUsuario = _usuario.Id, IdCategoria = categoria.Id, Nome = "Financiamento",
+                IdCategoria = categoria.Id, Nome = "Financiamento",
                 DataPrimeiroVencimento = new DateTime(2026, 10, 10), Valor = 100m, Ativo = false
             });
 

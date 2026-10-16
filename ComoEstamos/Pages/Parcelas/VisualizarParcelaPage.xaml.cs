@@ -57,7 +57,7 @@ namespace ComoEstamos.Pages.Parcelas
             ValorSituacao.Text = TextosParcela.Situacao(parcela, ehDivida);
             ValorDataPagamento.Text = parcela.DataPagamento is DateTime pagamento ? FormatoBr.Data(pagamento) : "—";
             ValorConta.Text = parcela.Conta?.Nome ?? "—";
-            ValorCategoria.Text = parcela.Categoria?.Nome ?? "—";
+            ValorCategoria.Text = parcela.Divida?.Categoria?.Nome ?? "—";
             ValorDescricao.Text = parcela.Descricao;
             ValorDataCriacao.Text = FormatoBr.DataHora(parcela.DataCriacao);
             ValorDataAlteracao.Text = FormatoBr.DataHora(parcela.DataAlteracao);

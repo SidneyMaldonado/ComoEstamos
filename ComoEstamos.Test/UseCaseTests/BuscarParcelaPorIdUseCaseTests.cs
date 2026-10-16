@@ -44,7 +44,7 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
-        public async Task ExecutarAsync_DevolveComContaCategoriaEADividaComAsParcelas()
+        public async Task ExecutarAsync_DevolveComContaEADividaComCategoriaEParcelas()
         {
             var segunda = (await ParcelasAsync())[1];
 
@@ -53,8 +53,8 @@ namespace ComoEstamos.Test.UseCaseTests
             Assert.IsNotNull(parcela);
             Assert.AreEqual("Notebook 2/3", parcela.Descricao);
             Assert.AreEqual("Corrente", parcela.Conta?.Nome);
-            Assert.AreEqual("Compras", parcela.Categoria?.Nome);
             Assert.AreEqual("Notebook", parcela.Divida?.Nome);
+            Assert.AreEqual("Compras", parcela.Divida?.Categoria?.Nome, "A categoria da parcela é a da dívida.");
             Assert.AreEqual(1, parcela.Divida!.Parcelas.FindIndex(p => p.Id == segunda.Id), "Parcelas da dívida por vencimento.");
             Assert.HasCount(3, parcela.Divida.Parcelas);
         }

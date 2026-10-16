@@ -26,13 +26,12 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         /// <summary>Dívida (ou crédito) com uma parcela para cada vencimento, de R$ <paramref name="valor"/>.</summary>
-        private async Task<Divida> CriarAsync(string nome, decimal valor, bool ehDivida = true, int? idUsuario = null,
+        private async Task<Divida> CriarAsync(string nome, decimal valor, bool ehDivida = true, int? idConta = null,
             bool ativa = true, params DateTime[] vencimentos)
         {
             var divida = new Divida
             {
-                IdUsuario = idUsuario ?? _usuario.Id,
-                IdConta = _conta.Id,
+                IdConta = idConta ?? _conta.Id,
                 IdCategoria = _categoria.Id,
                 Nome = nome,
                 EhDivida = ehDivida,
@@ -45,7 +44,6 @@ namespace ComoEstamos.Test.UseCaseTests
             {
                 Divida = divida,
                 IdConta = _conta.Id,
-                IdCategoria = _categoria.Id,
                 Descricao = $"{nome} {i + 1}/{vencimentos.Length}",
                 Valor = valor,
                 DataVencimento = v
@@ -111,8 +109,8 @@ namespace ComoEstamos.Test.UseCaseTests
         [TestMethod]
         public async Task ExecutarAsync_IgnoraExcluidasEDeOutroUsuario()
         {
-            var outro = await CriarUsuarioAsync("outro@teste.com");
-            await CriarAsync("De outro", 100m, idUsuario: outro.Id, vencimentos: [new DateTime(2026, 10, 10)]);
+            var contaDeOutro = await CriarContaDeOutroUsuarioAsync();
+            await CriarAsync("De outro", 100m, idConta: contaDeOutro.Id, vencimentos: [new DateTime(2026, 10, 10)]);
             await CriarAsync("Excluída", 100m, ativa: false, vencimentos: [new DateTime(2026, 10, 10)]);
             var comParcelaExcluida = await CriarAsync("Parcela excluída", 100m, vencimentos: [new DateTime(2026, 10, 10)]);
             await using (var db = CriarContexto())

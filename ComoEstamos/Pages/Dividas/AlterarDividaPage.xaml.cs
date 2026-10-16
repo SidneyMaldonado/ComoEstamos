@@ -76,7 +76,7 @@ namespace ComoEstamos.Pages.Dividas
                 CampoPrimeiroVencimento.IsEnabled = false;
                 AvisoPagas.Text = $"{pagas.Count} de {divida.Parcelas.Count} parcelas já pagas ({FormatoBr.Moeda(pagas.Sum(p => p.Valor))}). " +
                     "Elas não mudam. Se mudar o valor, o número de parcelas ou o dia, só as parcelas em aberto são refeitas, " +
-                    "com o que falta pagar. Conta e categoria novas valem só para as parcelas em aberto.";
+                    "com o que falta pagar. A conta nova vale só para as parcelas em aberto.";
                 AvisoPagas.IsVisible = true;
             }
         }

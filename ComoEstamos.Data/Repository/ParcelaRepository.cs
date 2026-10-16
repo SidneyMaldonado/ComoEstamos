@@ -16,7 +16,6 @@ namespace ComoEstamos.Data.Repository
         Task RegistrarPagamentoAsync(int idParcela, DateTime dataPagamento);
 
         Task<bool> ExisteAtivaPorContaAsync(int idConta);
-        Task<bool> ExisteAtivaPorCategoriaAsync(int idCategoria);
     }
 
     public class ParcelaRepository : RepositoryBase<Parcela>, IParcelaRepository
@@ -29,18 +28,17 @@ namespace ComoEstamos.Data.Repository
             ListarAsync(p => p.IdDivida == idDivida, incluirInativos, q => q.OrderBy(p => p.DataVencimento));
 
         public Task<List<Parcela>> ListarPorUsuarioAsync(int idUsuario) =>
-            ListarAsync(p => p.Divida!.IdUsuario == idUsuario, montarConsulta: q => q.OrderBy(p => p.DataVencimento));
+            ListarAsync(p => p.Divida!.Conta!.IdUsuario == idUsuario, montarConsulta: q => q.OrderBy(p => p.DataVencimento));
 
         public Task<List<Parcela>> ListarPendentesAsync(int idUsuario, DateTime vencimentoAte) =>
             ListarAsync(
-                p => p.Divida!.IdUsuario == idUsuario
+                p => p.Divida!.Conta!.IdUsuario == idUsuario
                      && p.Divida.Ativo
                      && p.DataPagamento == null
                      && p.DataVencimento <= vencimentoAte,
                 montarConsulta: q => q
                     .Include(p => p.Divida)
                     .Include(p => p.Conta)
-                    .Include(p => p.Categoria)
                     .OrderBy(p => p.DataVencimento));
 
         public async Task RegistrarPagamentoAsync(int idParcela, DateTime dataPagamento)
@@ -53,7 +51,5 @@ namespace ComoEstamos.Data.Repository
         }
 
         public Task<bool> ExisteAtivaPorContaAsync(int idConta) => ExisteAtivoAsync(p => p.IdConta == idConta);
-
-        public Task<bool> ExisteAtivaPorCategoriaAsync(int idCategoria) => ExisteAtivoAsync(p => p.IdCategoria == idCategoria);
     }
 }

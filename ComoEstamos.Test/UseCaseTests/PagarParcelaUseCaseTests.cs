@@ -14,7 +14,6 @@ namespace ComoEstamos.Test.UseCaseTests
         private PagarParcelaUseCase _useCase = null!;
         private Usuario _usuario = null!;
         private Conta _conta = null!;
-        private Categoria _categoria = null!;
 
         [TestInitialize]
         public async Task Inicializar()
@@ -22,19 +21,17 @@ namespace ComoEstamos.Test.UseCaseTests
             _useCase = new PagarParcelaUseCase(new UnitOfWorkFactory(ContextFactory));
             _usuario = await CriarUsuarioAsync();
             _conta = new Conta { IdUsuario = _usuario.Id, Nome = "Corrente", Saldo = 1000m };
-            _categoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Moradia" };
-            await SemearAsync(_conta, _categoria);
+            await SemearAsync(_conta);
         }
 
         private async Task<Parcela> CriarParcelaAsync(bool ehDivida = true, decimal valor = 250m, bool dividaAtiva = true)
         {
-            var divida = new Divida { IdUsuario = _usuario.Id, Nome = "Aluguel", Valor = valor, EhDivida = ehDivida, Ativo = dividaAtiva };
+            var divida = new Divida { IdConta = _conta.Id, Nome = "Aluguel", Valor = valor, EhDivida = ehDivida, Ativo = dividaAtiva };
             await SemearAsync(divida);
             var parcela = new Parcela
             {
                 IdDivida = divida.Id,
                 IdConta = _conta.Id,
-                IdCategoria = _categoria.Id,
                 Descricao = "Aluguel 1/1",
                 Valor = valor,
                 DataVencimento = new DateTime(2026, 10, 10)

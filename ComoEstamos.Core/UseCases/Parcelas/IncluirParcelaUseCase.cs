@@ -7,8 +7,8 @@ namespace ComoEstamos.Core.UseCases.Parcelas
     public interface IIncluirParcelaUseCase
     {
         /// <summary>
-        /// Acrescenta uma parcela em aberto à dívida <see cref="Parcela.IdDivida"/>, com valor, vencimento, conta e
-        /// categoria. A dívida fica com uma parcela a mais, o valor total passa a ser a soma das parcelas e as
+        /// Acrescenta uma parcela em aberto à dívida <see cref="Parcela.IdDivida"/>, com valor, vencimento e conta
+        /// (a categoria é a da dívida). A dívida fica com uma parcela a mais, o valor total passa a ser a soma das parcelas e as
         /// descrições são refeitas na ordem de vencimento.
         /// </summary>
         Task<Parcela> ExecutarAsync(Parcela parcela, int idUsuario);
@@ -34,8 +34,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
                 IdDivida = divida.Id,
                 Valor = parcela.Valor,
                 DataVencimento = parcela.DataVencimento.Date,
-                IdConta = parcela.IdConta,
-                IdCategoria = parcela.IdCategoria
+                IdConta = parcela.IdConta
             };
             await uow.Parcelas.InserirAsync(nova);
             ParcelaValidador.AtualizarDivida(divida, [.. parcelas, nova]);

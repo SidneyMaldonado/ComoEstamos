@@ -54,8 +54,7 @@ namespace ComoEstamos.Test.UseCaseTests
             IdDivida = idDivida,
             Valor = valor,
             DataVencimento = vencimento ?? new DateTime(2027, 1, 10),
-            IdConta = _conta.Id,
-            IdCategoria = _categoria.Id
+            IdConta = _conta.Id
         };
 
         /// <summary>Parcelas ativas gravadas, por vencimento.</summary>
@@ -136,12 +135,11 @@ namespace ComoEstamos.Test.UseCaseTests
             await SemearAsync(contaDeOutro);
             var nova = Nova(divida.Id, 0m);
             nova.IdConta = contaDeOutro.Id;
-            nova.IdCategoria = 0;
 
             var ex = await Assert.ThrowsExactlyAsync<ValidacaoException>(() => _useCase.ExecutarAsync(nova, _usuario.Id));
 
             CollectionAssert.AreEquivalent(
-                new[] { nameof(Parcela.Valor), nameof(Parcela.IdConta), nameof(Parcela.IdCategoria) },
+                new[] { nameof(Parcela.Valor), nameof(Parcela.IdConta) },
                 ex.Erros.Select(e => e.Campo).ToList());
             Assert.HasCount(3, await ParcelasAsync());
             Assert.AreEqual(300m, (await DividaGravadaAsync()).Valor);
