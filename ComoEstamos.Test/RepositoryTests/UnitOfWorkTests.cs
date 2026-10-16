@@ -56,7 +56,7 @@ namespace ComoEstamos.Test.RepositoryTests
             await SemearAsync(conta, categoria);
             var divida = new Divida { IdUsuario = usuario.Id, Nome = "Aluguel", Valor = 50m };
             await SemearAsync(divida);
-            var parcela = new Parcela { IdDivida = divida.Id, IdConta = conta.Id, IdCategoria = categoria.Id, Descricao = "1/1", Valor = 50m };
+            var parcela = new Parcela { IdDivida = divida.Id, IdConta = conta.Id, Descricao = "1/1", Valor = 50m };
             await SemearAsync(parcela);
 
             await using (var uow = await _factory.IniciarAsync())

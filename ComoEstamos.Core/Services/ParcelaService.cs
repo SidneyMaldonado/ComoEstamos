@@ -6,13 +6,13 @@ namespace ComoEstamos.Core.Services
     /// <summary>Operações de parcela usadas pelas telas, sempre do usuário atual.</summary>
     public interface IParcelaService
     {
-        /// <summary>Parcela com conta, categoria e a dívida (com as parcelas ativas dela).</summary>
+        /// <summary>Parcela com conta e a dívida (com a categoria e as parcelas ativas dela).</summary>
         Task<Parcela?> BuscarPorIdAsync(int id);
 
         /// <summary>Acrescenta uma parcela em aberto à dívida <see cref="Parcela.IdDivida"/>; o total da dívida é recalculado.</summary>
         Task<Parcela> IncluirAsync(Parcela parcela);
 
-        /// <summary>Grava valor, vencimento, conta e categoria de uma parcela em aberto; o total da dívida é recalculado.</summary>
+        /// <summary>Grava valor, vencimento e conta de uma parcela em aberto; o total da dívida é recalculado.</summary>
         Task AlterarAsync(Parcela parcela);
 
         /// <summary>Exclui uma parcela em aberto; a dívida fica com uma parcela a menos.</summary>

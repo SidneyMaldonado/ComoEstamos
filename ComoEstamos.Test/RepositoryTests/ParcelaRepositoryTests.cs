@@ -9,7 +9,6 @@ namespace ComoEstamos.Test.RepositoryTests
         private ParcelaRepository _repository = null!;
         private Usuario _usuario = null!;
         private Conta _conta = null!;
-        private Categoria _categoria = null!;
         private Divida _divida = null!;
 
         [TestInitialize]
@@ -18,8 +17,7 @@ namespace ComoEstamos.Test.RepositoryTests
             _repository = new ParcelaRepository(ContextFactory);
             _usuario = await CriarUsuarioAsync();
             _conta = new Conta { IdUsuario = _usuario.Id, Nome = "Corrente" };
-            _categoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Moradia" };
-            await SemearAsync(_conta, _categoria);
+            await SemearAsync(_conta);
             _divida = await CriarDividaAsync(_usuario.Id);
         }
 
@@ -41,7 +39,6 @@ namespace ComoEstamos.Test.RepositoryTests
         {
             IdDivida = idDivida ?? _divida.Id,
             IdConta = _conta.Id,
-            IdCategoria = _categoria.Id,
             Descricao = descricao,
             Valor = 100m,
             DataVencimento = vencimento
@@ -136,7 +133,7 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
-        public async Task ListarPendentesAsync_CarregaDividaContaECategoria()
+        public async Task ListarPendentesAsync_CarregaDividaEConta()
         {
             await SemearAsync(NovaParcela(new DateTime(2026, 10, 10)));
 
@@ -145,7 +142,6 @@ namespace ComoEstamos.Test.RepositoryTests
             Assert.HasCount(1, lista);
             Assert.AreEqual("Financiamento", lista[0].Divida?.Nome);
             Assert.AreEqual("Corrente", lista[0].Conta?.Nome);
-            Assert.AreEqual("Moradia", lista[0].Categoria?.Nome);
         }
 
         [TestMethod]
@@ -215,21 +211,17 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
-        public async Task ExisteAtivaPorContaECategoria_ConsideramSoParcelasAtivas()
+        public async Task ExisteAtivaPorConta_ConsideraSoParcelasAtivas()
         {
             var outraConta = new Conta { IdUsuario = _usuario.Id, Nome = "Poupança" };
-            var outraCategoria = new Categoria { IdUsuario = _usuario.Id, Nome = "Lazer" };
-            await SemearAsync(outraConta, outraCategoria);
+            await SemearAsync(outraConta);
             var inativa = NovaParcela(new DateTime(2026, 10, 10));
             inativa.IdConta = outraConta.Id;
-            inativa.IdCategoria = outraCategoria.Id;
             inativa.Ativo = false;
             await SemearAsync(NovaParcela(new DateTime(2026, 10, 10)), inativa);
 
             Assert.IsTrue(await _repository.ExisteAtivaPorContaAsync(_conta.Id));
-            Assert.IsTrue(await _repository.ExisteAtivaPorCategoriaAsync(_categoria.Id));
             Assert.IsFalse(await _repository.ExisteAtivaPorContaAsync(outraConta.Id));
-            Assert.IsFalse(await _repository.ExisteAtivaPorCategoriaAsync(outraCategoria.Id));
         }
     }
 }

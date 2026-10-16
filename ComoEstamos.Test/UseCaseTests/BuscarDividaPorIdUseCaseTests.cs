@@ -55,7 +55,6 @@ namespace ComoEstamos.Test.UseCaseTests
         {
             Divida = divida,
             IdConta = _conta.Id,
-            IdCategoria = _categoria.Id,
             Descricao = descricao,
             Valor = 150m,
             DataVencimento = vencimento

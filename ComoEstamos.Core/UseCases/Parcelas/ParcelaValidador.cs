@@ -28,7 +28,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
         }
 
         /// <summary>
-        /// Valida o domínio dos campos editáveis (valor, conta e categoria). O total da dívida —
+        /// Valida o domínio dos campos editáveis (valor e conta). O total da dívida —
         /// <paramref name="somaDasOutras"/> mais o valor desta parcela — também não pode passar do limite.
         /// Devolve o validador, para quem chama acrescentar as regras próprias.
         /// </summary>
@@ -43,10 +43,6 @@ namespace ComoEstamos.Core.UseCases.Parcelas
             var conta = await uow.Contas.ObterPorIdAsync(parcela.IdConta);
             if (conta is not { Ativo: true } || conta.IdUsuario != idUsuario)
                 validador.Adicionar(nameof(Parcela.IdConta), parcela.IdConta == 0 ? "Escolha a conta." : "A conta escolhida não existe mais.");
-
-            var categoria = await uow.Categorias.ObterPorIdAsync(parcela.IdCategoria);
-            if (categoria is not { Ativo: true } || categoria.IdUsuario != idUsuario)
-                validador.Adicionar(nameof(Parcela.IdCategoria), parcela.IdCategoria == 0 ? "Escolha a categoria." : "A categoria escolhida não existe mais.");
 
             return validador;
         }

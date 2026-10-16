@@ -7,7 +7,7 @@ namespace ComoEstamos.Core.UseCases.Parcelas
     public interface IAlterarParcelaUseCase
     {
         /// <summary>
-        /// Valida e grava valor, vencimento, conta e categoria de uma parcela em aberto. A dívida passa a ter
+        /// Valida e grava valor, vencimento e conta de uma parcela em aberto. A dívida passa a ter
         /// como valor total a soma das parcelas, e as descrições são refeitas na ordem de vencimento.
         /// Parcela paga não pode ser alterada.
         /// </summary>
@@ -32,7 +32,6 @@ namespace ComoEstamos.Core.UseCases.Parcelas
             gravada.Valor = parcela.Valor;
             gravada.DataVencimento = parcela.DataVencimento.Date;
             gravada.IdConta = parcela.IdConta;
-            gravada.IdCategoria = parcela.IdCategoria;
             ParcelaValidador.AtualizarDivida(divida, parcelas);
 
             await uow.ConfirmarAsync();

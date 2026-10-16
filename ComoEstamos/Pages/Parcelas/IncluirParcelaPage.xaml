@@ -43,12 +43,6 @@
                                 Title="Escolha a conta" />
                         <Label x:Name="ErroConta" Style="{StaticResource MensagemErro}" />
 
-                        <Label Text="Categoria" Style="{StaticResource TituloCampoSeguinte}" />
-                        <Picker x:Name="CampoCategoria"
-                                Style="{StaticResource CampoEscolha}"
-                                Title="Escolha a categoria" />
-                        <Label x:Name="ErroCategoria" Style="{StaticResource MensagemErro}" />
-
                     </VerticalStackLayout>
                 </Border>
 

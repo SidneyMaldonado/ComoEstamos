@@ -100,7 +100,7 @@ O Salvar chama `IContaService.AtualizarSaldosAsync` (`AtualizarSaldosUseCase`):
 A alteração pelo CRUD de Conta (`AlterarContaUseCase`) também grava uma linha em `tb_historico_saldo`
 quando o saldo muda. A inclusão da conta não grava histórico.
 
-**Categoria** — exclusão impedida se houver dívidas ou parcelas ativas na categoria.
+**Categoria** — exclusão impedida se houver dívidas ativas na categoria.
 
 | Campo | Título | Regra |
 |---|---|---|
@@ -184,8 +184,8 @@ erro abaixo do Primeiro Vencimento. Grava pelo `AlterarDividaUseCase`. Se já ho
 
 - o Primeiro Vencimento fica desabilitado;
 - acima do formulário aparece o aviso "N de T parcelas já pagas (R$ X). Elas não mudam. Se mudar o valor, o número
-  de parcelas ou o dia, só as parcelas em aberto são refeitas, com o que falta pagar. Conta e categoria novas valem
-  só para as parcelas em aberto."
+  de parcelas ou o dia, só as parcelas em aberto são refeitas, com o que falta pagar. A conta nova vale só para as
+  parcelas em aberto."
 
 ## Receitas
 
@@ -213,7 +213,7 @@ Visualizar Dívida (ou Receita), e incluída pelo **+** da seção Parcelas dela
 
 **Visualizar** (`VisualizarParcelaPage`, rota `visualizar-parcela?id=`). Com rolagem. Cartão em duas colunas: Dívida
 e Parcela (`2 de 12`); Valor e Vencimento; Situação (como na tabela da dívida) e Data do Pagamento (`—` em aberto);
-Conta e Categoria; Descrição; Data de Cadastro e Última Alteração. Botão Voltar.
+Conta e Categoria (a da dívida); Descrição; Data de Cadastro e Última Alteração. Botão Voltar.
 
 - **Parcela em aberto**: o cartão **Pagar** (Data do Pagamento, `DatePicker` que começa em hoje e não aceita data
   futura, e o botão Pagar). Pagar pede confirmação ("Confirma o pagamento de R$ 100,00 em 14/10/2026?"); Sim paga e a página
@@ -226,7 +226,7 @@ Conta e Categoria; Descrição; Data de Cadastro e Última Alteração. Botão V
 
 **Incluir** (`IncluirParcelaPage`, rota `incluir-parcela?id=`, com o Id da **dívida**). O mesmo formulário da Alterar,
 preenchido com o valor da última parcela, o vencimento do mês seguinte a ela (no dia de vencimento da dívida, ou no
-último dia do mês) e a conta e a categoria da dívida. Acima, o aviso "Nova parcela de \"X\". Ela entra na ordem do
+último dia do mês) e a conta da dívida. Acima, o aviso "Nova parcela de \"X\". Ela entra na ordem do
 vencimento, e o valor total da dívida passa a ser a soma das parcelas.". Grava pelo `IncluirParcelaUseCase` e volta.
 
 **Alterar** (`AlterarParcelaPage`, rota `alterar-parcela?id=`). Acima do formulário, a descrição da parcela e o
@@ -238,7 +238,8 @@ estiver paga ao abrir, avisa e volta.
 | `nr_valor` | Valor (R$) | Mesmos campos na Incluir. Obrigatório, até 2 casas, de 0,01 a 99.999.999,99; o total da dívida também não pode passar disso |
 | `dt_vencimento` | Vencimento | `DatePicker`; livre (pode mudar a ordem das parcelas) |
 | `id_conta` | Conta | Obrigatória (`Picker` com as contas ativas) |
-| `id_categoria` | Categoria | Obrigatória (`Picker` com as categorias ativas) |
+
+A parcela não tem campo de categoria: a dela é sempre a da dívida.
 
 ## Resumo do Mês
 

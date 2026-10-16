@@ -14,9 +14,6 @@ namespace ComoEstamos.Data.Model
         [Column("id_divida")]
         public int IdDivida { get; set; }
 
-        [Column("id_categoria")]
-        public int IdCategoria { get; set; }
-
         [Column("id_conta")]
         public int IdConta { get; set; }
 
@@ -36,9 +33,6 @@ namespace ComoEstamos.Data.Model
 
         [ForeignKey(nameof(IdDivida))]
         public Divida? Divida { get; set; }
-
-        [ForeignKey(nameof(IdCategoria))]
-        public Categoria? Categoria { get; set; }
 
         [ForeignKey(nameof(IdConta))]
         public Conta? Conta { get; set; }

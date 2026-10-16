@@ -44,7 +44,6 @@ namespace ComoEstamos.Test.UseCaseTests
             {
                 Divida = divida,
                 IdConta = _conta.Id,
-                IdCategoria = _categoria.Id,
                 Descricao = $"Notebook {i + 1}/3",
                 Valor = 100m,
                 DataVencimento = new DateTime(2026, 10 + i, 10),

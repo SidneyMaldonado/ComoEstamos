@@ -126,7 +126,7 @@ namespace ComoEstamos.Test.UseCaseTests
         }
 
         [TestMethod]
-        public async Task ExecutarAsync_NovaContaECategoriaValemSoParaAsParcelasEmAberto()
+        public async Task ExecutarAsync_NovaContaValeSoParaAsParcelasEmAberto()
         {
             var divida = await CriarAsync(pagas: 2);
             var edicao = Edicao(divida);
@@ -136,9 +136,11 @@ namespace ComoEstamos.Test.UseCaseTests
             await ExecutarAsync(edicao);
 
             var parcelas = await ParcelasAtivasAsync();
-            Assert.IsTrue(parcelas.Take(2).All(p => p.IdConta == _conta.Id && p.IdCategoria == _categoria.Id));
-            Assert.IsTrue(parcelas.Skip(2).All(p => p.IdConta == _outraConta.Id && p.IdCategoria == _outraCategoria.Id));
-            Assert.AreEqual(_outraConta.Id, (await DividaGravadaAsync()).IdConta);
+            Assert.IsTrue(parcelas.Take(2).All(p => p.IdConta == _conta.Id));
+            Assert.IsTrue(parcelas.Skip(2).All(p => p.IdConta == _outraConta.Id));
+            var gravada = await DividaGravadaAsync();
+            Assert.AreEqual(_outraConta.Id, gravada.IdConta);
+            Assert.AreEqual(_outraCategoria.Id, gravada.IdCategoria, "A categoria fica só na dívida.");
         }
 
         // ---- Campos financeiros: as parcelas em aberto são refeitas ----

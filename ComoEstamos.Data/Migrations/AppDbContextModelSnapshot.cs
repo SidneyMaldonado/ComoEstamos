@@ -488,10 +488,6 @@ namespace ComoEstamos.Data.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("ds_parcela");
 
-                    b.Property<int>("IdCategoria")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("id_categoria");
-
                     b.Property<int>("IdConta")
                         .HasColumnType("INTEGER")
                         .HasColumnName("id_conta");
@@ -506,8 +502,6 @@ namespace ComoEstamos.Data.Migrations
                         .HasColumnName("nr_valor");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdCategoria");
 
                     b.HasIndex("IdConta");
 
@@ -687,12 +681,6 @@ namespace ComoEstamos.Data.Migrations
 
             modelBuilder.Entity("ComoEstamos.Data.Model.Parcela", b =>
                 {
-                    b.HasOne("ComoEstamos.Data.Model.Categoria", "Categoria")
-                        .WithMany()
-                        .HasForeignKey("IdCategoria")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("ComoEstamos.Data.Model.Conta", "Conta")
                         .WithMany()
                         .HasForeignKey("IdConta")
@@ -704,8 +692,6 @@ namespace ComoEstamos.Data.Migrations
                         .HasForeignKey("IdDivida")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Categoria");
 
                     b.Navigation("Conta");
 

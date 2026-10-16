@@ -47,7 +47,7 @@ recebido, zera o `Id` e grava ativa. Usuário inexistente ou desativado → `Reg
 | `Valor` | Valor total: de 0,01 a 99.999.999,99, até 2 casas |
 | `NumeroParcelas` | De 1 a 360 (`DividaValidador.MaximoParcelas`) |
 | `DiaVencimento` | De 1 a 31 |
-| `IdConta`, `IdCategoria` | Obrigatórias (a parcela exige as duas), ativas e do mesmo usuário |
+| `IdConta`, `IdCategoria` | Obrigatórias, ativas e do mesmo usuário |
 | `IdCredor` | Opcional; se informado, ativo e do mesmo usuário |
 
 **Geração das parcelas:**
@@ -59,7 +59,9 @@ recebido, zera o `Id` e grava ativa. Usuário inexistente ou desativado → `Reg
 - Demais: nos meses seguintes, no dia `DiaVencimento`. Se o mês não tem esse dia, vence no
   último dia do mês (dia 31 → 28/02, 31/03, 30/04...).
 - Descrição: `"<Nome> <n>/<total>"` (ex.: `Notebook 3/12`). Se passar de 100 caracteres, o nome é cortado.
-- Conta e categoria das parcelas = as da dívida. As parcelas nascem ativas e sem pagamento.
+- Conta das parcelas = a da dívida. A parcela não tem categoria própria: a dela é sempre a da dívida
+  (`tb_divida.id_categoria`; a coluna `id_categoria` saiu de `tb_parcela` na migration `RemoverCategoriaParcela`).
+  As parcelas nascem ativas e sem pagamento.
 - Parcelas que vierem preenchidas em `divida.Parcelas` são descartadas; quem gera é o caso de uso.
 - Crédito (`EhDivida = false`) gera parcelas da mesma forma.
 
@@ -75,11 +77,11 @@ Assinatura: `ExecutarAsync(Divida divida, int idUsuario)`.
   traga outro valor.
 - Mensagens conforme o tipo: "o nome da receita", "parcelas recebidas", "já foram recebidos" e "O pagador escolhido"
   na receita (`DividaValidador.Tipo`/`Pagas`). O `PagarParcelaUseCase` também: "A data do recebimento não pode ser futura."
-- **As parcelas pagas nunca mudam** de valor, vencimento, conta ou categoria (só a descrição, abaixo).
+- **As parcelas pagas nunca mudam** de valor, vencimento ou conta (só a descrição, abaixo).
 
 **Campos simples** (nome, credor, conta, categoria), sem mudar nenhum campo financeiro: as parcelas continuam
 as mesmas. A descrição de todas é refeita com o novo nome (`<Nome> <n>/<total>`, na ordem de vencimento); a
-nova conta e categoria valem **só para as em aberto**.
+nova conta vale **só para as em aberto**. A nova categoria vale para todas, porque fica só na dívida.
 
 **Campos financeiros** (valor total, número de parcelas, dia ou primeiro vencimento) mudaram:
 
@@ -164,9 +166,9 @@ não muda.
 
 | Caso de uso | Assinatura | Regras |
 |---|---|---|
-| `BuscarParcelaPorIdUseCase` | `ExecutarAsync(id, idUsuario)` → `Parcela?` | Com `Conta`, `Categoria` e `Divida` (com as parcelas ativas dela, por vencimento, para a tela saber o número). `null` se não existe, é de outro usuário ou se a parcela ou a dívida foi excluída |
-| `IncluirParcelaUseCase` | `ExecutarAsync(Parcela, idUsuario)` → `Parcela` | Na dívida `IdDivida` (ativa e do usuário: senão `KeyNotFoundException`/`RegraDeNegocioException`). Grava só valor, vencimento (só a data), conta e categoria: nasce ativa e **em aberto**. Recusa passar de 360 parcelas. Recalcula a dívida. O saldo não muda |
-| `AlterarParcelaUseCase` | `ExecutarAsync(Parcela, idUsuario)` | Só parcela em aberto. Grava valor, vencimento (só a data), conta e categoria e recalcula a dívida |
+| `BuscarParcelaPorIdUseCase` | `ExecutarAsync(id, idUsuario)` → `Parcela?` | Com `Conta` e `Divida` (com a `Categoria` e as parcelas ativas dela, por vencimento, para a tela saber o número). `null` se não existe, é de outro usuário ou se a parcela ou a dívida foi excluída |
+| `IncluirParcelaUseCase` | `ExecutarAsync(Parcela, idUsuario)` → `Parcela` | Na dívida `IdDivida` (ativa e do usuário: senão `KeyNotFoundException`/`RegraDeNegocioException`). Grava só valor, vencimento (só a data) e conta: nasce ativa e **em aberto**. Recusa passar de 360 parcelas. Recalcula a dívida. O saldo não muda |
+| `AlterarParcelaUseCase` | `ExecutarAsync(Parcela, idUsuario)` | Só parcela em aberto. Grava valor, vencimento (só a data) e conta e recalcula a dívida |
 | `ExcluirParcelaUseCase` | `ExecutarAsync(id, idUsuario)` | Só parcela em aberto; desativa (não apaga) e recalcula a dívida. **A única parcela ativa não pode ser excluída** (exclua a dívida). O saldo não muda |
 | `PagarParcelaUseCase` | `ExecutarAsync(id, dataPagamento, idUsuario)` | Ver abaixo |
 
@@ -175,7 +177,7 @@ não muda.
 | Campo | Regra |
 |---|---|
 | `Valor` | De 0,01 a 99.999.999,99, até 2 casas. O novo total da dívida (soma das parcelas) também não pode passar de 99.999.999,99 |
-| `IdConta`, `IdCategoria` | Obrigatórias, ativas e do mesmo usuário |
+| `IdConta` | Obrigatória, ativa e do mesmo usuário |
 | `DataVencimento` | Livre. Pode mudar a ordem das parcelas: a numeração das descrições acompanha |
 
 Se depois a **dívida** for alterada num campo financeiro, o `AlterarDividaUseCase` refaz as parcelas em aberto

@@ -76,7 +76,7 @@ namespace ComoEstamos.Pages.Receitas
                 CampoPrimeiroVencimento.IsEnabled = false;
                 AvisoPagas.Text = $"{recebidas.Count} de {divida.Parcelas.Count} parcelas já recebidas ({FormatoBr.Moeda(recebidas.Sum(p => p.Valor))}). " +
                     "Elas não mudam. Se mudar o valor, o número de parcelas ou o dia, só as parcelas em aberto são refeitas, " +
-                    "com o que falta receber. Conta e categoria novas valem só para as parcelas em aberto.";
+                    "com o que falta receber. A conta nova vale só para as parcelas em aberto.";
                 AvisoPagas.IsVisible = true;
             }
         }

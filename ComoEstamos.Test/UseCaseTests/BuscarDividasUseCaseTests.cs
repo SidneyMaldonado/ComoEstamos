@@ -47,7 +47,6 @@ namespace ComoEstamos.Test.UseCaseTests
             {
                 Divida = divida,
                 IdConta = _conta.Id,
-                IdCategoria = _categoria.Id,
                 Descricao = $"{nome} {i + 1}/{vencimentos.Length}",
                 Valor = 100m,
                 DataVencimento = v,

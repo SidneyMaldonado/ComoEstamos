@@ -84,7 +84,7 @@ Hoje o banco fica em `FileSystem.AppDataDirectory`, que o sistema preserva nas a
   título; a Incluir preenchida, erros, a nova parcela na ordem certa e o total recalculado), o toque na parcela da Visualizar Dívida, a
   Visualizar Parcela (em aberto, vencida e paga: lápis e lixeira apagados), o Pagar (Sim e Não, data de hoje e
   anterior, saldo da conta sem mudar, página recarregada), a Alterar (valor, vencimento mudando a ordem, conta,
-  categoria, erros de formato e de domínio, total da dívida recalculado na volta) e a exclusão (Sim e Não, única
+  sem campo de categoria, erros de formato e de domínio, total da dívida recalculado na volta) e a exclusão (Sim e Não, única
   parcela recusada, volta para a dívida com uma parcela a menos).
 - [ ] **Windows e Android — Receitas (14/10/2026):** testar no app o item "Receitas" do menu (ícone), a lista (só
   receitas; filtros; "Recebida"), a Incluir (Pagador opcional, receita criada não aparece em Dívidas), a Visualizar e a

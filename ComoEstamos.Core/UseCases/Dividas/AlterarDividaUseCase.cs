@@ -8,7 +8,7 @@ namespace ComoEstamos.Core.UseCases.Dividas
     {
         /// <summary>
         /// Valida e grava nome, credor, conta, categoria, valor total, número de parcelas, dia e primeiro
-        /// vencimento. As parcelas pagas não mudam; as em aberto recebem a nova conta e categoria e, se um
+        /// vencimento. As parcelas pagas não mudam; as em aberto recebem a nova conta e, se um
         /// campo financeiro mudou, são refeitas com o que falta pagar.
         /// </summary>
         Task ExecutarAsync(Divida divida, int idUsuario);
@@ -87,15 +87,12 @@ namespace ComoEstamos.Core.UseCases.Dividas
             }
             else
             {
-                // Mesmas parcelas: só a descrição (nome) e, nas em aberto, a conta e a categoria.
+                // Mesmas parcelas: só a descrição (nome) e, nas em aberto, a conta.
                 var ordenadas = parcelas.OrderBy(p => p.DataVencimento).ToList();
                 for (var i = 0; i < ordenadas.Count; i++)
                     ordenadas[i].Descricao = Parcelamento.Descricao(gravada.Nome, i + 1, gravada.NumeroParcelas);
                 foreach (var parcela in emAberto)
-                {
                     parcela.IdConta = gravada.IdConta!.Value;
-                    parcela.IdCategoria = gravada.IdCategoria!.Value;
-                }
             }
 
             await uow.ConfirmarAsync();
