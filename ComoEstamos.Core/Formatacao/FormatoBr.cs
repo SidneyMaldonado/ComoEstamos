@@ -38,6 +38,14 @@ namespace ComoEstamos.Core.Formatacao
                 && decimal.TryParse(texto, NumberStyles.AllowLeadingSign | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, Cultura, out valor);
         }
 
+        /// <summary>
+        /// Indica se o texto digitado, lido como em <see cref="TentarLerDecimal"/>, tem mais de <paramref name="casas"/>
+        /// casas decimais (<c>1,005</c>, <c>1,000</c>, <c>0.125</c>). Texto vazio ou ainda incompleto (<c>1,</c>) não passa;
+        /// o ponto de milhar (<c>1.250</c>) também não.
+        /// </summary>
+        public static bool PassaDasCasas(string? texto, int casas) =>
+            TentarLerDecimal(texto, out var valor) && valor.Scale > casas;
+
         [GeneratedRegex(@"^[+-]?(\d+|\d{1,3}(\.\d{3})+)(,\d+)?$")]
         private static partial Regex NumeroBr();
 

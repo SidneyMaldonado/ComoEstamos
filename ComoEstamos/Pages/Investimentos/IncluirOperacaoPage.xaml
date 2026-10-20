@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
+             x:Class="ComoEstamos.Pages.Investimentos.IncluirOperacaoPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AzulFundo}">
+
+    <Grid>
+        <Image Source="fundo.png"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <ScrollView>
+            <VerticalStackLayout Style="{StaticResource ConteudoFormulario}">
+
+                <Label Text="Fazer Operação" Style="{StaticResource TituloPagina}" />
+
+                <BoxView Style="{StaticResource LinhaTitulo}" />
+
+                <Label x:Name="Aviso"
+                       FontSize="14"
+                       TextColor="{StaticResource TextoClaro}" />
+
+                <Border Style="{StaticResource Cartao}">
+                    <VerticalStackLayout Spacing="8">
+
+                        <Label Text="Operação" Style="{StaticResource TituloCampo}" />
+                        <Picker x:Name="CampoTipo"
+                                Style="{StaticResource CampoEscolha}"
+                                Title="Compra ou venda">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>Compra</x:String>
+                                    <x:String>Venda</x:String>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+
+                        <Label Text="Data e Hora" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <DatePicker x:Name="CampoData" Style="{StaticResource CampoData}" />
+                            <TimePicker x:Name="CampoHora" Grid.Column="1" Style="{StaticResource CampoHora}" />
+                        </Grid>
+                        <Label x:Name="ErroData" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Quantidade" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoQuantidade"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 10"
+                               Keyboard="Numeric"
+                               ReturnType="Next" />
+                        <Label x:Name="ErroQuantidade" Style="{StaticResource MensagemErro}" />
+
+                        <Label Text="Valor Total (R$)" Style="{StaticResource TituloCampoSeguinte}" />
+                        <Entry x:Name="CampoValorTotal"
+                               Style="{StaticResource Campo}"
+                               Placeholder="Ex.: 325,00"
+                               Keyboard="Numeric"
+                               ReturnType="Done">
+                            <Entry.Behaviors>
+                                <controls:LimiteCasasDecimais />
+                            </Entry.Behaviors>
+                        </Entry>
+                        <Label x:Name="ErroValorTotal" Style="{StaticResource MensagemErro}" />
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Text="Cancelar"
+                            Style="{StaticResource BotaoSecundario}"
+                            Clicked="Cancelar_Clicked" />
+                    <Button x:Name="BotaoSalvar"
+                            Grid.Column="1"
+                            Text="Salvar"
+                            Style="{StaticResource BotaoPrincipal}"
+                            Clicked="Salvar_Clicked" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+
+</ContentPage>

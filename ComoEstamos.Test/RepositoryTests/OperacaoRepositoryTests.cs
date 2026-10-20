@@ -109,6 +109,38 @@ namespace ComoEstamos.Test.RepositoryTests
         }
 
         [TestMethod]
+        public async Task ListarUltimasPorInvestimentoAsync_LimitaEOrdenaDaMaisRecente()
+        {
+            var inativa = NovaOperacao(new DateTime(2026, 9, 20));
+            inativa.Ativo = false;
+            await SemearAsync(
+                NovaOperacao(new DateTime(2026, 9, 1)),
+                NovaOperacao(new DateTime(2026, 9, 15, 10, 0, 0)),
+                inativa,
+                NovaOperacao(new DateTime(2026, 9, 15, 9, 0, 0)),
+                NovaOperacao(new DateTime(2026, 8, 1)));
+
+            var lista = await _repository.ListarUltimasPorInvestimentoAsync(_investimento.Id, 3);
+
+            CollectionAssert.AreEqual(
+                new[] { new DateTime(2026, 9, 15, 10, 0, 0), new DateTime(2026, 9, 15, 9, 0, 0), new DateTime(2026, 9, 1) },
+                lista.Select(o => o.DataOperacao).ToArray());
+        }
+
+        [TestMethod]
+        public async Task ListarUltimasPorInvestimentoAsync_NoEmpateDeDataAGravadaPorUltimoVemPrimeiro()
+        {
+            var primeira = NovaOperacao(new DateTime(2026, 9, 1));
+            var segunda = NovaOperacao(new DateTime(2026, 9, 1), ehCompra: false);
+            await SemearAsync(primeira);
+            await SemearAsync(segunda);
+
+            var lista = await _repository.ListarUltimasPorInvestimentoAsync(_investimento.Id, 10);
+
+            CollectionAssert.AreEqual(new[] { segunda.Id, primeira.Id }, lista.Select(o => o.Id).ToArray());
+        }
+
+        [TestMethod]
         public async Task AtualizarAsync_AlteraQuantidadeEValorTotal()
         {
             var operacao = await _repository.InserirAsync(NovaOperacao(new DateTime(2026, 9, 1)));

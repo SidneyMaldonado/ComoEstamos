@@ -1,6 +1,6 @@
 # Pendências (próxima etapa)
 
-Atualizado em 14/10/2026. Ao resolver um item, remova-o daqui e registre a decisão no documento correspondente.
+Atualizado em 20/10/2026. Ao resolver um item, remova-o daqui e registre a decisão no documento correspondente.
 
 ## Decisões em aberto
 
@@ -9,12 +9,13 @@ Atualizado em 14/10/2026. Ao resolver um item, remova-o daqui e registre a decis
 - [ ] **Imagens** (`img_conta`, `img_categoria`, `img_logo`, `img_usuario`): ficaram fora dos formulários
   (a alteração as preserva). Falta definir o seletor (galeria ou arquivo), o tamanho máximo e onde a
   imagem aparece (lista, menu).
-- [ ] **Quantidade do investimento.** Hoje a quantidade é editável no CRUD de Investimento, porque ainda
-  não há tela de Operação. Quando houver, decidir se a quantidade passa a mudar só pelas operações
-  (`RegistrarOperacaoUseCase`) e fica só de leitura no formulário.
+- [ ] **Quantidade do investimento.** Já há operações (20/10/2026), mas a quantidade continua editável no CRUD de
+  Investimento por enquanto (decisão de 20/10/2026). Alterá-la à mão faz a quantidade não bater com a soma das
+  operações, e a exclusão de uma operação desfaz o efeito sobre a quantidade que estiver lá. Decidir depois se ela
+  passa a mudar só pelas operações e fica só de leitura no formulário.
 - [ ] **Casos de uso candidatos** em [03-UseCases.md](03-UseCases.md#catálogo--candidatos-futuros): estornar
-  pagamento, transferir entre contas, registrar histórico, desativar operação.
-  Cada um tem decisões em aberto. O CRUD de Operação depende deles.
+  pagamento, transferir entre contas, registrar histórico.
+  Cada um tem decisões em aberto.
 
 ## Atualização do app (migrations)
 
@@ -47,7 +48,7 @@ Hoje o banco fica em `FileSystem.AppDataDirectory`, que o sistema preserva nas a
   | Entidade | Observação |
   |---|---|
   | Dívida | Listar, Visualizar, Incluir, Alterar e Excluir feitos em 13/10/2026 ([05-Telas.md](05-Telas.md#dívidas)). Receitas (`EhDivida = false`) com tela própria em 14/10/2026 ([05-Telas.md](05-Telas.md#receitas)) |
-  | Operação | Inclusão pelo `RegistrarOperacaoUseCase`; excluir depende de `DesativarOperacaoUseCase` |
+  | Operação | Últimas 10 na Visualizar Investimento, Incluir e Excluir feitos em 20/10/2026 ([05-Telas.md](05-Telas.md#operações)). Sem alteração (decisão) |
   | Parcela | Visualizar (com Pagar), Incluir, Alterar e Excluir feitos em 14/10/2026 ([05-Telas.md](05-Telas.md#parcelas)). Falta o **estorno** do pagamento (`EstornarPagamentoParcelaUseCase`) |
   | Histórico | Só consulta; depende de `RegistrarHistoricoUseCase` |
 
@@ -57,10 +58,16 @@ Hoje o banco fica em `FileSystem.AppDataDirectory`, que o sistema preserva nas a
   validação de nome vazio, inclusão com espaços, nome repetido, segunda inclusão). Falta conferir nas 5
   entidades: visualizar, alterar (lápis), cancelar, excluir (Sim e Não), exclusão impedida por dependentes,
   o Picker de carteira do Investimento e os erros de formato nos campos numéricos.
+- [ ] **Operações (20/10/2026):** só testes automáticos. Conferir no app: o + e a lista das 10 últimas na Visualizar
+  Investimento, a Incluir Operação (Picker, data e hora, erro de hora futura, venda maior que a disponível) e a exclusão
+  ao tocar na linha (Sim, Não e recusa por quantidade negativa).
 - [ ] **Android (e iOS):** até agora o app só foi testado no Windows. Conferir:
   - se o teclado numérico permite digitar vírgula e sinal de menos nos campos de valor;
   - o menu lateral com a barra de navegação escondida (o ☰ da página é o único jeito de abrir, além do gesto);
   - os popups de confirmação de exclusão.
+  - a cor da status bar no Android 15 ou mais novo: o `MainActivity` pinta a barra com `SetStatusBarColor`
+    (`#1A2E6E`), mas nessas versões o app ocupa a tela inteira (edge-to-edge) e o sistema ignora essa cor. Se a barra
+    ficar com o fundo da página em vez do azul, pintar a faixa pelo layout (área segura no topo) ou aceitar o fundo.
 - [ ] **Windows:** o Shell mostra um ☰ próprio na barra de título além do ☰ da página. Decidir se mantém os dois.
 
 - [ ] **Windows e Android — 13/10/2026:** testar no app o total da tela inicial, a tela "Atualizar Saldos"

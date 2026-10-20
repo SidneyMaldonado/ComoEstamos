@@ -7,7 +7,7 @@ Projeto `ComoEstamos.Test` (MSTest 4, paralelismo por método, configurado em `M
 | Pasta | O que testa |
 |---|---|
 | `RepositoryTests/` | Um arquivo `<Nome>RepositoryTests.cs` por repositório, mais `RepositoryBaseTests` e `UnitOfWorkTests` |
-| `UseCaseTests/` | Um arquivo `<Nome>UseCaseTests.cs` por caso de uso; os 5 do CRUD de uma entidade ficam juntos em `Crud<X>Tests.cs` (ver [07-Crud.md](07-Crud.md#testes-obrigatórios)) |
+| `UseCaseTests/` | Um arquivo `<Nome>UseCaseTests.cs` por caso de uso; os 5 do CRUD de uma entidade ficam juntos em `Crud<X>Tests.cs` (ver [07-Crud.md](07-Crud.md#testes-obrigatórios)); os de operação, em `OperacaoUseCaseTests.cs` |
 | `ServiceTests/` | `<X>ServiceTests.cs` (o service usa o usuário atual) e `UsuarioAtualTests` |
 | `ValidacaoTests/` | `ValidadorCampos` e `FormatoBr`, sem banco |
 

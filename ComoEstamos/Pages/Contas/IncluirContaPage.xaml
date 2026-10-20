@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
              x:Class="ComoEstamos.Pages.Contas.IncluirContaPage"
              Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource AzulFundo}">
@@ -34,7 +35,11 @@
                                Style="{StaticResource Campo}"
                                Placeholder="Ex.: 1.250,00"
                                Keyboard="Numeric"
-                               ReturnType="Done" />
+                               ReturnType="Done">
+                            <Entry.Behaviors>
+                                <controls:LimiteCasasDecimais />
+                            </Entry.Behaviors>
+                        </Entry>
                         <Label x:Name="ErroSaldo" Style="{StaticResource MensagemErro}" />
 
                     </VerticalStackLayout>

@@ -108,21 +108,26 @@ namespace ComoEstamos.Pages
         }
 
         /// <summary>
-        /// Pede a confirmação da exclusão. "Sim" exclui e volta para a lista; "Não" fica na página.
+        /// Pede a confirmação da exclusão. "Sim" exclui e volta para a lista (ou fica, com
+        /// <paramref name="voltar"/> = <c>false</c>); "Não" fica na página.
         /// Se a exclusão for recusada (ex.: há dependentes), mostra a mensagem e fica na página.
+        /// Devolve <c>true</c> se excluiu.
         /// </summary>
-        public static async Task ConfirmarEExcluirAsync(Page pagina, string titulo, string pergunta, Func<Task> excluir)
+        public static async Task<bool> ConfirmarEExcluirAsync(Page pagina, string titulo, string pergunta, Func<Task> excluir, bool voltar = true)
         {
             if (!await pagina.DisplayAlertAsync(titulo, pergunta, "Sim", "Não"))
-                return;
+                return false;
             try
             {
                 await excluir();
-                await VoltarAsync();
+                if (voltar)
+                    await VoltarAsync();
+                return true;
             }
             catch (Exception ex)
             {
                 await pagina.DisplayAlertAsync("Não foi possível excluir", ex.Message, "OK");
+                return false;
             }
         }
 

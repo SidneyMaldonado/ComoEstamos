@@ -36,6 +36,7 @@ namespace ComoEstamos
             Routing.RegisterRoute(IncluirInvestimentoPage.Rota, typeof(IncluirInvestimentoPage));
             Routing.RegisterRoute(AlterarInvestimentoPage.Rota, typeof(AlterarInvestimentoPage));
             Routing.RegisterRoute(VisualizarInvestimentoPage.Rota, typeof(VisualizarInvestimentoPage));
+            Routing.RegisterRoute(IncluirOperacaoPage.Rota, typeof(IncluirOperacaoPage));
 
             Routing.RegisterRoute(IncluirDividaPage.Rota, typeof(IncluirDividaPage));
             Routing.RegisterRoute(AlterarDividaPage.Rota, typeof(AlterarDividaPage));

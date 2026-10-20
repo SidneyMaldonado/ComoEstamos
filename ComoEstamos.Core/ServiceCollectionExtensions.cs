@@ -1,5 +1,4 @@
 using ComoEstamos.Core.Services;
-using ComoEstamos.Core.UseCases;
 using ComoEstamos.Core.UseCases.Backup;
 using ComoEstamos.Core.UseCases.Carteiras;
 using ComoEstamos.Core.UseCases.Categorias;
@@ -7,6 +6,7 @@ using ComoEstamos.Core.UseCases.Contas;
 using ComoEstamos.Core.UseCases.Credores;
 using ComoEstamos.Core.UseCases.Dividas;
 using ComoEstamos.Core.UseCases.Investimentos;
+using ComoEstamos.Core.UseCases.Operacoes;
 using ComoEstamos.Core.UseCases.Parcelas;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,8 +17,6 @@ namespace ComoEstamos.Core
         /// <summary>Registra os casos de uso, os services e o usuário atual. Requer <c>AddComoEstamosData</c>.</summary>
         public static IServiceCollection AddComoEstamosCore(this IServiceCollection services)
         {
-            services.AddSingleton<IRegistrarOperacaoUseCase, RegistrarOperacaoUseCase>();
-
             services.AddSingleton<IUsuarioAtual, UsuarioAtual>();
 
             // CRUDs: os 5 casos de uso e o service de cada entidade (Spec/07-Crud.md).
@@ -57,6 +55,12 @@ namespace ComoEstamos.Core
             services.AddSingleton<IAlterarInvestimentoUseCase, AlterarInvestimentoUseCase>();
             services.AddSingleton<IExcluirInvestimentoUseCase, ExcluirInvestimentoUseCase>();
             services.AddSingleton<IInvestimentoService, InvestimentoService>();
+
+            // Operações (compra e venda) de investimento: fora do CRUD padrão.
+            services.AddSingleton<IBuscarUltimasOperacoesUseCase, BuscarUltimasOperacoesUseCase>();
+            services.AddSingleton<IRegistrarOperacaoUseCase, RegistrarOperacaoUseCase>();
+            services.AddSingleton<IExcluirOperacaoUseCase, ExcluirOperacaoUseCase>();
+            services.AddSingleton<IOperacaoService, OperacaoService>();
 
             // Dívidas: fora do CRUD padrão (Spec/07-Crud.md, "Entidades fora do CRUD padrão").
             services.AddSingleton<IBuscarDividasUseCase, BuscarDividasUseCase>();

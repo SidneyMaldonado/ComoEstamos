@@ -61,6 +61,7 @@ namespace ComoEstamos
             builder.Services.AddTransient<VisualizarInvestimentoPage>();
             builder.Services.AddTransient<IncluirInvestimentoPage>();
             builder.Services.AddTransient<AlterarInvestimentoPage>();
+            builder.Services.AddTransient<IncluirOperacaoPage>();
 
             // Dívidas: listar (consulta com filtros), visualizar, incluir e alterar; excluir é pela visualizar.
             builder.Services.AddTransient<ResumoMesPage>();
