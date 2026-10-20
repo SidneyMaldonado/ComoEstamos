@@ -71,6 +71,10 @@ A estrutura completa (camadas, casos de uso, validação, fluxo entre as 4 pági
   número é conferido pela página; o domínio (tamanho, faixa, casas, nome repetido...), pelo caso de uso.
 - Valores em dinheiro são exibidos com `FormatoBr.Moeda` (`R$ 1.250,50`), negativos em vermelho claro.
   Na digitação, aceitam o formato brasileiro (`1.250,50`) e o ponto decimal de teclados numéricos (`1250.5`).
+  Os campos em dinheiro (Saldo, Valor da dívida, receita e parcela, Valor Total da operação e os saldos do
+  Atualizar Saldos) **não deixam digitar a 3ª casa decimal** (`Controls/LimiteCasasDecimais`, decisão de 20/10/2026): a
+  tecla é desfeita. A leitura é a do `FormatoBr`, então `1.250` continua sendo mil. Quantidade e Cotação continuam com
+  até 6 casas.
 
 ### Regras do formulário
 
@@ -129,6 +133,33 @@ Lista: nome, carteira (abaixo, em letra menor) e valor (quantidade × cotação)
 | `nr_quantidade` | Quantidade | Obrigatória, até 6 casas, de 0 a 999.999.999.999,999999 |
 | `vl_cotacao` | Cotação (R$) | Obrigatória, até 6 casas, de 0 a 999.999.999.999,999999 |
 | `ds_observacao` | Observação | Opcional (`Editor`), até 500 caracteres; vazio grava `null` |
+
+## Operações
+
+Compra e venda de investimento (decisão de 20/10/2026), com o `IOperacaoService`. Não há lista nem Visualizar próprias:
+as operações aparecem na **Visualizar Investimento**, abaixo do cartão, na seção "Últimas Operações": as **10 mais
+recentes** (`TabelaRegistros` com `RolaSozinha="False"`, dentro da rolagem da página). Cada linha: "Compra de 10" (ou
+"Venda de 10"), a data e hora abaixo, e o valor total à direita; vazia, "Nenhuma operação.". Regras em
+[03-UseCases.md](03-UseCases.md#operações-usecasesoperacoes).
+
+- **+** da seção (círculo menor, como em Parcelas): abre a **Incluir Operação**.
+- **Tocar numa operação**: não há alteração; vai direto para a exclusão. "Confirma a exclusão da compra de 10 em
+  20/10/2026 14:35 (R$ 325,00)? A quantidade do investimento passa de 100 para 90." (Sim/Não). Sim exclui, **fica** na
+  Visualizar Investimento e recarrega (quantidade e lista). Exclusão recusada (quantidade ficaria negativa) mostra a
+  mensagem num alerta.
+
+**Incluir** (`IncluirOperacaoPage`, em `Pages/Investimentos/`, rota `incluir-operacao?id=`, com o Id do
+**investimento**). Título "Fazer Operação". Acima, o aviso "Operação de \"PETR4\", com 100 hoje. A compra soma na
+quantidade e a venda subtrai; a cotação não muda.".
+
+| Campo | Título | Regra |
+|---|---|---|
+| `dm_compra` | Operação | `Picker` Compra/Venda; começa em Compra |
+| `dt_operacao` | Data e Hora | `DatePicker` (máximo hoje) e `TimePicker` (`HH:mm`, estilo `CampoHora`), começam em agora; data e hora não podem ser futuras |
+| `nr_quantidade` | Quantidade | Obrigatória, até 6 casas, maior que zero; na venda, até a quantidade disponível |
+| `vl_operacao` | Valor Total (R$) | Obrigatório, até 2 casas, de 0 a 99.999.999,99. É o **total** da operação, não o preço unitário |
+
+Salvar grava pelo `RegistrarOperacaoUseCase` e volta; a Visualizar Investimento recarrega com a quantidade nova.
 
 ## Dívidas
 

@@ -18,13 +18,14 @@ namespace ComoEstamos
             WindowCompat.SetDecorFitsSystemWindows(Window, false);
 
 #pragma warning disable CA1422
-            // Torna a status bar transparente para o conteúdo aparecer atrás
+            // Pinta a status bar de azul escuro (no Android 15+ o sistema ignora esta cor; ver Spec/06-Pendencias.md)
             Window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#1A2E6E"));
 #pragma warning restore CA1422
 
             // Ícones da status bar em branco (para fundo escuro)
             var controller = WindowCompat.GetInsetsController(Window, Window.DecorView);
-            controller.AppearanceLightStatusBars = false;
+            if (controller is not null)
+                controller.AppearanceLightStatusBars = false;
         }
     }
 }

@@ -65,6 +65,30 @@ namespace ComoEstamos.Test.ValidacaoTests
         }
 
         [TestMethod]
+        [DataRow("1,005", DisplayName = "3 casas com vírgula")]
+        [DataRow("1,000", DisplayName = "Zeros contam como casa digitada")]
+        [DataRow("0.125", DisplayName = "Ponto decimal com 3 casas")]
+        [DataRow("1.2555", DisplayName = "Ponto decimal com 4 casas")]
+        [DataRow("1.250,005", DisplayName = "Milhar e 3 casas")]
+        public void PassaDasCasas_RecusaMaisDeDuasCasas(string texto)
+        {
+            Assert.IsTrue(FormatoBr.PassaDasCasas(texto, 2));
+        }
+
+        [TestMethod]
+        [DataRow("", DisplayName = "Vazio")]
+        [DataRow("-", DisplayName = "Só o sinal")]
+        [DataRow("1,", DisplayName = "Vírgula sem casas ainda")]
+        [DataRow("1,5", DisplayName = "1 casa")]
+        [DataRow("1.250,50", DisplayName = "Formato brasileiro")]
+        [DataRow("1.250", DisplayName = "Ponto de milhar no meio da digitação")]
+        [DataRow("1250.5", DisplayName = "Ponto decimal com 1 casa")]
+        public void PassaDasCasas_AceitaAteDuasCasasETextoIncompleto(string texto)
+        {
+            Assert.IsFalse(FormatoBr.PassaDasCasas(texto, 2));
+        }
+
+        [TestMethod]
         public void DataHora_FormataOuMostraTracoQuandoNula()
         {
             Assert.AreEqual("07/10/2026 14:30", FormatoBr.DataHora(new DateTime(2026, 10, 7, 14, 30, 0)));

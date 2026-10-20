@@ -200,21 +200,46 @@ a data do pagamento não pode ser futura (`ValidacaoException`, campo `DataPagam
 **O saldo da conta não muda** (decisão de 14/10/2026; até então, a dívida debitava e a receita creditava a conta).
 O saldo é atualizado pelo usuário em "Atualizar Saldos". Por isso o pagamento também não grava `tb_historico_saldo`.
 
-### RegistrarOperacaoUseCase
+### Operações (`UseCases/Operacoes/`)
+
+Decisão de 20/10/2026. Chamados pelo `IOperacaoService` (tela Visualizar Investimento e Incluir Operação, ver
+[05-Telas.md](05-Telas.md#operações)). A operação não tem `id_usuario`: o dono é conferido **pela carteira do
+investimento** (`InvestimentoValidador.ObterDoUsuarioAsync`). **Não há alteração** de operação: para corrigir, exclui e
+registra de novo. Testes em `UseCaseTests/OperacaoUseCaseTests.cs`.
+
+#### RegistrarOperacaoUseCase
 
 Registra a compra ou venda de um investimento e atualiza a quantidade em carteira.
+Assinatura: `ExecutarAsync(Operacao operacao, int idUsuario)`.
 
-**Repositórios:** Investimentos, Operacoes
+**Repositórios:** Carteiras (leitura) · Investimentos, Operacoes (escrita)
 
-**Validações:** `Quantidade` > 0; `ValorTotal` ≥ 0; o investimento deve existir
-(`KeyNotFoundException`) e estar ativo; na venda, `Quantidade` ≤ quantidade disponível.
+**Validações:** o investimento deve existir e ser do usuário (`KeyNotFoundException`) e estar ativo
+(`RegraDeNegocioException`). Por campo (`ValidacaoException`): `Quantidade` com até 6 casas, de 0,000001 a
+999.999.999.999,999999; `ValorTotal` com até 2 casas, de 0 a 99.999.999,99; `DataOperacao` (data **e hora**) não pode
+ser futura (comparada com `DateTime.Now`); na venda, `Quantidade` ≤ quantidade disponível; na compra, a quantidade
+resultante não pode passar do limite.
 
-**Efeito:** compra → `Investimento.Quantidade += Quantidade`; venda → `-=`. A operação é gravada.
-A cotação do investimento **não** é alterada.
+**Efeito:** compra → `Investimento.Quantidade += Quantidade`; venda → `-=`. Grava uma operação nova só com os campos
+do formulário (nasce ativa). A cotação do investimento **não** é alterada.
 
 `Operacao.ValorTotal` é o **valor total** da operação (quantidade × preço unitário), não o
 preço unitário. Quando for preciso o preço unitário (preço médio, rentabilidade), calcule
 `ValorTotal / Quantidade`.
+
+#### ExcluirOperacaoUseCase
+
+Desativa a operação e **desfaz o efeito** dela na quantidade do investimento: compra excluída → `-= Quantidade`; venda
+excluída → `+= Quantidade`. Inexistente ou de outro usuário → `KeyNotFoundException`; operação já excluída ou investimento
+excluído → `RegraDeNegocioException`. Recusa (`RegraDeNegocioException`) se a quantidade ficasse negativa (ex.: compra
+de 50 seguida de venda de 120, numa posição de 100) ou passasse do limite.
+
+#### BuscarUltimasOperacoesUseCase
+
+`ExecutarAsync(int idInvestimento, int quantidade, int idUsuario)`: as `quantidade` operações **ativas** mais recentes,
+por `DataOperacao` decrescente (no empate, a de maior Id primeiro), pelo
+`IOperacaoRepository.ListarUltimasPorInvestimentoAsync`. Lista vazia se o investimento não existe, é de outro usuário
+ou está inativo.
 
 ### AtualizarSaldosUseCase
 
@@ -299,4 +324,3 @@ Operações já identificadas que envolvem mais de um repositório. Especifique 
 | `EstornarPagamentoParcelaUseCase` | Parcelas, Dividas | Precisa de um método no repositório para limpar `DataPagamento`; o saldo não muda (como no `PagarParcela`) |
 | `TransferirEntreContasUseCase` | Contas | Uma só tabela, mas duas contas precisam mudar juntas |
 | `RegistrarHistoricoUseCase` | Investimentos, Historicos | Retrato da carteira inteira ou de um investimento; periodicidade (manual ou mensal) |
-| `DesativarOperacaoUseCase` | Operacoes, Investimentos | Reverter a quantidade do investimento; impedir se a quantidade ficar negativa |

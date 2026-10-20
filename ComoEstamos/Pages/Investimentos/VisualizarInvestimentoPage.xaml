@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
              x:Class="ComoEstamos.Pages.Investimentos.VisualizarInvestimentoPage"
              Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource AzulFundo}">
@@ -67,6 +68,29 @@
 
                     </VerticalStackLayout>
                 </Border>
+
+                <!-- Título da seção e, à direita, o + que registra uma operação (círculo menor que o do topo) -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Últimas Operações" Style="{StaticResource TituloSecao}" VerticalOptions="Center" />
+                    <Border Grid.Column="1"
+                            Style="{StaticResource BotaoCirculo}"
+                            WidthRequest="34"
+                            HeightRequest="34"
+                            SemanticProperties.Description="Fazer uma operação">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="IncluirOperacao_Tapped" />
+                        </Border.GestureRecognizers>
+                        <Label Style="{StaticResource SinalMais}" FontSize="22" Margin="0,-2,0,0" />
+                    </Border>
+                </Grid>
+
+                <!-- No máximo 10 linhas: cresce dentro da rolagem da página. Tocar numa linha pede a exclusão. -->
+                <controls:TabelaRegistros x:Name="TabelaOperacoes"
+                                       TituloTexto="Operação"
+                                       TituloValor="Valor Total"
+                                       MensagemVazia="Nenhuma operação."
+                                       RolaSozinha="False"
+                                       LinhaTocada="TabelaOperacoes_LinhaTocada" />
 
                 <Button Text="Voltar"
                         Style="{StaticResource BotaoSecundario}"

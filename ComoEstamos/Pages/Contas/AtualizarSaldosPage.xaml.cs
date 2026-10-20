@@ -1,3 +1,4 @@
+using ComoEstamos.Controls;
 using ComoEstamos.Core.Formatacao;
 using ComoEstamos.Core.Services;
 using ComoEstamos.Core.UseCases.Contas;
@@ -56,6 +57,7 @@ namespace ComoEstamos.Pages.Contas
                 HorizontalTextAlignment = TextAlignment.End,
                 WidthRequest = 160,
             };
+            campo.Behaviors.Add(new LimiteCasasDecimais());
             var erro = new Label { Style = (Style)Application.Current.Resources["MensagemErro"] };
 
             var grade = new Grid { ColumnDefinitions = [new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto)], ColumnSpacing = 12 };

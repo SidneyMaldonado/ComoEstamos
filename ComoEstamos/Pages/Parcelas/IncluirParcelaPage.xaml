@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ComoEstamos.Controls"
              x:Class="ComoEstamos.Pages.Parcelas.IncluirParcelaPage"
              Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource AzulFundo}">
@@ -30,7 +31,11 @@
                                Style="{StaticResource Campo}"
                                Placeholder="Ex.: 300,00"
                                Keyboard="Numeric"
-                               ReturnType="Next" />
+                               ReturnType="Next">
+                            <Entry.Behaviors>
+                                <controls:LimiteCasasDecimais />
+                            </Entry.Behaviors>
+                        </Entry>
                         <Label x:Name="ErroValor" Style="{StaticResource MensagemErro}" />
 
                         <Label Text="Vencimento" Style="{StaticResource TituloCampoSeguinte}" />
