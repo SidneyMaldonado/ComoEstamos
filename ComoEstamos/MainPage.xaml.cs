@@ -66,8 +66,6 @@ namespace ComoEstamos
 
         private async void ArrastarParaCima_Swiped(object? sender, SwipedEventArgs e) => await AbrirResumoAsync();
 
-        private async void Resumo_Tapped(object? sender, TappedEventArgs e) => await AbrirResumoAsync();
-
         /// <summary>Abre os investimentos como o item "Investimentos" do menu.</summary>
         private async void ArrastarParaBaixo_Swiped(object? sender, SwipedEventArgs e) =>
             await Shell.Current.GoToAsync("//investimentos");

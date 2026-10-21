@@ -12,7 +12,7 @@
                HorizontalOptions="Fill"
                VerticalOptions="Fill" />
 
-        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto"
+        <Grid RowDefinitions="Auto,Auto,*,Auto"
               Padding="20,50,20,20"
               RowSpacing="16">
 
@@ -56,19 +56,6 @@
                     Text="Atualizar Saldos"
                     Style="{StaticResource BotaoPrincipal}"
                     Clicked="AtualizarSaldos_Clicked" />
-
-            <!-- Dica do atalho; tocar também abre o resumo (no Windows, o arrasto com o mouse não dispara o gesto). -->
-            <Label Grid.Row="4"
-                   Text="︿  Arraste para cima para ver o resumo do mês"
-                   FontSize="12"
-                   TextColor="{StaticResource Dourado}"
-                   Opacity="0.8"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,-8,0,0">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="Resumo_Tapped" />
-                </Label.GestureRecognizers>
-            </Label>
         </Grid>
     </Grid>
 
