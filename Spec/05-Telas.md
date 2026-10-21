@@ -4,11 +4,12 @@
 
 | Onde | O quê |
 |---|---|
-| `MainPage.xaml` | Tela inicial: título, tabela de contas com saldo e total no rodapé, botão "Atualizar Saldos" e o atalho para as dívidas (abaixo) |
+| `MainPage.xaml` | Tela inicial: título, tabela de contas com saldo e total no rodapé, botão "Atualizar Saldos" e os atalhos de arrastar para o resumo do mês e os investimentos |
 | `Compartilhamento/ImagemSaldos.cs` | PNG da tabela de saldos compartilhada pela tela inicial (SkiaSharp) |
 | `Pages/<Entidades>/` | As 4 páginas do CRUD de cada entidade (`ListarContasPage`, `VisualizarContaPage`, `IncluirContaPage`, `AlterarContaPage`). Ver [07-Crud.md](07-Crud.md) |
 | `Pages/Formulario.cs` | Passos repetidos das páginas: ler o Id da rota, ler números, mostrar erros nos campos, salvar, excluir, voltar |
 | `Controls/TabelaRegistros` | Tabela das listas: coluna de texto (com detalhe opcional), coluna de valor opcional e rodapé de total opcional (`Total`; nulo esconde). `RolaSozinha` (padrão `true`): as linhas rolam dentro da tabela; `false`: a tabela cresce com as linhas (pilha com `BindableLayout`), para ficar numa `ScrollView` da página. `Montar(..., apagado:)` deixa o valor da linha num tom mais fraco |
+| `Controls/RolagemComAtalhos` | `ScrollView` que avisa quando o dedo arrasta para cima com a rolagem já no fim (`ArrastouParaCimaNoFim`) ou para baixo com ela no topo (`ArrastouParaBaixoNoInicio`), mesmo em cima das linhas. Vale a posição da rolagem no começo do arrasto (o arrasto que rola até o fim não navega); mínimo de 60 dp, quase na vertical. Só no Android (`Platforms/Android/RolagemComAtalhosHandler`, registrado em `MauiProgram`, olha o toque em `DispatchTouchEvent` antes das linhas); nas outras plataformas é uma `ScrollView` comum |
 | `Resources/Styles/Styles.xaml` | Estilos com chave usados pelas páginas (ver "Visual") |
 | `Resources/Styles/Colors.xaml` | Paleta do app |
 
@@ -38,15 +39,15 @@ só o `UsuarioAtual` muda.
 
 - **Atalho da tela inicial para o resumo do mês** (até 14/10/2026 abria as dívidas): arrastar o dedo para cima na
   MainPage (`SwipeGestureRecognizer` `Up` no conteúdo) abre `//resumo`, como o item do menu. As linhas da tabela de
-  saldos continuam rolando: o gesto vale fora delas (título, espaço abaixo da tabela, botão). A dica "︿ Arraste
-  para cima para ver o resumo do mês", abaixo do botão "Atualizar Saldos", também abre o resumo ao ser tocada (no
-  Windows, o arrasto com o mouse não dispara o gesto).
+  saldos continuam rolando: o gesto vale fora delas (título, espaço abaixo da tabela, botão). Sem dica na tela
+  (retirada em 21/10/2026; no Windows, onde o arrasto com o mouse não dispara o gesto, o resumo fica no menu).
 - **Do resumo para as dívidas**: arrastar o dedo para cima na `ResumoMesPage` abre `//dividas`. A rolagem das
-  tabelas consome o arrasto, então o gesto vale no título e na linha do mês; no fim da rolagem, a dica "︿ Arraste
-  para cima para ver as dívidas" também abre as dívidas ao ser tocada.
+  tabelas consome o arrasto do `SwipeGestureRecognizer`, que só vale no título e na linha do mês; em cima das
+  tabelas, a rolagem é uma `RolagemComAtalhos` (21/10/2026): no Android, arrastar para cima com ela já no fim abre
+  as dívidas. Sem dica na tela (retirada em 21/10/2026; no Windows, as dívidas ficam no menu).
 - **Volta, na mesma ordem** (Dívidas ↓ Resumo ↓ Início): arrastar o dedo para baixo na `ListarDividasPage` abre
-  `//resumo` (vale fora das linhas da tabela e do campo de busca); na `ResumoMesPage`, abre `//MainPage` (no título e
-  na linha do mês). Sem dica na tela.
+  `//resumo` (vale fora das linhas da tabela e do campo de busca); na `ResumoMesPage`, abre `//MainPage` (no título,
+  na linha do mês e, no Android, em cima das tabelas com a rolagem no topo). Sem dica na tela.
 - **Das dívidas para as receitas** (14/10/2026): arrastar o dedo para cima na `ListarDividasPage` abre `//receitas`;
   na `ListarReceitasPage`, arrastar para baixo volta para `//dividas`. Valem fora das linhas da tabela e do campo de
   busca. Sem dica na tela (no Windows, as receitas ficam no menu). Ordem completa: Início ↑ Resumo ↑ Dívidas ↑ Receitas.
@@ -278,10 +279,11 @@ A parcela não tem campo de categoria: a dela é sempre a da dívida.
 `resumo_icon.svg`, e o atalho da tela inicial). Versão no app da planilha "Como Estamos": o que vence no mês, as
 receitas e a diferença. Usa o `IDividaService.BuscarResumoMesAsync` ([03-UseCases.md](03-UseCases.md#buscarresumomesusecase)).
 
-- Atalhos: para cima abre as dívidas, para baixo volta para a tela inicial (ver "Navegação"); dica no fim da rolagem.
+- Atalhos: para cima abre as dívidas, para baixo volta para a tela inicial (ver "Navegação"); valem também em cima das tabelas
+  no Android, com a rolagem no fim (para cima) ou no topo (para baixo). Sem dica na tela.
 - Topo: ☰ e "Resumo do Mês". Abaixo, o mês: `‹ Outubro/2026 ›`. Começa no mês atual; as setas andam um mês; tocar no
   texto volta para o mês atual. O mês continua ao voltar para a página. Recarrega em `OnAppearing`.
-- Uma `ScrollView` com três `TabelaRegistros` (`RolaSozinha="False"`), todas com o nome do mês no título da coluna
+- Uma `RolagemComAtalhos` com três `TabelaRegistros` (`RolaSozinha="False"`), todas com o nome do mês no título da coluna
   de valor (como a planilha):
   - **Dívidas**: uma linha por dívida (`EhDivida = true`) com parcela vencendo no mês, com o nome e, abaixo,
     "Paga em 05/10", "Vencida em 10/10" ou "Vence em 10/10"; à direita, a soma das parcelas do mês. O valor das

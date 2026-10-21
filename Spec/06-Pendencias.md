@@ -78,11 +78,11 @@ Hoje o banco fica em `FileSystem.AppDataDirectory`, que o sistema preserva nas a
   Incluir (Pickers, `DatePicker` preenchendo o dia, erros de formato e de domínio, parcelas geradas), a Alterar
   (sem e com parcelas pagas: aviso, primeiro vencimento bloqueado, erros de valor e de número de parcelas) e a
   exclusão (Sim e Não, mensagem extra quando há parcela paga). Na tela inicial, o atalho para as dívidas: arrastar
-  para cima (Android: em cima da tabela, fora dela e com muitas contas) e tocar na dica; e a volta, arrastando para
+  para cima (Android: em cima da tabela, fora dela e com muitas contas); e a volta, arrastando para
   baixo na lista de dívidas.
 - [ ] **Windows e Android — Resumo do Mês (14/10/2026):** testar no app o item do menu e o atalho da tela inicial
-  (arrastar para cima e tocar na dica, agora para o resumo), do resumo para as dívidas (arrastar no título e na linha
-  do mês, e tocar na dica no fim da rolagem), a volta na mesma ordem (dívidas → resumo → início), as setas e o toque no mês,
+  (arrastar para cima, agora para o resumo), do resumo para as dívidas (arrastar no título e na linha
+  do mês), a volta na mesma ordem (dívidas → resumo → início), as setas e o toque no mês,
   a ida para os investimentos (arrastar para baixo na tela inicial) e a volta (arrastar para cima nos investimentos),
   a rolagem das três tabelas juntas (`RolaSozinha="False"`, em tela pequena e com muitas dívidas), o tom das pagas, os
   textos Paga/Vencida/Vence, a Diferença negativa em vermelho e o toque na linha abrindo a dívida. Conferir também
@@ -108,6 +108,11 @@ Hoje o banco fica em `FileSystem.AppDataDirectory`, que o sistema preserva nas a
   `RemoverCategoriaParcela` e `RemoverUsuarioDivida`) e conferir que as dívidas, as receitas e as parcelas continuam
   na lista, no Resumo do Mês e na Visualizar; incluir e alterar dívida e parcela; restaurar um backup anterior a
   essas migrations.
+- [ ] **Android — arrastar sobre as tabelas do Resumo do Mês (21/10/2026):** só build. Conferir no aparelho a
+  `RolagemComAtalhos`: com poucas dívidas (sem rolagem), arrastar para cima em cima das tabelas abre as dívidas e
+  para baixo volta ao início; com muitas, o arrasto rola normalmente e só abre as dívidas quando já começa no fim
+  (e o início, quando começa no topo); o toque na linha continua abrindo a dívida ou a receita; um arrasto na
+  horizontal ou curto não navega. Conferir também que a tela inicial e o resumo ficaram sem as dicas.
 - [ ] **Android:** aviso `CS8602` em `Platforms/Android/MainActivity.cs` (linha 27), anterior a 13/10/2026.
 
 ## Limpeza

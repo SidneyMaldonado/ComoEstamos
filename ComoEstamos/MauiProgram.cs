@@ -1,3 +1,4 @@
+using ComoEstamos.Controls;
 using ComoEstamos.Core;
 using ComoEstamos.Data;
 using ComoEstamos.Pages.Carteiras;
@@ -27,6 +28,13 @@ namespace ComoEstamos
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                })
+                .ConfigureMauiHandlers(handlers =>
+                {
+#if ANDROID
+                    // Rolagem que vira atalho ao arrastar além do fim ou do topo (ver Controls/RolagemComAtalhos)
+                    handlers.AddHandler<RolagemComAtalhos, RolagemComAtalhosHandler>();
+#endif
                 });
 
             var caminhoBanco = Path.Combine(FileSystem.AppDataDirectory, "comoestamos.db3");

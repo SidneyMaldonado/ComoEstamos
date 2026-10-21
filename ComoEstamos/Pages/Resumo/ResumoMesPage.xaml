@@ -15,7 +15,7 @@
         <Grid RowDefinitions="Auto,Auto,Auto,*" Style="{StaticResource Conteudo}">
 
             <!-- Atalhos (Início ↑ Resumo ↑ Dívidas): para cima abre as dívidas; para baixo volta para a tela inicial.
-                 Dentro da rolagem das tabelas o arrasto rola a lista: os gestos valem no título e na linha do mês. -->
+                 Valem no título e na linha do mês; em cima das tabelas, quem avisa é a RolagemComAtalhos. -->
             <Grid.GestureRecognizers>
                 <SwipeGestureRecognizer Direction="Up" Swiped="ArrastarParaCima_Swiped" />
                 <SwipeGestureRecognizer Direction="Down" Swiped="ArrastarParaBaixo_Swiped" />
@@ -60,8 +60,11 @@
                         Clicked="ProximoMes_Clicked" />
             </Grid>
 
-            <!-- Uma rolagem só para as três tabelas: elas crescem com as linhas (RolaSozinha = False). -->
-            <ScrollView Grid.Row="3">
+            <!-- Uma rolagem só para as três tabelas: elas crescem com as linhas (RolaSozinha = False). No Android,
+                 arrastar para cima com a rolagem no fim abre as dívidas, e para baixo com ela no topo volta ao início. -->
+            <controls:RolagemComAtalhos Grid.Row="3"
+                                        ArrastouParaCimaNoFim="Rolagem_ArrastouParaCimaNoFim"
+                                        ArrastouParaBaixoNoInicio="Rolagem_ArrastouParaBaixoNoInicio">
                 <VerticalStackLayout Spacing="16">
 
                     <controls:TabelaRegistros x:Name="TabelaDespesas"
@@ -84,19 +87,8 @@
                                            TituloTotal="Diferença"
                                            RolaSozinha="False" />
 
-                    <!-- Dica do atalho; tocar também abre as dívidas (no Windows, o arrasto com o mouse não dispara o gesto). -->
-                    <Label Text="︿  Arraste para cima para ver as dívidas"
-                           FontSize="12"
-                           TextColor="{StaticResource Dourado}"
-                           Opacity="0.8"
-                           HorizontalTextAlignment="Center">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="Dividas_Tapped" />
-                        </Label.GestureRecognizers>
-                    </Label>
-
                 </VerticalStackLayout>
-            </ScrollView>
+            </controls:RolagemComAtalhos>
         </Grid>
     </Grid>
 

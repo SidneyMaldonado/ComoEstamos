@@ -108,13 +108,16 @@ namespace ComoEstamos.Pages.Resumo
 
         private async void ArrastarParaCima_Swiped(object? sender, SwipedEventArgs e) => await AbrirDividasAsync();
 
-        private async void Dividas_Tapped(object? sender, TappedEventArgs e) => await AbrirDividasAsync();
+        private async void Rolagem_ArrastouParaCimaNoFim(object? sender, EventArgs e) => await AbrirDividasAsync();
 
         /// <summary>Abre a lista de dívidas como o item "Dívidas" do menu (rota absoluta do Shell).</summary>
         private static Task AbrirDividasAsync() => Shell.Current.GoToAsync("//dividas");
 
+        private async void ArrastarParaBaixo_Swiped(object? sender, SwipedEventArgs e) => await VoltarAoInicioAsync();
+
+        private async void Rolagem_ArrastouParaBaixoNoInicio(object? sender, EventArgs e) => await VoltarAoInicioAsync();
+
         /// <summary>Volta para a tela inicial, como o item "Início" do menu.</summary>
-        private async void ArrastarParaBaixo_Swiped(object? sender, SwipedEventArgs e) =>
-            await Shell.Current.GoToAsync("//MainPage");
+        private static Task VoltarAoInicioAsync() => Shell.Current.GoToAsync("//MainPage");
     }
 }
